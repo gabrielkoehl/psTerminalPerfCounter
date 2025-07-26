@@ -6,7 +6,12 @@ A PowerShell module for creating and using predefined performance counter config
 
 Initiated from my role as SQL Server consultant since I always want to use what's available, namely PowerShell
 
-<img src="docs/src/logo.png" alt="Alt Text" style="width: 20%; display: block; margin: 0 auto;">
+<div align="center">
+<img src="docs/src/logo.png" alt="Alt Text" style="width: 30%;">
+
+[-- BLOG -- ](https://dbavonnebenan.de)
+</div>
+
 
 
 ## Documentation
