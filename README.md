@@ -20,7 +20,7 @@ Initiated from my role as SQL Server consultant since I always want to use what'
 - **[Get-tpcAvailableCounterConfig](docs/en-US/Get-tpcAvailableCounterConfig.md)** - List available configuration templates
 - **[Get-tpcPerformanceCounterInfo](docs/en-US/Get-tpcPerformanceCounterInfo.md)** - Get detailed information about performance counters
 - **[Counter Configuration Guide](docs/en-US/CounterConfiguration.md)** - Guide for creating and customizing JSON configurations
-- **[Development Status](docs/en-US/DevelopmentStatus.ms)** - Whats next?
+- **[Development Status](docs/en-US/DevelopmentStatus.md)** - Whats next?
 
 
 
