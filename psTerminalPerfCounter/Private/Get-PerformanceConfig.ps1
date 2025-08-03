@@ -1,25 +1,115 @@
 function Get-PerformanceConfig {
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'ConfigName')]
     [OutputType([hashtable])]
     param(
-        [Parameter(Mandatory=$true)]
-        [string]    $ConfigName,
-        [Parameter(Mandatory=$false)]
-        [array]     $ConfigPath = @($(Join-Path $PSScriptRoot "..\Config"))
+        [Parameter(ParameterSetName = 'ConfigName')]
+        [string] $ConfigName,
+
+        [Parameter(ParameterSetName = 'ConfigPath')]
+        [string] $ConfigPath
     )
 
     try {
 
-        $JsonConfig = Get-ConfigurationFromJson -ConfigName $ConfigName -ConfigPath $ConfigPath[0] # prepared for multiple paths in the future
-        $Counters   = New-PerformanceCountersFromJson -JsonConfig $JsonConfig
+        if ( $PSCmdlet.ParameterSetName -eq 'ConfigPath' ) {
+            if ( [string]::IsNullOrWhiteSpace($ConfigPath) ) {
+                throw "ConfigPath parameter cannot be null or empty"
+            }
+            # Direct path mode - skip folder searching
+            $configContent = Get-Content $ConfigPath -Raw
+
+            if ( -not [string]::IsNullOrWhiteSpace($configContent) ) {
+
+                try {
+                    $jsonContent = $configContent | ConvertFrom-Json
+                } catch {
+                    Write-Warning "Failed to parse JSON from configuration file: $ConfigPath"
+                    Return
+                }
+
+            } else {
+                Write-Warning "Configuration file is empty: $ConfigPath"
+                Return
+            }
+
+            $counters       = New-PerformanceCountersFromJson -JsonConfig $jsonContent
+
+            return @{
+                Name        = $jsonContent.name
+                Description = $jsonContent.description
+                Counters    = $counters
+                ConfigPath  = Split-Path $ConfigPath -Parent
+            }
+        }
+
+        # ConfigName mode - use default if not provided
+        if ( [string]::IsNullOrWhiteSpace($ConfigName) ) {
+            throw "ConfigName parameter cannot be null or empty"
+        }
+
+        $configPaths  = Get-tpcConfigPaths
+        $foundConfigs = @()
+
+        foreach ( $configPath in $configPaths ) {
+
+            $jsonFilePath = Join-Path $configPath "tpc_$ConfigName.json"
+
+            if ( Test-Path $jsonFilePath ) {
+                $foundConfigs += @{
+                    Path        = $jsonFilePath
+                    ConfigPath  = $configPath
+                }
+            }
+
+        }
+
+        if ( $foundConfigs.Count -eq 0 ) {
+            $searchedPaths = $configPaths | ForEach-Object { Join-Path $_ "tpc_$ConfigName.json" }
+            write-warning "Configuration file 'tpc_$ConfigName.json' not found in any of the following paths: $($searchedPaths -join ', ')"
+            Return
+        }
+
+        if ( $foundConfigs.Count -gt 1 ) {
+            $duplicatePaths = $foundConfigs | ForEach-Object { $_.Path }
+            Write-Warning "Configuration 'tpc_$ConfigName.json' was found in multiple locations: $($duplicatePaths -join ', '). Please resolve this by removing duplicates. Using the first found configuration: $($foundConfigs[0].Path)"
+            Return
+        }
+
+        $selectedConfig = $foundConfigs[0]
+        $configContent  = Get-Content $selectedConfig.Path -Raw
+
+        if ( -not [string]::IsNullOrWhiteSpace($configContent) ) {
+
+            try {
+                $jsonContent = $configContent | ConvertFrom-Json
+            } catch {
+                Write-Warning "Failed to parse JSON from configuration file: $($selectedConfig.Path)"
+                Return
+            }
+
+        } else {
+            Write-Warning "Configuration file is empty: $($selectedConfig.Path)"
+            Return
+        }
+
+        $counters       = New-PerformanceCountersFromJson -JsonConfig $jsonContent
+
         return @{
-            Name        = $JsonConfig.name
-            Description = $JsonConfig.description
-            Counters    = $Counters
+            Name        = $jsonContent.name
+            Description = $jsonContent.description
+            Counters    = $counters
+            ConfigPath  = $selectedConfig.ConfigPath
         }
 
     } catch {
-        throw "Error loading performance configuration '$ConfigName': $($_.Exception.Message)"
+
+        $errorMessage = if ($PSCmdlet.ParameterSetName -eq 'ConfigPath') {
+            "Error loading performance configuration from '$ConfigPath': $($_.Exception.Message)"
+        } else {
+            "Error loading performance configuration '$ConfigName': $($_.Exception.Message)"
+        }
+        throw $errorMessage
+
     }
 
 }

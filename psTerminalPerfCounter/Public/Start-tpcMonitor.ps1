@@ -16,6 +16,12 @@
         Name of the configuration template to load (without 'tpc_' prefix and '.json' extension).
         Must correspond to a JSON file in the config directory (e.g., 'CPU' loads 'tpc_CPU.json').
         Default: 'CPU'
+        Cannot be used together with ConfigPath parameter.
+
+    .PARAMETER ConfigPath
+        Absolute path to a specific JSON configuration file.
+        The file must follow the naming convention 'tpc_*.json' and exist at the specified location.
+        Cannot be used together with ConfigName parameter.
 
     .PARAMETER UpdateInterval
         Interval in seconds between performance counter updates and display refreshes.
@@ -31,6 +37,11 @@
         Start-tpcMonitor
 
         Starts monitoring using the default CPU configuration with 1-second updates and 100 data points.
+
+    .EXAMPLE
+        Start-tpcMonitor -ConfigPath "C:\MyConfigs\tpc_CustomCPU.json"
+
+        Starts monitoring using a custom configuration file from an absolute path.
 
     .EXAMPLE
         Start-tpcMonitor -ConfigName "Memory" -UpdateInterval 2
@@ -55,20 +66,48 @@
         Press Ctrl+C to stop monitoring and display session summary.
     #>
 
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'ConfigName')]
     param(
-        [string]    $ConfigName         = "CPU",
-        [int]       $UpdateInterval     = 1,
-        [int]       $MaxDataPoints      = 100
+        [Parameter(ParameterSetName = 'ConfigName')]
+        [string]    $ConfigName     = "CPU",
+
+        [Parameter(ParameterSetName = 'ConfigPath')]
+        [string]    $ConfigPath,
+
+        [int]       $UpdateInterval = 1,
+        [int]       $MaxDataPoints  = 100
     )
 
     try {
 
-        Write-Host "Loading configuration '$ConfigName'..." -ForegroundColor Yellow
-        $Config = Get-PerformanceConfig -ConfigName $ConfigName
+        # Validate ConfigPath if provided
+        if ( $PSCmdlet.ParameterSetName -eq 'ConfigPath' ) {
+
+            if ( -not (Test-Path $ConfigPath) ) {
+                Write-Warning "Configuration file not found: $ConfigPath"
+                Return
+            }
+
+            $fileName = Split-Path $ConfigPath -Leaf
+            if ( $fileName -notmatch '^tpc_.+\.json$' ) {
+                Write-Warning "Invalid configuration file name. File must follow the pattern 'tpc_*.json'. Found: $fileName"
+                Return
+            }
+
+            Write-Host "Loading configuration from '$ConfigPath'..." -ForegroundColor Yellow
+            $Config = Get-PerformanceConfig -ConfigPath $ConfigPath
+
+        } else {
+
+            Write-Host "Loading configuration '$ConfigName'..." -ForegroundColor Yellow
+            $Config = Get-PerformanceConfig -ConfigName $ConfigName
+
+        }
 
         if ( $Config.Counters.Count -eq 0 ) {
-            throw "No counters found in configuration '$ConfigName'"
+            $configInfo = if ( $PSCmdlet.ParameterSetName -eq 'ConfigPath' ) { $ConfigPath } else { $ConfigName }
+            Write-Warning "No counters found in configuration '$configInfo'"
+            return
         }
 
         Write-Host "Testing performance counters..." -ForegroundColor Yellow
@@ -103,8 +142,8 @@
         foreach ( $Counter in $AvailableCounters ) {
             Write-Host "    $($Counter.Title)$LangInfo" -ForegroundColor Green
         }
-        Write-Host ""
 
+        Write-Host ""
 
         # Start monitoring
         $MonitoringParams = @{
