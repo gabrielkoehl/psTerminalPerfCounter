@@ -3,10 +3,10 @@
     "description": "Disk I/O activity and queue monitoring",
     "counters": [
         {
-            "title": "Disk Read MB/sec",
-            "unit": "MB/sec",
+            "title": "Disk Read KB/sec",
+            "unit": "KB/sec",
             "conversionFactor": 1024,
-            "conversionExponent": 2,
+            "conversionExponent": 1,
             "type": "Number",
             "format": "both",
             "counterID": "234-220",
@@ -32,10 +32,10 @@
             }
         },
         {
-            "title": "Disk Write MB/sec",
-            "unit": "MB/sec",
+            "title": "Disk Write KB/sec",
+            "unit": "KB/sec",
             "conversionFactor": 1024,
-            "conversionExponent": 2,
+            "conversionExponent": 1,
             "type": "Number",
             "format": "both",
             "counterID": "234-222",
@@ -62,6 +62,8 @@
         {
             "title": "Disk Queue Length",
             "unit": "",
+            "conversionFactor": 1,
+            "conversionExponent": 1,
             "type": "Number",
             "format": "both",
             "counterID": "234-198",

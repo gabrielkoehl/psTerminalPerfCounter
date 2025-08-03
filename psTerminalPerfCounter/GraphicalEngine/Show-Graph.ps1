@@ -11,6 +11,20 @@
         [Hashtable] $ColorMap
     )
 
+    Function Format-YAxisValue {
+        param([int]$Value)
+
+        if ($Value -ge 1000000) {
+            return "{0:0.0}M" -f ($Value / 1000000)
+        }
+        elseif ($Value -ge 1000) {
+            return "{0:0.0}k" -f ($Value / 1000)
+        }
+        else {
+            return $Value.ToString()
+        }
+    }
+
     # graph boundary marks
     $TopLeft                = [char]9484 # ┌
     $BottomLeft             = [char]9492 # └
@@ -27,8 +41,15 @@
     $difference             = $EndofRange - $StartOfRange
     $NumOfRows              = $difference/($YAxisStep)
 
-    # Calculate label lengths
-    $LengthOfMaxYAxisLabel  = [Math]::Max(1, (($Datapoints | Measure-Object -Maximum).Maximum).tostring().length)
+    # Calculate maximum Y value width for formatting
+    $MaxYValueWidth = 1
+    for ($i = 1; $i -le $NumOfRows; $i++) {
+        $YValue = $StartOfRange + $i * $YAxisStep
+        $FormattedLength = (Format-YAxisValue -Value $YValue).Length
+        if ($FormattedLength -gt $MaxYValueWidth) {
+            $MaxYValueWidth = $FormattedLength
+        }
+    }
 
     # Cap number of rows to yAxisMaxRows for better readability
     if ( $NumOfRows -gt $yAxisMaxRows ) {
@@ -44,14 +65,14 @@
 
     # Preparing the step markings on the X-Axis (reversed for time series)
     $Increment  = $XAxisStep
-    $XAxisLabel = " " * ($LengthOfMaxYAxisLabel + 4)
-    $XAxis      = " " * ($LengthOfMaxYAxisLabel + 3) + [char]9492 # └
+    $XAxisText  = " " * ($MaxYValueWidth + 4)
+    $XAxis      = " " * ($MaxYValueWidth + 3) + [char]9492 # └
 
-    For ( $Label = 1; $Label -le $NumOfDatapoints; $Label++ ) {
+    For ( $Index = 1; $Index -le $NumOfDatapoints; $Index++ ) {
 
-        if ( [math]::floor($Label/$XAxisStep) ){
-            $TimeLabel      = $NumOfDatapoints - $Label + 1
-            $XAxisLabel    += $TimeLabel.tostring().PadLeft($Increment)
+        if ( [math]::floor($Index/$XAxisStep) ){
+            $TimeValue      = $NumOfDatapoints - $Index + 1
+            $XAxisText     += $TimeValue.tostring().PadLeft($Increment)
             $XAxis         += ([char]9516).ToString()
             $XAxisStep     += $Increment
         } else {
@@ -89,7 +110,8 @@
 
         }
 
-        $YAxisLabel = $StartOfRange + $i * $YAxisStep
+        $CurrentYValue = $StartOfRange + $i * $YAxisStep
+        $FormattedYValue = Format-YAxisValue -Value $CurrentYValue
 
         If( $ColorMap ) {
 
@@ -107,7 +129,7 @@
             }
 
             $Color = $Map.ForEach({
-                if( $YAxisLabel -ge $_.LowerBound -and $YAxisLabel -le $_.UpperBound ) {
+                if( $CurrentYValue -ge $_.LowerBound -and $CurrentYValue -le $_.UpperBound ) {
                     $_.Color
                 }
             })
@@ -118,7 +140,7 @@
                 $Color  = $Map[0].Color
             }
 
-            Write-Graph ' ' $YAxisLabel $Row $Color 'DarkYellow' $LengthOfMaxYAxisLabel
+            Write-Graph ' ' $FormattedYValue $Row $Color 'DarkYellow' $MaxYValueWidth
 
         } else {
             THROW "ColorMap is not defined. Please provide a valid ColorMap hashtable."
@@ -127,9 +149,9 @@
     }
 
     # draw bottom boundary
-    $XAxisLabel +=" "*([Math]::Max(0, $XAxis.Length-$XAxisLabel.Length)) # to match x-axis label length with x-axis length
+    $XAxisText +=" "*([Math]::Max(0, $XAxis.Length-$XAxisText.Length)) # to match x-axis label length with x-axis length
     Write-Host([String]::Concat($VerticalEdge,$XAxis,"  ",$VerticalEdge)) # Prints X-Axis horizontal line
-    Write-Host([string]::Concat($VerticalEdge,$XAxisLabel,"  ",$VerticalEdge)) # Prints X-Axis step labels
+    Write-Host([string]::Concat($VerticalEdge,$XAxisText,"  ",$VerticalEdge)) # Prints X-Axis step labels
 
     # bottom boundary
     Write-Host([string]::Concat($BottomLeft,$([string]$BottomEdge * $BottomBoundaryLength),$BottomRight))
