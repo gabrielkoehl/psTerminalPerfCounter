@@ -1,0 +1,42 @@
+[
+ {
+   "interval": 2,
+   "credential": "vaultname | null (ask user)",
+   "SRV-DB01": {
+     "comment": "Database Server - Production",
+     "counter": [
+       "238-6",
+       "4-24",
+       "234-220"
+     ]
+   },
+   "SRV-WEB02": {
+     "comment": "Web Server - Frontend",
+     "counter": [
+       "238-6",
+       "4-24",
+       "510-262"
+     ]
+   }
+ },
+ {
+   "interval": 60,
+   "credential": "Local-Admin",
+   "SRV-APP03": {
+     "comment": "Application Server - Backend",
+     "counter": [
+       "238-6",
+       "4-24",
+       "234-200"
+     ]
+   },
+   "SRV-FILE04": {
+     "comment": "File Server - Storage",
+     "counter": [
+       "234-26",
+       "510-262",
+       "2-44"
+     ]
+   }
+ }
+]

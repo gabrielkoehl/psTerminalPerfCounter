@@ -1,5 +1,5 @@
 {
- "Intervall": 30,
+ "Intervall": 1,
  "Computer": {
    "SRV-DB01": {
      "Processor(_Total)\\% Processor Time": {
