@@ -17,3 +17,8 @@ while ($true) {
 - Possibility for each server to have its own JSON config
 - Also work with configuration files again to quickly load specific server sets and configs, but also enable direct loading
 - In this context, also implement the output as JSON right away, depending on what PsWriteHTML requires
+
+
+# Challenges
+
+- all values from all counters need same timestamp
