@@ -1,23 +1,23 @@
 using namespace System.Collections.Generic
 
 class PerformanceCounter {
-    [string]    $counterID
-    [string]    $counterSetType
-    [string]    $counterInstance
-    [string]    $CounterPath
-    [string]    $Title
-    [string]    $Type
-    [string]    $Format
-    [int]       $conversionFactor
-    [int]       $conversionExponent
-    [string]    $Unit
-    [hashtable] $graphConfiguration
-    [List[int]] $HistoricalData
-    [hashtable] $ColorMap
-    [hashtable] $Statistics
-    [bool]      $IsAvailable
-    [string]    $LastError
-    [datetime]  $LastUpdate
+    [string]                $counterID
+    [string]                $counterSetType
+    [string]                $counterInstance
+    [string]                $CounterPath
+    [string]                $Title
+    [string]                $Type
+    [string]                $Format
+    [int]                   $conversionFactor
+    [int]                   $conversionExponent
+    [string]                $Unit
+    [hashtable]             $graphConfiguration
+    [List[PSCustomObject]]  $HistoricalData
+    [hashtable]             $ColorMap
+    [hashtable]             $Statistics
+    [bool]                  $IsAvailable
+    [string]                $LastError
+    [datetime]              $LastUpdate
 
 
     # Constructor
@@ -34,7 +34,7 @@ class PerformanceCounter {
         $this.conversionExponent    = $conversionExponent
         $this.ColorMap              = $this.SetColorMap($colorMap)
         $this.GraphConfiguration    = $this.SetGraphConfig($graphConfiguration)
-        $this.HistoricalData        = [List[int]]::new()
+        $this.HistoricalData        = [List[PSCustomObject]]::new()
         $this.Statistics            = @{}
         $this.IsAvailable           = $false
         $this.LastError             = ""
@@ -128,11 +128,16 @@ class PerformanceCounter {
 
     }
 
-    # Add new data point
+    # Add new data point with timestamp
     [void] AddDataPoint([int]$value, [int]$maxHistoryPoints) {
 
-        $this.HistoricalData.Add($value)
-        $this.LastUpdate = Get-Date
+        $dataPoint = [PSCustomObject]@{
+            Timestamp = Get-Date
+            Value = $value
+        }
+
+        $this.HistoricalData.Add($dataPoint)
+        $this.LastUpdate = $dataPoint.Timestamp
 
         # Limit historical data size, drop oldest point
         while ( $this.HistoricalData.Count -gt $maxHistoryPoints ) {
@@ -149,15 +154,15 @@ class PerformanceCounter {
 
         if ( $this.HistoricalData.Count -eq 0 ) { return }
 
-        $data = $this.HistoricalData.ToArray()
+        $values = $this.HistoricalData | ForEach-Object { $_.Value }
 
         $this.Statistics = @{
-            Current = $data[-1]
-            Minimum = ($data | Measure-Object -Minimum).Minimum
-            Maximum = ($data | Measure-Object -Maximum).Maximum
-            Average = [Math]::Round(($data | Measure-Object -Average).Average, 1)
-            Count   = $data.Count
-            Last5   = if ($data.Count -ge 5) { $data[-5..-1] } else { $data }
+            Current = $values[-1]
+            Minimum = ($values | Measure-Object -Minimum).Minimum
+            Maximum = ($values | Measure-Object -Maximum).Maximum
+            Average = [Math]::Round(($values | Measure-Object -Average).Average, 1)
+            Count   = $values.Count
+            Last5   = if ($values.Count -ge 5) { $values[-5..-1] } else { $values }
         }
 
     }
@@ -219,18 +224,26 @@ class PerformanceCounter {
         $dataCount = $this.HistoricalData.Count
         if ( $dataCount -eq 0 ) { return @() }
 
+        # Extract values from timestamped data points
+        $values = $this.HistoricalData | ForEach-Object { $_.Value }
+
         # Take the last sampleCount points
         if ( $dataCount -ge $sampleCount ) {
-            return $this.HistoricalData.GetRange($dataCount - $sampleCount, $sampleCount).ToArray()
+            return $values[-$sampleCount..-1]
 
         # Pad with zeros at the beginning
         } else {
             $padding = @(0) * ($sampleCount - $dataCount)
-            return $padding + $this.HistoricalData.ToArray()
+            return $padding + $values
         }
     }
 
-    # ToString override for debugging
+    # Get complete historical data with timestamps for external tools
+    [PSCustomObject[]] GetHistoricalDataWithTimestamps() {
+        return $this.HistoricalData.ToArray()
+    }
+
+    # ToString override for output
     [string] ToString() {
         return "PerformanceCounter: $($this.Title) - Available: $($this.IsAvailable) - Data Points: $($this.HistoricalData.Count)"
     }
