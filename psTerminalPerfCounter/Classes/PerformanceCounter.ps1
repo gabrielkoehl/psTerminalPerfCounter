@@ -129,13 +129,13 @@ class PerformanceCounter {
     }
 
     # Add new data point
-    [void] AddDataPoint([int]$value, [int]$maxDataPoints = 100) {
+    [void] AddDataPoint([int]$value, [int]$maxHistoryPoints) {
 
         $this.HistoricalData.Add($value)
         $this.LastUpdate = Get-Date
 
         # Limit historical data size, drop oldest point
-        while ( $this.HistoricalData.Count -gt $maxDataPoints ) {
+        while ( $this.HistoricalData.Count -gt $maxHistoryPoints ) {
             $this.HistoricalData.RemoveAt(0)
         }
 
@@ -213,19 +213,19 @@ class PerformanceCounter {
 
     }
 
-    # Get data for graphing (padded to target width)
-    [int[]] GetGraphData([int]$targetWidth) {
+    # Get data for graphing (padded to target sample count)
+    [int[]] GetGraphData([int]$sampleCount) {
 
         $dataCount = $this.HistoricalData.Count
         if ( $dataCount -eq 0 ) { return @() }
 
-        # Take the last targetWidth points
-        if ( $dataCount -ge $targetWidth ) {
-            return $this.HistoricalData.GetRange($dataCount - $targetWidth, $targetWidth).ToArray()
+        # Take the last sampleCount points
+        if ( $dataCount -ge $sampleCount ) {
+            return $this.HistoricalData.GetRange($dataCount - $sampleCount, $sampleCount).ToArray()
 
         # Pad with zeros at the beginning
         } else {
-            $padding = @(0) * ($targetWidth - $dataCount)
+            $padding = @(0) * ($sampleCount - $dataCount)
             return $padding + $this.HistoricalData.ToArray()
         }
     }

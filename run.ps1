@@ -10,6 +10,8 @@ Get-tpcConfigPaths
 # start-tpcMonitor -configpath "C:\test1\tpc_asdfvsdaf.json"
 Get-tpcAvailableCounterConfig
 
+Remove-tpcConfigPath
+
 # start-tpcMonitor
 
 

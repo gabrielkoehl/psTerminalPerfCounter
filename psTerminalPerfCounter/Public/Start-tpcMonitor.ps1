@@ -26,17 +26,20 @@
     .PARAMETER UpdateInterval
         Interval in seconds between performance counter updates and display refreshes.
         Lower values provide more responsive monitoring but increase system load.
+        Graph time span = Samples (from JSON config) × UpdateInterval seconds.
         Default: 1 second
 
-    .PARAMETER MaxDataPoints
-        Maximum number of data points to retain in memory for each counter.
-        Affects currently only statistical calculations.
-        Default: 100 data points
+    .PARAMETER MaxHistoryPoints
+        Maximum number of historical data points to retain in memory for each counter.
+        This is the complete historical data used for statistics and future export.
+        Independent of graph display width. Time span covered by graph display = Samples × UpdateInterval seconds.
+        Default: 100 historical data points
 
     .EXAMPLE
         Start-tpcMonitor
 
-        Starts monitoring using the default CPU configuration with 1-second updates and 100 data points.
+        Starts monitoring using the default CPU configuration with 1-second updates and 100 historical data points.
+        Graph displays 70 samples covering 70 seconds (70 samples × 1 second interval).
 
     .EXAMPLE
         Start-tpcMonitor -ConfigPath "C:\MyConfigs\tpc_CustomCPU.json"
@@ -49,7 +52,7 @@
         Starts memory monitoring with 2-second update intervals using the 'tpc_Memory.json' configuration.
 
     .EXAMPLE
-        Start-tpcMonitor -ConfigName "Disk" -UpdateInterval 1 -MaxDataPoints 200
+        Start-tpcMonitor -ConfigName "Disk" -UpdateInterval 1 -MaxHistoryPoints 200
 
         Starts disk monitoring with 1-second updates and extended data retention of 200 points.
 
@@ -75,7 +78,7 @@
         [string]    $ConfigPath,
 
         [int]       $UpdateInterval = 1,
-        [int]       $MaxDataPoints  = 100
+        [int]       $MaxHistoryPoints  = 100
     )
 
     try {
@@ -150,7 +153,7 @@
             Counters       = $AvailableCounters
             Config         = $Config
             UpdateInterval = $UpdateInterval
-            MaxDataPoints  = $MaxDataPoints
+            MaxDataPoints  = $MaxHistoryPoints
         }
 
         Start-MonitoringLoop @MonitoringParams

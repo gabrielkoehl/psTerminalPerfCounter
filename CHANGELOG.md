@@ -44,4 +44,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   * Renamed loop variable `$Label` to `$Index` in X-axis generation for clarity
   * Updated all function calls and parameter references to use consistent naming throughout the codebase
 
+* **Parameter harmonization and documentation improvements**
+  * Renamed `MaxDataPoints` parameter to `MaxHistoryPoints` in `Start-tpcMonitor` for clarity - distinguishes between historical data storage and graph display
+  * Renamed internal variable `targetWidth` to `sampleCount` in `GetGraphData()` method for semantic accuracy
+  * Renamed `maxDataPoints` parameter to `maxHistoryPoints` in `AddDataPoint()` method for consistency
+  * Enhanced parameter documentation with clear explanations of `MaxHistoryPoints` (complete historical data) vs `Samples` (graph display points)
+  * Clarified time span calculation: **Graph time span = Samples × UpdateInterval seconds**
+  * Updated examples to demonstrate the relationship between update interval and graph time coverage
+
+
 ## [0.1.0]  - 2025-07-25
