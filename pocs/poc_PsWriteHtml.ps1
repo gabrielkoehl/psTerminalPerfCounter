@@ -1,7 +1,5 @@
-# Performance Counter Line Chart Demo für PSWriteHTML
-# Basierend auf der Analyse der PSWriteHTML Beispiele
 
-# 1. Ihre vorgeschlagene Datenstruktur (leicht angepasst)
+# 1. Datenstruktur
 $performanceData = @{
     Intervall = 1  # Sekunden
     Computer = @{
@@ -162,40 +160,3 @@ function ConvertTo-PSWriteHTMLLineChart {
 # 3. Demo ausführen
 $outputPath = "$PSScriptRoot\PerformanceCounter-Demo.html"
 ConvertTo-PSWriteHTMLLineChart -PerformanceData $performanceData -ComputerName "Server01" -HtmlFilePath $outputPath
-
-Write-Host "Demo-Chart erstellt: $outputPath" -ForegroundColor Green
-
-# 4. Beispiel-Code für Ihre Performance Counter Implementierung
-Write-Host "`n=== IMPLEMENTIERUNGS-HINWEISE ===" -ForegroundColor Yellow
-Write-Host @"
-
-Ihre Datenstruktur sollte so aufgebaut werden:
-
-`$exportData = @{
-    Intervall = `$intervallInSekunden
-    Computer = @{}
-}
-
-# Für jeden Computer:
-`$exportData.Computer[`$computerName] = @{}
-
-# Für jeden Counter:
-`$exportData.Computer[`$computerName][`$counterName] = @{
-    Title = `$displayName     # z.B. "CPU Auslastung"
-    Unit = `$unit            # z.B. "%", "MB", "MB/sec"
-    Values = @{}             # Hashtable mit Timestamp = Wert
-}
-
-# Werte hinzufügen:
-`$exportData.Computer[`$computerName][`$counterName].Values[`$timestamp] = `$value
-
-WICHTIG:
-- Timestamps als String im ISO-Format: (Get-Date).ToString("yyyy-MM-ddTHH:mm:ss")
-- Alle Counter eines Computers sollten die gleichen Timestamps haben
-- Values sollten numerisch sein (Int/Double)
-- PSWriteHTML benötigt für Line Charts Arrays in der richtigen Reihenfolge
-- Parameter 'ShowTickLabels' existiert NICHT in PSWriteHTML (Y-Achsen zeigen immer Zahlen)
-- Units werden im Tooltip angezeigt durch Serienname: 'Titel (Unit)'
-- Mehrere Y-Achsen für verschiedene Einheiten verwenden -SeriesName Parameter
-
-"@ -ForegroundColor Cyan
