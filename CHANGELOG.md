@@ -25,7 +25,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Removed
 
-* Private `Get-ConfigurationFromJson` merged into `Get-PerformanceConfig.ps1`
+* Private `Get-ConfigurationFromJson` merged into `Get-CounterConfiguration.ps1`
 
 ### Fixed
 

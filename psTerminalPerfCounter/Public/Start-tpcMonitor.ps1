@@ -98,12 +98,12 @@
             }
 
             Write-Host "Loading configuration from '$ConfigPath'..." -ForegroundColor Yellow
-            $Config = Get-PerformanceConfig -ConfigPath $ConfigPath
+            $Config = Get-CounterConfiguration -ConfigPath $ConfigPath
 
         } else {
 
             Write-Host "Loading configuration '$ConfigName'..." -ForegroundColor Yellow
-            $Config = Get-PerformanceConfig -ConfigName $ConfigName
+            $Config = Get-CounterConfiguration -ConfigName $ConfigName
 
         }
 

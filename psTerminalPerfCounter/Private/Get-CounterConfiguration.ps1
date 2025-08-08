@@ -1,4 +1,4 @@
-function Get-PerformanceConfig {
+function Get-CounterConfiguration {
     [CmdletBinding(DefaultParameterSetName = 'ConfigName')]
     [OutputType([hashtable])]
     param(
