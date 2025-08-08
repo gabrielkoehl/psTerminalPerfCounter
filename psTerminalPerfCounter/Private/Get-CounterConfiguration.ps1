@@ -72,7 +72,6 @@ function Get-CounterConfiguration {
         if ( $foundConfigs.Count -gt 1 ) {
             $duplicatePaths = $foundConfigs | ForEach-Object { $_.Path }
             Write-Warning "Configuration 'tpc_$ConfigName.json' was found in multiple locations: $($duplicatePaths -join ', '). Please resolve this by removing duplicates. Using the first found configuration: $($foundConfigs[0].Path)"
-            Return
         }
 
         $selectedConfig = $foundConfigs[0]
