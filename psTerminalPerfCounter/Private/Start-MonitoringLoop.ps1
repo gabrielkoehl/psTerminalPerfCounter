@@ -24,6 +24,7 @@ function Start-MonitoringLoop {
                 $Counter.AddDataPoint($Value, $MaxDataPoints)
             } catch {
                 Write-Warning "Error reading counter '$($Counter.Title)': $($_.Exception.Message)"
+                Pause # Clear-Host is to fast to read anything
             }
 
         }

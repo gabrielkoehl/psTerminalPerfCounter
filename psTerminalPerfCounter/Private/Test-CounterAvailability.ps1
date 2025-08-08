@@ -3,7 +3,7 @@ function Test-CounterAvailability {
     [OutputType([psobject])]
     param(
         [Parameter(ParameterSetName = 'LocalConfig')]
-        [psobject] $LocalConfig,
+        [psobject] $Config,
 
         [Parameter(ParameterSetName = 'RemoteServerConfig')]
         [string] $RemoteServerConfig

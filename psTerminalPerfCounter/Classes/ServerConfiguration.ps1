@@ -17,6 +17,7 @@ class ServerConfiguration {
                    $counter.isRemote        = $true
                    $counter.computername    = $ComputerName
                    $counter.Credential      = $credential
+                   $counter.IsAvailable     = $true   #for testing
                }
 
           }

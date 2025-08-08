@@ -181,14 +181,34 @@ class CounterConfiguration {
 
         try {
 
-            $sample = (Get-Counter -Counter $this.CounterPath -MaxSamples 1).CounterSamples
-            $value  = $sample.CookedValue
+            if ( $this.isRemote ) {
+
+                $paramRemote = @{
+                    ComputerName = $this.computername
+                }
+
+                if ( $this.Credential ) {
+                    $paramRemote.Credential = $this.Credential
+                }
+
+                $script = {
+                    param($CounterPath, $MaxSamples)
+                    $counter = Get-Counter -Counter $CounterPath -MaxSamples $MaxSamples
+                    $counter.CounterSamples.CookedValue
+                }
+
+                $value = Invoke-Command @paramRemote -ScriptBlock $script -ArgumentList $this.CounterPath, 1
+
+            } else {
+
+                $value = (Get-Counter -Counter $this.CounterPath -MaxSamples 1).CounterSamples.CookedValue
+
+            }
 
             # Convert Units
             $value = [Math]::Round($value / [Math]::Pow($this.conversionFactor, $this.conversionExponent))
 
             return $value
-
 
         } catch {
             $this.LastError = $_.Exception.Message
