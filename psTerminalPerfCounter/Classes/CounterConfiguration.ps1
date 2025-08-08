@@ -1,6 +1,6 @@
 using namespace System.Collections.Generic
 
-class PerformanceCounter {
+class CounterConfiguration {
     [string]                $counterID
     [string]                $counterSetType
     [string]                $counterInstance
@@ -20,8 +20,7 @@ class PerformanceCounter {
     [datetime]              $LastUpdate
 
 
-    # Constructor
-    PerformanceCounter([string]$counterID, [string]$counterSetType, [string]$counterInstance, [string]$title, [string]$Type, [string]$Format, [string]$unit, [int]$conversionFactor, [int]$conversionExponent, [psobject]$colorMap, [psobject]$graphConfiguration) {
+    CounterConfiguration([string]$counterID, [string]$counterSetType, [string]$counterInstance, [string]$title, [string]$Type, [string]$Format, [string]$unit, [int]$conversionFactor, [int]$conversionExponent, [psobject]$colorMap, [psobject]$graphConfiguration) {
         $this.counterID             = $counterID
         $this.counterSetType        = $counterSetType
         $this.counterInstance       = $counterInstance

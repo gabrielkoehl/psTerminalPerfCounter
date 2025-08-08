@@ -144,7 +144,7 @@
 
                          try {
 
-                              $Counter = [PerformanceCounter]::new(
+                              $Counter = [CounterConfiguration]::new(
                                    $CounterConfig.counterID,
                                    $CounterConfig.counterSetType,
                                    $CounterConfig.counterInstance,

@@ -3,7 +3,7 @@ function Test-CounterAvailability {
     [OutputType([PSCustomObject[]])]
     param(
         [Parameter(Mandatory=$true)]
-        [PerformanceCounter[]]$Counters
+        [CounterConfiguration[]]$Counters
     )
 
     $Results = @()

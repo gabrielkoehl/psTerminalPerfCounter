@@ -2,7 +2,7 @@
      [CmdletBinding()]
      param(
           [Parameter(Mandatory=$true)]
-          [PerformanceCounter[]]$Counters
+          [CounterConfiguration[]]$Counters
      )
 
      if ( $Counters.Count -eq 0 ) { return }

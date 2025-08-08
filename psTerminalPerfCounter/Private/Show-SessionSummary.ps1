@@ -2,7 +2,7 @@ function Show-SessionSummary {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
-        [PerformanceCounter[]]  $Counters
+        [CounterConfiguration[]]  $Counters
     )
 
     Write-Host "`n=== Session Summary ===" -ForegroundColor Cyan

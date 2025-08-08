@@ -2,7 +2,7 @@ function Start-MonitoringLoop {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
-        [PerformanceCounter[]]  $Counters,
+        [CounterConfiguration[]]  $Counters,
         [Parameter(Mandatory=$true)]
         [hashtable]             $Config,
         [Parameter(Mandatory=$true)]

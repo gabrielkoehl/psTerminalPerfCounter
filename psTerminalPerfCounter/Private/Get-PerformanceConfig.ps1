@@ -32,7 +32,7 @@ function Get-PerformanceConfig {
                 Return
             }
 
-            $counters       = New-PerformanceCountersFromJson -JsonConfig $jsonContent
+            $counters       = New-CounterConfigurationFromJson -JsonConfig $jsonContent
 
             return @{
                 Name        = $jsonContent.name
@@ -92,7 +92,7 @@ function Get-PerformanceConfig {
             Return
         }
 
-        $counters       = New-PerformanceCountersFromJson -JsonConfig $jsonContent
+        $counters       = New-CounterConfigurationFromJson -JsonConfig $jsonContent
 
         return @{
             Name        = $jsonContent.name

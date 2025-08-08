@@ -6,3 +6,5 @@ scratch/
 testResults.xml
 
 tpc_Network.json
+
+_temp/
