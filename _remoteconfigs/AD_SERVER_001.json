@@ -1,0 +1,32 @@
+[
+     {
+          "name": "SQL_ENVIRONMENT_001",
+          "description": "SQL Server Environment Production",
+          "interval": 2,
+          "secretvaultname": "SecretStore",
+          "credentialname": "devadmin",
+          "servers": [
+               {
+                    "computername": "DEV-DC",
+                    "comment": "Domain Controller",
+                    "counterConfig": [
+                         "CPU"
+                    ]
+               },
+               {
+                    "computername": "DEV-NODE1",
+                    "comment": "Sql Server Node A Production",
+                    "counterConfig": [
+                         "CPU"
+                    ]
+               },
+               {
+                    "computername": "DEV-NODE2",
+                    "comment": "Sql Server Node B Production",
+                    "counterConfig": [
+                         "CPU"
+                    ]
+               }
+          ]
+     }
+]

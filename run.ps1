@@ -1,4 +1,4 @@
 import-module -fullyqualifiedname .\psTerminalPerfCounter\psTerminalPerfCounter.psd1 -force
 
 
-start-tpcmonitor -RemoteServerConfig C:\SyncThing\gabi_development\repositories\psTerminalPerfCounter\_temp\test_config.json
+start-tpcmonitor -RemoteServerConfig ".\_remoteconfigs\AD_SERVER_001.json"
