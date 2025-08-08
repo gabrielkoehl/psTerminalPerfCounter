@@ -16,11 +16,12 @@ class CounterConfiguration {
     [hashtable]             $ColorMap
     [hashtable]             $Statistics
     [bool]                  $IsAvailable
+    [bool]                  $isRemote
     [string]                $LastError
     [datetime]              $LastUpdate
 
 
-    CounterConfiguration([string]$counterID, [string]$counterSetType, [string]$counterInstance, [string]$title, [string]$Type, [string]$Format, [string]$unit, [int]$conversionFactor, [int]$conversionExponent, [psobject]$colorMap, [psobject]$graphConfiguration) {
+    CounterConfiguration([string]$counterID, [string]$counterSetType, [string]$counterInstance, [string]$title, [string]$Type, [string]$Format, [string]$unit, [int]$conversionFactor, [int]$conversionExponent, [psobject]$colorMap, [psobject]$graphConfiguration, [bool]$isRemote = $false) {
         $this.counterID             = $counterID
         $this.counterSetType        = $counterSetType
         $this.counterInstance       = $counterInstance
@@ -37,6 +38,7 @@ class CounterConfiguration {
         $this.Statistics            = @{}
         $this.IsAvailable           = $false
         $this.LastError             = ""
+        $this.isRemote              = $isRemote     # default $false
     }
 
     [hashtable] SetColorMap([psobject]$colorMap) {

@@ -6,7 +6,10 @@ function Get-CounterConfiguration {
         [string] $ConfigName,
 
         [Parameter(ParameterSetName = 'ConfigPath')]
-        [string] $ConfigPath
+        [string] $ConfigPath,
+
+        [Parameter()]
+        [bool] $isRemote = $false
     )
 
     try {
@@ -32,7 +35,7 @@ function Get-CounterConfiguration {
                 Return
             }
 
-            $counters       = New-CounterConfigurationFromJson -JsonConfig $jsonContent
+            $counters       = New-CounterConfigurationFromJson -isRemote $isRemote -JsonConfig $jsonContent
 
             return @{
                 Name        = $jsonContent.name
@@ -91,7 +94,7 @@ function Get-CounterConfiguration {
             Return
         }
 
-        $counters       = New-CounterConfigurationFromJson -JsonConfig $jsonContent
+        $counters       = New-CounterConfigurationFromJson -isRemote $isRemote -JsonConfig $jsonContent
 
         return @{
             Name        = $jsonContent.name

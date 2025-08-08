@@ -3,7 +3,10 @@
     [OutputType([CounterConfiguration[]])]
     param(
         [Parameter(Mandatory=$true)]
-        [PSCustomObject]    $JsonConfig
+        [PSCustomObject]    $JsonConfig,
+
+        [Parameter()]
+        [bool]              $isRemote = $false
     )
 
     $PerformanceCounters = @()
@@ -22,7 +25,8 @@
             $CounterConfig.conversionFactor,
             $CounterConfig.conversionExponent,
             $CounterConfig.colorMap,
-            $CounterConfig.graphConfiguration
+            $CounterConfig.graphConfiguration,
+            $isRemote
         )
 
         $PerformanceCounters += $CounterConfiguration
