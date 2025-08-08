@@ -86,7 +86,8 @@
 
     try {
 
-        # Validate ConfigPath if provided
+        $config = @()
+
         if ( $PSCmdlet.ParameterSetName -eq 'ConfigPath' ) {
 
             if ( -not (Test-Path $ConfigPath) ) {
@@ -103,68 +104,66 @@
             Write-Host "Loading configuration from '$ConfigPath'..." -ForegroundColor Yellow
             $Config = Get-CounterConfiguration -ConfigPath $ConfigPath
 
+            if ( $Config.Counters.Count -eq 0 ) {
+                Write-Warning "No valid counters found in configuration '$ConfigPath'"
+                Return
+            }
+
         } elseif ( $PSCmdlet.ParameterSetName -eq 'ConfigName' ) {
 
             Write-Host "Loading configuration '$ConfigName'..." -ForegroundColor Yellow
             $Config = Get-CounterConfiguration -ConfigName $ConfigName
 
+            if ( $Config.Counters.Count -eq 0 ) {
+                Write-Warning "No valid counters found in configuration '$ConfigName'"
+                Return
+            }
+
         } elseif ( $PSCmdlet.ParameterSetName -eq 'RemoteServerConfig' ) {
 
             Write-Host "Loading remote server configuration from '$RemoteServerConfig'..." -ForegroundColor Yellow
+
+            if ( -not (Test-Path $RemoteServerConfig) ) {
+                Write-Warning "Server Configuration file not found: $RemoteServerConfig"
+                Return
+            }
+
             $Config = Get-ServerConfiguration -pathServerConfiguration $RemoteServerConfig
+
+            if ( $Config.Servers.Count -eq 0 ) {
+                Write-Warning "No valid servers found in remote server configuration '$RemoteServerConfig'"
+                Return
+            }
 
         } else {
             throw "Invalid parameter set. Use ConfigName, ConfigPath, or RemoteServerConfig."
         }
 
+        # Test availabilities
 
-# Ab hier weitermachen
-# Das muss alles in eigen Funktion für reuse
+        if ( $config -ne @() ) {
 
-        if ( $Config.Counters.Count -eq 0 ) {
-            $configInfo = if ( $PSCmdlet.ParameterSetName -eq 'ConfigPath' ) { $ConfigPath } else { $ConfigName }
-            Write-Warning "No counters found in configuration '$configInfo'"
-            return
-        }
+            if ( $PSCmdlet.ParameterSetName -in @('ConfigName', 'ConfigPath') ) {
 
-        Write-Host "Testing performance counters..." -ForegroundColor Yellow
-        $TestResults = Test-CounterAvailability -Counters $Config.Counters
+                $availabilityResult = Test-CounterAvailability -LocalConfig $Config
 
-        # Filter available counters
-        $AvailableCounters      = @()
-        $UnavailableCounters    = @()
+                if ( $availabilityResult.Success -eq $true ) {
 
-        for ( $i = 0; $i -lt $Config.Counters.Count; $i++ ) {
-            if ( $TestResults[$i].Available ) {
-                $AvailableCounters      += $Config.Counters[$i]
-            } else {
-                $UnavailableCounters    += $TestResults[$i]
+                    $config = $availabilityResult.CleanedConfig
+
+                } elseif ( $availabilityResult.Success -eq $false ) {
+
+                    Write-Warning "Counter availability test failed."
+                    return
+
+                }
+
             }
-        }
 
-        # Show unavailable counters
-        if ( $UnavailableCounters.Count -gt 0 ) {
-            Write-Host "Warning: The following counters are not available:" -ForegroundColor Yellow
-            foreach ( $Counter in $UnavailableCounters ) {
-                Write-Host "    $($Counter.Title): $($Counter.Error)" -ForegroundColor Red
-            }
-            Write-Host ""
         }
-
-        if ( $AvailableCounters.Count -eq 0 ) {
-            throw "No performance counters are available for monitoring"
-        }
-
-        Write-Host "Available counters:" -ForegroundColor Green
-        foreach ( $Counter in $AvailableCounters ) {
-            Write-Host "    $($Counter.Title)$LangInfo" -ForegroundColor Green
-        }
-
-        Write-Host ""
 
         # Start monitoring
         $MonitoringParams = @{
-            Counters       = $AvailableCounters
             Config         = $Config
             UpdateInterval = $UpdateInterval
             MaxDataPoints  = $MaxHistoryPoints
@@ -183,9 +182,15 @@
         throw
 
     } finally {
-        if ( $AvailableCounters.Count -gt 0 ) {
-            Show-SessionSummary -Counters $AvailableCounters
+
+        if ( $PSCmdlet.ParameterSetName -in @('ConfigName', 'ConfigPath') ) {
+
+            if ( $availabilityResult.Success -eq $true ) {
+                Show-SessionSummary -Counters $config.Counters
+            }
+
         }
+
     }
 
 }

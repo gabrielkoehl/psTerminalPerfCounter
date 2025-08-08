@@ -2,6 +2,10 @@
 
      currently only powershell vault is supported
 
+     2do
+     - Module verification
+     - implement dynamic support for (all) other existing vaults (e.g., Azure Key Vault, HashiCorp Vault)
+
 #>
 
 function Get-CredentialFromVault {

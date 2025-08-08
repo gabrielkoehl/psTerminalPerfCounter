@@ -2,13 +2,11 @@ function Start-MonitoringLoop {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
-        [CounterConfiguration[]]  $Counters,
+        [psobject]  $Config,
         [Parameter(Mandatory=$true)]
-        [hashtable]             $Config,
+        [int]       $UpdateInterval,
         [Parameter(Mandatory=$true)]
-        [int]                   $UpdateInterval,
-        [Parameter(Mandatory=$true)]
-        [int]                   $MaxDataPoints
+        [int]       $MaxDataPoints
     )
 
     $SampleCount    = 0
@@ -19,7 +17,7 @@ function Start-MonitoringLoop {
         $SampleCount++
 
         # Collect data from all counters
-        foreach ( $Counter in $Counters ) {
+        foreach ( $Counter in $Config.Counters ) {
 
             try {
                 $Value = $Counter.GetCurrentValue()
@@ -36,7 +34,7 @@ function Start-MonitoringLoop {
         $graphCounters = @()
         $tableCounters = @()
 
-        foreach ( $Counter in $Counters ) {
+        foreach ( $Counter in $Config.Counters ) {
             if ( $Counter.HistoricalData.Count -gt 3 ) {  # Need some data points
                 switch ($Counter.Format) {
                     "graph" { $graphCounters += $Counter }
