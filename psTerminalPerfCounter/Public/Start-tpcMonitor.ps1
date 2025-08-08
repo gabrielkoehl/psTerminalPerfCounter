@@ -166,49 +166,64 @@
         # Validate remote server count, only one is allowed to be visualized in console, more go external
         if ( $PSCmdlet.ParameterSetName -eq 'RemoteServerConfig' ) {
 
-            if ( -not $visHTML.IsPresent -and $Config.Servers.Count -gt 1 ) {
+            if ( -not $visHTML.IsPresent ) {
 
-                Write-Host "Multiple remote servers found. Please select which server to visualize in console:" -ForegroundColor Yellow
-                Write-Host ""
+                if ( $Config.Servers.Count -gt 1 ) {
 
-                # Display server selection menu
-                Write-Host "[0] Abort monitoring" -ForegroundColor Red
-                for ( $i = 0; $i -lt $Config.Servers.Count; $i++ ) {
-                    $server = $Config.Servers[$i]
-                    Write-Host "[$($i + 1)] $($server.serverName) - $($server.serverComment)" -ForegroundColor Cyan
+                    Write-Host "Multiple remote servers found. Please select which server to visualize in console:" -ForegroundColor Yellow
+                    Write-Host ""
+
+                    # Display server selection menu
+                    Write-Host "[0] Abort monitoring" -ForegroundColor Red
+                    for ( $i = 0; $i -lt $Config.Servers.Count; $i++ ) {
+                        $server = $Config.Servers[$i]
+                        Write-Host "[$($i + 1)] $($server.serverName) - $($server.serverComment)" -ForegroundColor Cyan
+                    }
+                    Write-Host ""
+
+                    # Get user selection
+                    do {
+                        $selection      = Read-Host "Enter your choice (0 to abort, 1-$($Config.Servers.Count) to select server)"
+                        $selectedIndex  = $null
+
+                        if ( [int]::TryParse($selection, [ref]$selectedIndex) ) {
+
+                            if ( $selectedIndex -eq 0 ) {
+                                Write-Host "Monitoring aborted by user." -ForegroundColor Red
+                                return
+                            }
+
+                            $selectedIndex = $selectedIndex - 1  # Convert to 0-based index
+                            if ( $selectedIndex -ge 0 -and $selectedIndex -lt $Config.Servers.Count ) {
+                                break
+                            }
+
+                        }
+
+                        Write-Host "Invalid selection. Please enter 0 to abort or a number between 1 and $($Config.Servers.Count)." -ForegroundColor Red
+
+                    } while ($true)
+
+                    # Clean up config
+                    $selectedServer = $Config.Servers[$selectedIndex]
+                    $Config.Servers = @($selectedServer)
+
+                    Write-Host "Selected server: $($selectedServer.serverName)" -ForegroundColor Green
+                    Write-Host ""
+
                 }
-                Write-Host ""
 
-                # Get user selection
-                do {
-                    $selection      = Read-Host "Enter your choice (0 to abort, 1-$($Config.Servers.Count) to select server)"
-                    $selectedIndex  = $null
+                # rebuild config for directly use local monitoring loop
+                if ( $Config.Servers.Count -eq 1) {
 
-                    if ( [int]::TryParse($selection, [ref]$selectedIndex) ) {
-
-                        if ( $selectedIndex -eq 0 ) {
-                            Write-Host "Monitoring aborted by user." -ForegroundColor Red
-                            return
-                        }
-
-                        $selectedIndex = $selectedIndex - 1  # Convert to 0-based index
-                        if ( $selectedIndex -ge 0 -and $selectedIndex -lt $Config.Servers.Count ) {
-                            break
-                        }
-
+                    $config = @{
+                        Name        = "$($Config.Servers[0].PerformanceCounters[0].Name) - REMOTE $($Config.Servers[0].serverName)" # currently only one key ( counter configuration ) is supported
+                        Description = "Remote monitoring of $($Config.Servers[0].serverName)"
+                        ConfigPath  = "REMOTE CONFIG"
+                        Counters    = $Config.Servers[0].PerformanceCounters[0].Counters
                     }
 
-                    Write-Host "Invalid selection. Please enter 0 to abort or a number between 1 and $($Config.Servers.Count)." -ForegroundColor Red
-
-                } while ($true)
-
-                # Clean up config
-                $selectedServer = $Config.Servers[$selectedIndex]
-                $Config.Servers = @($selectedServer)
-
-                Write-Host "Selected server: $($selectedServer.serverName)" -ForegroundColor Green
-                Write-Host ""
-
+                }
             }
 
         }

@@ -3,10 +3,7 @@
     [OutputType([ServerConfiguration[]])]
     param(
         [Parameter(Mandatory=$true)]
-        [PSCustomObject]    $JsonConfig,
-
-        [Parameter()]
-        [bool]              $isRemote = $false
+        [PSCustomObject] $JsonConfig
     )
 
         $servers = @()
@@ -29,7 +26,7 @@
                 #Counters
                 if ( $ServerConfig.CounterConfig ) {
                     foreach ( $CounterConfig in $ServerConfig.CounterConfig ) {
-                        $performanceCounters += Get-CounterConfiguration -isRemote $isRemote -ConfigName $CounterConfig
+                        $performanceCounters += Get-CounterConfiguration -ConfigName $CounterConfig
                     }
                 }
 
@@ -41,9 +38,10 @@ if ( $performanceCounters.count -gt 1 ) {
                 $serverConfiguration = [ServerConfiguration]::new(
                     $ServerConfig.computername,
                     $ServerConfig.comment,
-                    $setCredential,
                     $performanceCounters
                 )
+
+                $serverConfiguration.SetCounterRemoteProperties($ServerConfig.computername, $setCredential)
 
                 $servers += $serverConfiguration
 

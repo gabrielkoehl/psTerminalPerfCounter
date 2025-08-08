@@ -25,8 +25,7 @@
             $CounterConfig.conversionFactor,
             $CounterConfig.conversionExponent,
             $CounterConfig.colorMap,
-            $CounterConfig.graphConfiguration,
-            $isRemote
+            $CounterConfig.graphConfiguration
         )
 
         $PerformanceCounters += $CounterConfiguration

@@ -29,7 +29,7 @@ function Get-ServerConfiguration {
         }
 
 
-        $servers = New-ServerConfigurationFromJson -isRemote $true -JsonConfig $jsonContent
+        $servers = New-ServerConfigurationFromJson -JsonConfig $jsonContent
 
 
         return @{
