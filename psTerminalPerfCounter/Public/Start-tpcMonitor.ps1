@@ -77,8 +77,11 @@
         [Parameter(ParameterSetName = 'ConfigPath')]
         [string]    $ConfigPath,
 
-        [int]       $UpdateInterval = 1,
-        [int]       $MaxHistoryPoints  = 100
+        [Parameter(ParameterSetName = 'RemoteServerConfig')]
+        [string]    $RemoteServerConfig,
+
+        [int]       $UpdateInterval     = 1,
+        [int]       $MaxHistoryPoints   = 100
     )
 
     try {
@@ -100,12 +103,23 @@
             Write-Host "Loading configuration from '$ConfigPath'..." -ForegroundColor Yellow
             $Config = Get-CounterConfiguration -ConfigPath $ConfigPath
 
-        } else {
+        } elseif ( $PSCmdlet.ParameterSetName -eq 'ConfigName' ) {
 
             Write-Host "Loading configuration '$ConfigName'..." -ForegroundColor Yellow
             $Config = Get-CounterConfiguration -ConfigName $ConfigName
 
+        } elseif ( $PSCmdlet.ParameterSetName -eq 'RemoteServerConfig' ) {
+
+            Write-Host "Loading remote server configuration from '$RemoteServerConfig'..." -ForegroundColor Yellow
+            $Config = Get-ServerConfiguration -pathServerConfiguration $RemoteServerConfig
+
+        } else {
+            throw "Invalid parameter set. Use ConfigName, ConfigPath, or RemoteServerConfig."
         }
+
+
+# Ab hier weitermachen
+# Das muss alles in eigen Funktion für reuse
 
         if ( $Config.Counters.Count -eq 0 ) {
             $configInfo = if ( $PSCmdlet.ParameterSetName -eq 'ConfigPath' ) { $ConfigPath } else { $ConfigName }

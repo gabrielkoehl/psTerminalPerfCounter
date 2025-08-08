@@ -1,10 +1,17 @@
-using namespace System.Collections.Generic
 
 class ServerConfiguration {
-    [string]                $serverName
+     [string]            $serverName
+     [string]            $serverComment
+     [pscredential]      $serverCredential
+     [array]             $PerformanceCounters
 
-    ServerConfiguration([string]$serverName) {
-        $this.serverName     = $serverName
-    }
+     ServerConfiguration([string]$serverName, [string]$serverComment, [pscredential]$serverCredential, [array]$PerformanceCounters) {
+          $this.serverName           = $serverName
+          $this.serverComment        = $serverComment
+          $this.serverCredential     = $serverCredential
+          $this.PerformanceCounters  = $PerformanceCounters
+     }
+
+
 
 }
