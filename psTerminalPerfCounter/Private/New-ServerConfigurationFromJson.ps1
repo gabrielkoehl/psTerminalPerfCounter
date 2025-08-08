@@ -12,9 +12,9 @@
         $servers = @()
 
         # Credential
-        if ( $JsonConfig.Credential -and $JsonConfig.Credential -eq 'integrated') {
+        if ( $JsonConfig.CredentialName -and $JsonConfig.CredentialName -eq 'integrated') {
             $setCredential = $null
-        } elseif ( $JsonConfig.Credential -eq 'get' ) {
+        } elseif ( $JsonConfig.CredentialName -eq 'get' ) {
             $setCredential = Get-Credential
         } else {
             $setCredential = Get-CredentialFromVault -VaultName $JsonConfig.SecretVaultName -CredentialName $JsonConfig.CredentialName
@@ -32,6 +32,11 @@
                         $performanceCounters += Get-CounterConfiguration -isRemote $isRemote -ConfigName $CounterConfig
                     }
                 }
+
+# in development, the selection of 1st one is in start-tpcMonitor, server count validation
+if ( $performanceCounters.count -gt 1 ) {
+    Write-Warning "Currently only one performance counter is supported for each server. Monitoring only $($performanceCounters.title)"
+}
 
                 $serverConfiguration = [ServerConfiguration]::new(
                     $ServerConfig.computername,
