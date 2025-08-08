@@ -49,7 +49,15 @@ function Get-tpcConfigPaths {
                             ForEach-Object { $_.Trim() } |
                             Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
 
-        $paths += $envPathList
+
+        foreach ( $envPath in $envPathList ) {
+            if ( Test-Path -Path $envPath ) {
+                $paths += $envPath
+            } else {
+                Write-Warning "Configured path '$envPath' does not exist."
+            }
+        }
+
     }
 
     return ( $paths | Sort-Object -Unique )
