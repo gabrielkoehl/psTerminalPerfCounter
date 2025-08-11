@@ -25,6 +25,7 @@ function Start-MonitoringLoop {
                     $Counter.AddDataPoint($Value, $MaxDataPoints)
                 } else {
                     Write-Warning "Counter '$($Counter.Title)' is not available: $($Counter.LastError)"
+                    Start-Sleep -Milliseconds 500 # Clear-Host is to fast to read anything
                 }
             } catch {
                 Write-Warning "Error reading counter '$($Counter.Title)': $($_.Exception.Message)"

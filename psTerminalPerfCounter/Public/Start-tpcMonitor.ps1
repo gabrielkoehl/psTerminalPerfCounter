@@ -72,6 +72,7 @@
     [CmdletBinding(DefaultParameterSetName = 'ConfigName')]
     param(
         [Parameter(ParameterSetName = 'ConfigName')]
+        [Parameter(ParameterSetName = 'SingleRemoteServer')]
         [string]    $ConfigName     = "CPU",
 
         [Parameter(ParameterSetName = 'ConfigPath')]
@@ -80,163 +81,213 @@
         [Parameter(ParameterSetName = 'RemoteServerConfig')]
         [string]    $RemoteServerConfig,
 
+        [Parameter(ParameterSetName = 'SingleRemoteServer')]
+        [string]        $ComputerName,
+        [Parameter(ParameterSetName = 'SingleRemoteServer')]
+        [pscredential]  $Credential = $null,
+
         [int]       $UpdateInterval     = 1,
         [int]       $MaxHistoryPoints   = 100,
         [switch]    $visHTML
     )
 
-    try {
+    BEGIN {
 
         $config = @()
 
-        if ( $PSCmdlet.ParameterSetName -eq 'ConfigPath' ) {
+    }
 
-            if ( -not (Test-Path $ConfigPath) ) {
-                Write-Warning "Configuration file not found: $ConfigPath"
-                Return
-            }
+    PROCESS {
 
-            $fileName = Split-Path $ConfigPath -Leaf
-            if ( $fileName -notmatch '^tpc_.+\.json$' ) {
-                Write-Warning "Invalid configuration file name. File must follow the pattern 'tpc_*.json'. Found: $fileName"
-                Return
-            }
+        try {
 
-            Write-Host "Loading configuration from '$ConfigPath'..." -ForegroundColor Yellow
-            $Config = Get-CounterConfiguration -ConfigPath $ConfigPath
 
-            foreach ( $counter in $Config.Counters ) {
-                $counter.TestAvailability()
-            }
+            if ( $PSCmdlet.ParameterSetName -eq 'ConfigPath' ) {
 
-        } elseif ( $PSCmdlet.ParameterSetName -eq 'ConfigName' ) {
+                if ( -not (Test-Path $ConfigPath) ) {
+                    Write-Warning "Configuration file not found: $ConfigPath"
+                    Return
+                }
 
-            Write-Host "Loading configuration '$ConfigName'..." -ForegroundColor Yellow
-            $Config = Get-CounterConfiguration -ConfigName $ConfigName
+                $fileName = Split-Path $ConfigPath -Leaf
+                if ( $fileName -notmatch '^tpc_.+\.json$' ) {
+                    Write-Warning "Invalid configuration file name. File must follow the pattern 'tpc_*.json'. Found: $fileName"
+                    Return
+                }
 
-            foreach ( $counter in $Config.Counters ) {
-                $counter.TestAvailability()
-            }
+                Write-Host "Loading configuration from '$ConfigPath'..." -ForegroundColor Yellow
+                $Config = Get-CounterConfiguration -ConfigPath $ConfigPath
 
-        } elseif ( $PSCmdlet.ParameterSetName -eq 'RemoteServerConfig' ) {
+                foreach ( $counter in $Config.Counters ) {
+                    $counter.TestAvailability()
+                }
 
-            Write-Host "Loading remote server configuration from '$RemoteServerConfig'..." -ForegroundColor Yellow
+            } elseif ( $PSCmdlet.ParameterSetName -eq 'ConfigName' ) {
 
-            if ( -not (Test-Path $RemoteServerConfig) ) {
-                Write-Warning "Server Configuration file not found: $RemoteServerConfig"
-                Return
-            }
+                Write-Host "Loading configuration '$ConfigName'..." -ForegroundColor Yellow
+                $Config = Get-CounterConfiguration -ConfigName $ConfigName
 
-            $Config = Get-ServerConfiguration -pathServerConfiguration $RemoteServerConfig
+                foreach ( $counter in $Config.Counters ) {
+                    $counter.TestAvailability()
+                }
 
-            if ( $Config.Servers.Count -eq 0 ) {
-                Write-Warning "No valid servers found in remote server configuration '$RemoteServerConfig'"
-                Return
-            }
+            } elseif ( $PSCmdlet.ParameterSetName -eq 'RemoteServerConfig' ) {
 
-        } else {
-            throw "Invalid parameter set. Use ConfigName, ConfigPath, or RemoteServerConfig."
-        }
+                Write-Host "Loading remote server configuration from '$RemoteServerConfig'..." -ForegroundColor Yellow
 
-        # Validate remote server, server count, only one is allowed to be visualized in console, more go external
-        if ( $PSCmdlet.ParameterSetName -eq 'RemoteServerConfig' ) {
+                if ( -not (Test-Path $RemoteServerConfig) ) {
+                    Write-Warning "Server Configuration file not found: $RemoteServerConfig"
+                    Return
+                }
 
-            if ( -not $visHTML.IsPresent ) {
+                $Config = Get-ServerConfiguration -pathServerConfiguration $RemoteServerConfig
 
-                if ( $Config.Servers.Count -gt 1 ) {
+                if ( $Config.Servers.Count -eq 0 ) {
+                    Write-Warning "No valid servers found in remote server configuration '$RemoteServerConfig'"
+                    Return
+                }
 
-                    Write-Host "Multiple remote servers found. Please select which server to visualize in console:" -ForegroundColor Yellow
-                    Write-Host ""
+            } elseif ( $PSCmdlet.ParameterSetName -eq 'SingleRemoteServer' ) {
 
-                    # Display server selection menu
-                    Write-Host "[0] Abort monitoring" -ForegroundColor Red
-                    for ( $i = 0; $i -lt $Config.Servers.Count; $i++ ) {
-                        $server = $Config.Servers[$i]
-                        Write-Host "[$($i + 1)] $($server.serverName) - $($server.serverComment)" -ForegroundColor Cyan
+                Write-Host "Starting remote monitoring for $computername " -ForegroundColor Yellow -NoNewline
+
+                if ( $credential ) {
+                    Write-Host "using $($credential.UserName)." -ForegroundColor Yellow -NoNewline
+                } else {
+                    Write-Host "using $(whoami)." -ForegroundColor Yellow
+                }
+
+                if ( Test-Connection -ComputerName $ComputerName -Count 1 -Quiet ) {
+
+                    $Config = Get-CounterConfiguration -ConfigName $ConfigName
+
+                    $config.name = "$($Config.Name) @ REMOTE $($ComputerName)"
+
+                    foreach ( $counter in $config.counters ) {
+
+                        $counter.isRemote        = $true
+                        $counter.computername    = $ComputerName
+                        $counter.Credential      = $credential
+
+                        $counter.SetRemoteConnectionParameter()
+                        $counter.TestAvailability()
+
                     }
-                    Write-Host ""
 
-                    # Get user selection
-                    do {
-                        $selection      = Read-Host "Enter your choice (0 to abort, 1-$($Config.Servers.Count) to select server)"
-                        $selectedIndex  = $null
+                } else {
+                    Write-Warning "Remote computer $computername not reachable. Aborting"
+                    Return
+                }
 
-                        if ( [int]::TryParse($selection, [ref]$selectedIndex) ) {
+            } else {
+                throw "Invalid parameter set. Use ConfigName, ConfigPath, or RemoteServerConfig."
+            }
 
-                            if ( $selectedIndex -eq 0 ) {
-                                Write-Host "Monitoring aborted by user." -ForegroundColor Red
-                                return
+            # Validate remote server, server count, only one is allowed to be visualized in console, more go external
+            if ( $PSCmdlet.ParameterSetName -eq 'RemoteServerConfig' ) {
+
+                if ( -not $visHTML.IsPresent ) {
+
+                    if ( $Config.Servers.Count -gt 1 ) {
+
+                        Write-Host "Multiple remote servers found. Please select which server to visualize in console:" -ForegroundColor Yellow
+                        Write-Host ""
+
+                        # Display server selection menu
+                        Write-Host "[0] Abort monitoring" -ForegroundColor Red
+                        for ( $i = 0; $i -lt $Config.Servers.Count; $i++ ) {
+                            $server = $Config.Servers[$i]
+                            Write-Host "[$($i + 1)] $($server.serverName) - $($server.serverComment)" -ForegroundColor Cyan
+                        }
+                        Write-Host ""
+
+                        # Get user selection
+                        do {
+                            $selection      = Read-Host "Enter your choice (0 to abort, 1-$($Config.Servers.Count) to select server)"
+                            $selectedIndex  = $null
+
+                            if ( [int]::TryParse($selection, [ref]$selectedIndex) ) {
+
+                                if ( $selectedIndex -eq 0 ) {
+                                    Write-Host "Monitoring aborted by user." -ForegroundColor Red
+                                    return
+                                }
+
+                                $selectedIndex = $selectedIndex - 1  # Convert to 0-based index
+                                if ( $selectedIndex -ge 0 -and $selectedIndex -lt $Config.Servers.Count ) {
+                                    break
+                                }
+
                             }
 
-                            $selectedIndex = $selectedIndex - 1  # Convert to 0-based index
-                            if ( $selectedIndex -ge 0 -and $selectedIndex -lt $Config.Servers.Count ) {
-                                break
-                            }
+                            Write-Host "Invalid selection. Please enter 0 to abort or a number between 1 and $($Config.Servers.Count)." -ForegroundColor Red
 
+                        } while ($true)
+
+                        # Clean up config
+                        $selectedServer = $Config.Servers[$selectedIndex]
+                        $Config.Servers = @($selectedServer)
+
+                        Write-Host "Selected server: $($selectedServer.serverName)" -ForegroundColor Green
+                        Write-Host ""
+
+                    }
+
+                    # rebuild config for directly use local monitoring loop
+                    if ( $Config.Servers.Count -eq 1) {
+
+                        $config = @{
+                            Name        = "$($Config.Servers[0].PerformanceCounters[0].Name) - REMOTE $($Config.Servers[0].serverName)" # currently only one key ( counter configuration ) is supported
+                            Description = "Remote monitoring of $($Config.Servers[0].serverName)"
+                            ConfigPath  = "REMOTE CONFIG"
+                            Counters    = $Config.Servers[0].PerformanceCounters[0].Counters
                         }
 
-                        Write-Host "Invalid selection. Please enter 0 to abort or a number between 1 and $($Config.Servers.Count)." -ForegroundColor Red
+                        foreach ( $counter in $Config.Counters ) {
+                            $counter.TestAvailability()
+                        }
 
-                    } while ($true)
-
-                    # Clean up config
-                    $selectedServer = $Config.Servers[$selectedIndex]
-                    $Config.Servers = @($selectedServer)
-
-                    Write-Host "Selected server: $($selectedServer.serverName)" -ForegroundColor Green
-                    Write-Host ""
-
+                    }
                 }
 
-                # rebuild config for directly use local monitoring loop
-                if ( $Config.Servers.Count -eq 1) {
 
-                    $config = @{
-                        Name        = "$($Config.Servers[0].PerformanceCounters[0].Name) - REMOTE $($Config.Servers[0].serverName)" # currently only one key ( counter configuration ) is supported
-                        Description = "Remote monitoring of $($Config.Servers[0].serverName)"
-                        ConfigPath  = "REMOTE CONFIG"
-                        Counters    = $Config.Servers[0].PerformanceCounters[0].Counters
-                    }
 
-                    foreach ( $counter in $Config.Counters ) {
-                        $counter.TestAvailability()
-                    }
-
-                }
             }
 
+            # Start monitoring
+            $MonitoringParams = @{
+                Config         = $Config
+                UpdateInterval = $UpdateInterval
+                MaxDataPoints  = $MaxHistoryPoints
+            }
 
+            Start-MonitoringLoop @MonitoringParams
 
-        }
+        } catch [System.Management.Automation.HaltCommandException] {
 
-        # Start monitoring
-        $MonitoringParams = @{
-            Config         = $Config
-            UpdateInterval = $UpdateInterval
-            MaxDataPoints  = $MaxHistoryPoints
-        }
+            Write-Host "`n=== Monitoring stopped by user ===" -ForegroundColor Green
 
-        Start-MonitoringLoop @MonitoringParams
+        } catch {
 
-    } catch [System.Management.Automation.HaltCommandException] {
+            Write-Host "`n=== ERROR ===" -ForegroundColor Red
+            Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Yellow
+            throw
 
-        Write-Host "`n=== Monitoring stopped by user ===" -ForegroundColor Green
+        } finally {
 
-    } catch {
+            if ( $PSCmdlet.ParameterSetName -in @('ConfigName', 'ConfigPath') ) {
 
-        Write-Host "`n=== ERROR ===" -ForegroundColor Red
-        Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Yellow
-        throw
+                if ( $availabilityResult.Success -eq $true ) {
+                    Show-SessionSummary -Counters $config.Counters
+                }
 
-    } finally {
-
-        if ( $PSCmdlet.ParameterSetName -in @('ConfigName', 'ConfigPath') ) {
-
-            if ( $availabilityResult.Success -eq $true ) {
-                Show-SessionSummary -Counters $config.Counters
             }
 
         }
+
+    }
+
+    END {
 
     }
 

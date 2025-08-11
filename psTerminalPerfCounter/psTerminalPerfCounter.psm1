@@ -1,4 +1,4 @@
-﻿# Error Handling
+﻿# Script Handling
 $ErrorActionPreference = "Stop"
 
 # Config Path Management

@@ -32,7 +32,7 @@
 
 # in development, the selection of 1st one is in start-tpcMonitor, server count validation
 if ( $performanceCounters.count -gt 1 ) {
-    Write-Warning "Currently only one performance counter is supported for each server. Monitoring only $($performanceCounters.title)"
+    Write-Warning "Currently only one performance counter is supported for each server. You can add more counter to config itself. Monitoring only $($performanceCounters.title)"
 }
 
                 $serverConfiguration = [ServerConfiguration]::new(
