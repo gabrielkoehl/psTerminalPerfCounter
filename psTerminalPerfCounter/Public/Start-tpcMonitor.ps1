@@ -105,9 +105,8 @@
             Write-Host "Loading configuration from '$ConfigPath'..." -ForegroundColor Yellow
             $Config = Get-CounterConfiguration -ConfigPath $ConfigPath
 
-            if ( $Config.Counters.Count -eq 0 ) {
-                Write-Warning "No valid counters found in configuration '$ConfigPath'"
-                Return
+            foreach ( $counter in $Config.Counters ) {
+                $counter.TestAvailability()
             }
 
         } elseif ( $PSCmdlet.ParameterSetName -eq 'ConfigName' ) {
@@ -115,9 +114,8 @@
             Write-Host "Loading configuration '$ConfigName'..." -ForegroundColor Yellow
             $Config = Get-CounterConfiguration -ConfigName $ConfigName
 
-            if ( $Config.Counters.Count -eq 0 ) {
-                Write-Warning "No valid counters found in configuration '$ConfigName'"
-                Return
+            foreach ( $counter in $Config.Counters ) {
+                $counter.TestAvailability()
             }
 
         } elseif ( $PSCmdlet.ParameterSetName -eq 'RemoteServerConfig' ) {
@@ -140,30 +138,7 @@
             throw "Invalid parameter set. Use ConfigName, ConfigPath, or RemoteServerConfig."
         }
 
-        # Test availabilities
-
-        if ( $config -ne @() ) {
-
-            if ( $PSCmdlet.ParameterSetName -in @('ConfigName', 'ConfigPath') ) {
-
-                $availabilityResult = Test-CounterAvailability -LocalConfig $Config
-
-                if ( $availabilityResult.Success -eq $true ) {
-
-                    $config = $availabilityResult.CleanedConfig
-
-                } elseif ( $availabilityResult.Success -eq $false ) {
-
-                    Write-Warning "Counter availability test failed."
-                    return
-
-                }
-
-            }
-
-        }
-
-        # Validate remote server count, only one is allowed to be visualized in console, more go external
+        # Validate remote server, server count, only one is allowed to be visualized in console, more go external
         if ( $PSCmdlet.ParameterSetName -eq 'RemoteServerConfig' ) {
 
             if ( -not $visHTML.IsPresent ) {
@@ -223,8 +198,14 @@
                         Counters    = $Config.Servers[0].PerformanceCounters[0].Counters
                     }
 
+                    foreach ( $counter in $Config.Counters ) {
+                        $counter.TestAvailability()
+                    }
+
                 }
             }
+
+
 
         }
 

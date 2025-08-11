@@ -19,6 +19,7 @@ class CounterConfiguration {
     [bool]                  $isRemote
     [string]                $ComputerName
     [pscredential]          $Credential
+    [hashtable]             $ParamRemote
     [string]                $LastError
     [datetime]              $LastUpdate
 
@@ -27,22 +28,34 @@ class CounterConfiguration {
         $this.counterID             = $counterID
         $this.counterSetType        = $counterSetType
         $this.counterInstance       = $counterInstance
-        $this.CounterPath           = $this.GetCounterPath($counterID, $counterSetType, $counterInstance)
         $this.Title                 = $title
         $this.Type                  = $Type
         $this.Format                = $Format
         $this.Unit                  = $unit
         $this.conversionFactor      = $conversionFactor
         $this.conversionExponent    = $conversionExponent
-        $this.ColorMap              = $this.SetColorMap($colorMap)
-        $this.GraphConfiguration    = $this.SetGraphConfig($graphConfiguration)
-        $this.HistoricalData        = [List[PSCustomObject]]::new()
+        $this.HistoricalData        = [List[PSCustomObject]]::new() # need list methods ( Add, RemoveAt ), not possible with array
         $this.Statistics            = @{}
         $this.IsAvailable           = $false
         $this.LastError             = ""
         $this.isRemote              = $false
         $this.ComputerName          = $env:COMPUTERNAME
         $this.Credential            = $null
+
+        $this.CounterPath           = $this.GetCounterPath($counterID, $counterSetType, $counterInstance)
+        $this.ColorMap              = $this.SetColorMap($colorMap)
+        $this.GraphConfiguration    = $this.SetGraphConfig($graphConfiguration)
+
+    }
+
+    [void] SetRemoteConnectionParameter () {
+
+        $this.ParamRemote = @{ ComputerName = $this.ComputerName }
+
+        if ( $this.Credential ) {
+            $this.ParamRemote.Credential = $this.Credential
+        }
+
     }
 
     [hashtable] SetColorMap([psobject]$colorMap) {
@@ -118,17 +131,26 @@ class CounterConfiguration {
     }
 
     # Test if counter is available
-    [bool] TestAvailability() {
+    [void] TestAvailability() {
 
         try {
-            $null               = Get-Counter -Counter $this.CounterPath -MaxSamples 1 -ErrorAction Stop
+            if ( $this.isRemote ) {
+                $null = $this.GetRemoteValue(1)
+            } else {
+                $null = Get-Counter -Counter $this.CounterPath -MaxSamples 1
+            }
+
             $this.IsAvailable   = $true
             $this.LastError     = ""
-            return $true
+
         } catch {
+
             $this.IsAvailable   = $false
             $this.LastError     = $_.Exception.Message
-            return $false
+
+            Write-Warning "Counter '$($this.Title)' is not available: $($this.LastError)"
+            Start-Sleep -Milliseconds 500 # Allow time for reading
+
         }
 
     }
@@ -183,25 +205,11 @@ class CounterConfiguration {
 
             if ( $this.isRemote ) {
 
-                $paramRemote = @{
-                    ComputerName = $this.computername
-                }
-
-                if ( $this.Credential ) {
-                    $paramRemote.Credential = $this.Credential
-                }
-
-                $script = {
-                    param($CounterPath, $MaxSamples)
-                    $counter = Get-Counter -Counter $CounterPath -MaxSamples $MaxSamples
-                    $counter.CounterSamples.CookedValue
-                }
-
-                $value = Invoke-Command @paramRemote -ScriptBlock $script -ArgumentList $this.CounterPath, 1
+                $value = $this.GetRemoteValue(1)
 
             } else {
 
-                $value = (Get-Counter -Counter $this.CounterPath -MaxSamples 1).CounterSamples.CookedValue
+                $value = ( Get-Counter -Counter $this.CounterPath -MaxSamples 1 ).CounterSamples.CookedValue
 
             }
 
@@ -213,6 +221,27 @@ class CounterConfiguration {
         } catch {
             $this.LastError = $_.Exception.Message
             throw "Error reading counter '$($this.Title)': $($_.Exception.Message)"
+        }
+
+    }
+
+    # Get value from remote connection
+    hidden [int] GetRemoteValue([int]$maxSamples) {
+
+        $script = {
+            param( $CounterPath, $MaxSamples )
+            $counter = Get-Counter -Counter $CounterPath -MaxSamples $MaxSamples
+            $counter.CounterSamples.CookedValue
+        }
+
+        $param = $this.ParamRemote
+
+        try {
+            $returnValue = Invoke-Command @param -ScriptBlock $script -ArgumentList $this.CounterPath, $maxSamples
+            return $returnValue
+        } catch {
+            Throw "Error getting remote value for '$($this.Title)': $($_.Exception.Message)"
+            return $null
         }
 
     }

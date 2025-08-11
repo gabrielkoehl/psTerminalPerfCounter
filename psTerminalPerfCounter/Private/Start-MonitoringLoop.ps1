@@ -20,8 +20,12 @@ function Start-MonitoringLoop {
         foreach ( $Counter in $Config.Counters ) {
 
             try {
-                $Value = $Counter.GetCurrentValue()
-                $Counter.AddDataPoint($Value, $MaxDataPoints)
+                if ( $Counter.IsAvailable ) {
+                    $Value = $Counter.GetCurrentValue()
+                    $Counter.AddDataPoint($Value, $MaxDataPoints)
+                } else {
+                    Write-Warning "Counter '$($Counter.Title)' is not available: $($Counter.LastError)"
+                }
             } catch {
                 Write-Warning "Error reading counter '$($Counter.Title)': $($_.Exception.Message)"
                 Pause # Clear-Host is to fast to read anything
