@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+* **Remoting**: Added capability for monitoring remote servers
+  * `Start-TpcMonitor -ComputerName <COMPUTERNAME> -ConfigName <CONFIGNAME> -Credential <NULL|CredentialObject>`: Enables ad-hoc monitoring of remote servers using either integrated security or provided credentials
+
 * **Configuration path management**: Added functions to manage custom configuration paths via TPC_CONFIGPATH environment variable
   * `Add-tpcConfigPath` - Add configuration paths with validation and path creation
   * `Remove-tpcConfigPath` - Interactive removal of configuration paths
