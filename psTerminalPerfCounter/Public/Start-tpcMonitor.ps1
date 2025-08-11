@@ -69,26 +69,26 @@
         Press Ctrl+C to stop monitoring and display session summary.
     #>
 
-    [CmdletBinding(DefaultParameterSetName = 'ConfigName')]
+    [CmdletBinding()]
     param(
-        [Parameter(ParameterSetName = 'ConfigName')]
-        [Parameter(ParameterSetName = 'SingleRemoteServer')]
-        [string]    $ConfigName     = "CPU",
+        [Parameter(ParameterSetName = 'ConfigName',         Mandatory)]
+        [Parameter(ParameterSetName = 'SingleRemoteServer', Mandatory)]
+        [string]        $ConfigName,
 
-        [Parameter(ParameterSetName = 'ConfigPath')]
-        [string]    $ConfigPath,
+        [Parameter(ParameterSetName = 'ConfigPath',         Mandatory)]
+        [string]        $ConfigPath,
 
-        [Parameter(ParameterSetName = 'RemoteServerConfig')]
-        [string]    $RemoteServerConfig,
+        [Parameter(ParameterSetName = 'RemoteServerConfig', Mandatory)]
+        [string]        $RemoteServerConfig,
 
-        [Parameter(ParameterSetName = 'SingleRemoteServer')]
+        [Parameter(ParameterSetName = 'SingleRemoteServer', Mandatory)]
         [string]        $ComputerName,
         [Parameter(ParameterSetName = 'SingleRemoteServer')]
         [pscredential]  $Credential = $null,
 
-        [int]       $UpdateInterval     = 1,
-        [int]       $MaxHistoryPoints   = 100,
-        [switch]    $visHTML
+        [int]           $UpdateInterval     = 1,
+        [int]           $MaxHistoryPoints   = 100,
+        [switch]        $visHTML
     )
 
     BEGIN {
@@ -159,20 +159,10 @@
 
                 if ( Test-Connection -ComputerName $ComputerName -Count 1 -Quiet ) {
 
-                    $Config = Get-CounterConfiguration -ConfigName $ConfigName
+                    $Config = Get-CounterConfiguration -ConfigName $ConfigName -isRemote -computername $ComputerName -credential $credential
 
                     $config.name = "$($Config.Name) @ REMOTE $($ComputerName)"
 
-                    foreach ( $counter in $config.counters ) {
-
-                        $counter.isRemote        = $true
-                        $counter.computername    = $ComputerName
-                        $counter.Credential      = $credential
-
-                        $counter.SetRemoteConnectionParameter()
-                        $counter.TestAvailability()
-
-                    }
 
                 } else {
                     Write-Warning "Remote computer $computername not reachable. Aborting"

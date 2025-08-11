@@ -24,7 +24,7 @@ class CounterConfiguration {
     [datetime]              $LastUpdate
 
 
-    CounterConfiguration([string]$counterID, [string]$counterSetType, [string]$counterInstance, [string]$title, [string]$Type, [string]$Format, [string]$unit, [int]$conversionFactor, [int]$conversionExponent, [psobject]$colorMap, [psobject]$graphConfiguration) {
+    CounterConfiguration([string]$counterID, [string]$counterSetType, [string]$counterInstance, [string]$title, [string]$Type, [string]$Format, [string]$unit, [int]$conversionFactor, [int]$conversionExponent, [psobject]$colorMap, [psobject]$graphConfiguration, [bool]$isRemote, [string]$computerName, [pscredential]$credential) {
         $this.counterID             = $counterID
         $this.counterSetType        = $counterSetType
         $this.counterInstance       = $counterInstance
@@ -38,13 +38,17 @@ class CounterConfiguration {
         $this.Statistics            = @{}
         $this.IsAvailable           = $false
         $this.LastError             = ""
-        $this.isRemote              = $false
-        $this.ComputerName          = $env:COMPUTERNAME
-        $this.Credential            = $null
+        $this.isRemote              = $isRemote
+        $this.ComputerName          = $computerName
+        $this.Credential            = $credential
+
+        $this.SetRemoteConnectionParameter()
 
         $this.CounterPath           = $this.GetCounterPath($counterID, $counterSetType, $counterInstance)
         $this.ColorMap              = $this.SetColorMap($colorMap)
         $this.GraphConfiguration    = $this.SetGraphConfig($graphConfiguration)
+
+        $this.TestAvailability()
 
     }
 
@@ -100,7 +104,11 @@ class CounterConfiguration {
 
     [string] GetCounterPath([string]$counterID, [string]$counterSetType, [string]$counterInstance) {
 
-        [string] $returnObject = ""
+        [string] $returnObject  = ""
+        [string] $setName       = ""
+        [string] $pathName      = ""
+
+        $param = $this.ParamRemote
 
         if ( -not $counterID ) {
             throw "Counter ID cannot be null or empty."
@@ -111,8 +119,25 @@ class CounterConfiguration {
             $setID          = $counterID.Split('-')[0]
             $pathID         = $counterID.Split('-')[1]
 
-            $setName        = Get-PerformanceCounterLocalName -Id $setID    -ErrorAction Stop
-            $pathName       = Get-PerformanceCounterLocalName -Id $pathID   -ErrorAction Stop
+            if ( $this.isRemote ) {
+
+                $functionDef = ${function:Get-PerformanceCounterLocalName}
+
+                $scriptblock = [ScriptBlock]::Create("
+                    param( `$Id )
+                    function Get-PerformanceCounterLocalName { $functionDef }
+                    Get-PerformanceCounterLocalName -Id `$Id
+                ")
+
+                $setName    = Invoke-Command @param -ScriptBlock $scriptblock -ArgumentList $setID
+                $pathName   = Invoke-Command @param -ScriptBlock $scriptblock -ArgumentList $pathID
+
+            } elseif ( $this.isRemote -eq $false ) {
+
+                $setName    = Get-PerformanceCounterLocalName -Id $setID    -ErrorAction Stop
+                $pathName   = Get-PerformanceCounterLocalName -Id $pathID   -ErrorAction Stop
+
+            }
 
             if ( $counterSetType -eq 'SingleInstance'  ) {
                 $returnObject = "\$($setName)\$($pathName)"

@@ -5,8 +5,13 @@
         [Parameter(Mandatory=$true)]
         [PSCustomObject]    $JsonConfig,
 
+        # Remote params
         [Parameter()]
-        [bool]              $isRemote = $false
+        [bool]              $isRemote,
+        [Parameter()]
+        [string]            $computername,
+        [Parameter()]
+        [pscredential]      $credential
     )
 
     $PerformanceCounters = @()
@@ -25,7 +30,10 @@
             $CounterConfig.conversionFactor,
             $CounterConfig.conversionExponent,
             $CounterConfig.colorMap,
-            $CounterConfig.graphConfiguration
+            $CounterConfig.graphConfiguration,
+            $isRemote,
+            $computername,
+            $credential
         )
 
         $PerformanceCounters += $CounterConfiguration
