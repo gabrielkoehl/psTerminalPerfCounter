@@ -21,7 +21,9 @@ function Start-MonitoringLoop {
 
             try {
                 if ( $Counter.IsAvailable ) {
-                    $Value = $Counter.GetCurrentValue()
+                    $return                     = $Counter.GetCurrentValue()
+                    $value                      = $return[0]
+                    $Counter.ExecutionDuration  = $return[1]
                     $Counter.AddDataPoint($Value, $MaxDataPoints)
                 } else {
                     Write-Warning "Counter '$($Counter.Title)' is not available: $($Counter.LastError)"

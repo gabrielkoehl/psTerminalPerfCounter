@@ -8,6 +8,7 @@ function Show-CounterStatistic {
     $Config             = $Counter.GraphConfiguration
     $colorMap           = $Counter.colorMap
     $Stats              = $Counter.Statistics
+    $ExecutionTime      = $Counter.ExecutionDuration
     $Indent             = "  "
     $StatLine           = ""
 
@@ -41,6 +42,8 @@ function Show-CounterStatistic {
             Write-Host -ForegroundColor $Config.Colors.Statistics -NoNewline " | "
 
         }
+
+        if ( $Counter.isRemote ) { Write-Host " RT: $($ExecutionTime)ms" -ForegroundColor DarkGray }
 
         Write-Host ""
 

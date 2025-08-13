@@ -13,6 +13,7 @@ class CounterConfiguration {
     [string]                $Unit
     [hashtable]             $graphConfiguration
     [List[PSCustomObject]]  $HistoricalData
+    [int]                   $ExecutionDuration
     [hashtable]             $ColorMap
     [hashtable]             $Statistics
     [bool]                  $IsAvailable
@@ -220,7 +221,9 @@ class CounterConfiguration {
     }
 
     # Get current value from performance counter
-    [int] GetCurrentValue() {
+    [int[]] GetCurrentValue() {
+
+        [int] $duration = $null
 
         if ( -not $this.IsAvailable ) {
             throw "Counter '$($this.Title)' is not available: $($this.LastError)"
@@ -230,7 +233,9 @@ class CounterConfiguration {
 
             if ( $this.isRemote ) {
 
-                $value = $this.GetRemoteValue(1)
+                $return     = $this.GetRemoteValue(1)
+                $value      = $return[0]
+                $duration   = $return[1]
 
             } else {
 
@@ -241,7 +246,7 @@ class CounterConfiguration {
             # Convert Units
             $value = [Math]::Round($value / [Math]::Pow($this.conversionFactor, $this.conversionExponent))
 
-            return $value
+            return $value,$duration
 
         } catch {
             $this.LastError = $_.Exception.Message
@@ -251,7 +256,7 @@ class CounterConfiguration {
     }
 
     # Get value from remote connection
-    hidden [int] GetRemoteValue([int]$maxSamples) {
+    hidden [int[]] GetRemoteValue([int]$maxSamples) {
 
         $script = {
             param( $CounterPath, $MaxSamples )
@@ -262,8 +267,12 @@ class CounterConfiguration {
         $param = $this.ParamRemote
 
         try {
-            $returnValue = Invoke-Command @param -ScriptBlock $script -ArgumentList $this.CounterPath, $maxSamples
-            return $returnValue
+            $dateStart  = Get-Date
+                $returnValue = Invoke-Command @param -ScriptBlock $script -ArgumentList $this.CounterPath, $maxSamples
+            $dateEnd    = Get-Date
+
+            $duration = $dateEnd - $dateStart
+            return $returnValue,$duration.Milliseconds
         } catch {
             Throw "Error getting remote value for '$($this.Title)': $($_.Exception.Message)"
             return $null

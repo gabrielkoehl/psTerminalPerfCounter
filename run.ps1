@@ -3,6 +3,6 @@ import-module -fullyqualifiedname .\psTerminalPerfCounter\psTerminalPerfCounter.
 
 # start-tpcmonitor -RemoteServerConfig ".\_remoteconfigs\AD_SERVER_001.json"
 
-#start-tpcmonitor -ComputerName dev-dc -ConfigName CPU
+# start-tpcmonitor -ComputerName dev-dc -ConfigName CPU
 
 start-tpcMonitor -ConfigName CPU
