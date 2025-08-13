@@ -23,8 +23,8 @@ function Get-CredentialFromVault {
           $currentVault       = $VaultName
           $currentCredential  = $CredentialName
 
-          $secretStore_isAvailable      = Get-Module -ListAvailable -Name "Microsoft.PowerShell.SecretStoreff"
-          $secretManagement_isAvailable = Get-Module -ListAvailable -Name "Microsoft.PowerShell.SecretManagementff"
+          $secretStore_isAvailable      = Get-Module -ListAvailable -Name "Microsoft.PowerShell.SecretStore"
+          $secretManagement_isAvailable = Get-Module -ListAvailable -Name "Microsoft.PowerShell.SecretManagement"
      }
 
      process {

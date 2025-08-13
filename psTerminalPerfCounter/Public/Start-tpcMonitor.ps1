@@ -80,6 +80,8 @@
 
         [Parameter(ParameterSetName = 'RemoteServerConfig', Mandatory)]
         [string]        $RemoteServerConfig,
+        [Parameter(ParameterSetName = 'RemoteServerConfig' )]
+        [switch]        $showConsoleTable,
 
         [Parameter(ParameterSetName = 'SingleRemoteServer', Mandatory)]
         [string]        $ComputerName,
@@ -88,12 +90,14 @@
 
         [int]           $UpdateInterval     = 1,
         [int]           $MaxHistoryPoints   = 100,
-        [switch]        $visHTML
+        [switch]        $visHTML,
+        [switch]        $exportJson
     )
 
     BEGIN {
 
-        $config = @()
+        $config         = @()
+        $monitorType    = 'local'
 
     }
 
@@ -103,6 +107,8 @@
 
 
             if ( $PSCmdlet.ParameterSetName -eq 'ConfigPath' ) {
+
+                $monitorType = 'local'
 
                 if ( -not (Test-Path $ConfigPath) ) {
                     Write-Warning "Configuration file not found: $ConfigPath"
@@ -124,6 +130,8 @@
 
             } elseif ( $PSCmdlet.ParameterSetName -eq 'ConfigName' ) {
 
+                $monitorType = 'local'
+
                 Write-Host "Loading configuration '$ConfigName'..." -ForegroundColor Yellow
                 $Config = Get-CounterConfiguration -ConfigName $ConfigName
 
@@ -132,6 +140,8 @@
                 }
 
             } elseif ( $PSCmdlet.ParameterSetName -eq 'RemoteServerConfig' ) {
+
+                $monitorType = 'remoteMulti'
 
                 Write-Host "Loading remote server configuration from '$RemoteServerConfig'..." -ForegroundColor Yellow
 
@@ -148,6 +158,8 @@
                 }
 
             } elseif ( $PSCmdlet.ParameterSetName -eq 'SingleRemoteServer' ) {
+
+                $monitorType = 'remoteSingle'
 
                 Write-Host "Starting remote monitoring for $computername " -ForegroundColor Yellow -NoNewline
 
@@ -173,14 +185,14 @@
                 throw "Invalid parameter set. Use ConfigName, ConfigPath, or RemoteServerConfig."
             }
 
-            # Validate remote server, server count, only one is allowed to be visualized in console, more go external
+            # Validate remote server, server count, only one is allowed to be visualized with graph in console. use -showTable or -visHTML
             if ( $PSCmdlet.ParameterSetName -eq 'RemoteServerConfig' ) {
 
-                if ( -not $visHTML.IsPresent ) {
+                if ( -not $showConsoleTable.IsPresent ) {
 
                     if ( $Config.Servers.Count -gt 1 ) {
 
-                        Write-Host "Multiple remote servers found. Please select which server to visualize in console:" -ForegroundColor Yellow
+                        Write-Host "Multiple remote servers found. Please select which server to visualize in console (or use switch -showConsoleTable):" -ForegroundColor Yellow
                         Write-Host ""
 
                         # Display server selection menu
@@ -226,6 +238,8 @@
                     # rebuild config for directly use local monitoring loop
                     if ( $Config.Servers.Count -eq 1) {
 
+                        $monitorType = 'remoteSingle'
+
                         $config = @{
                             Name        = "$($Config.Servers[0].PerformanceCounters[0].Name) - REMOTE $($Config.Servers[0].serverName)" # currently only one key ( counter configuration ) is supported
                             Description = "Remote monitoring of $($Config.Servers[0].serverName)"
@@ -233,11 +247,31 @@
                             Counters    = $Config.Servers[0].PerformanceCounters[0].Counters
                         }
 
-                        foreach ( $counter in $Config.Counters ) {
-                            $counter.TestAvailability()
-                        }
-
                     }
+
+                } elseif ( $showConsoleTable.IsPresent ) {
+
+                    # set all counter formats to table
+                    foreach ( $server in $Config.servers ) {
+                        foreach ( $counter in $server.PerformanceCounters ) {
+                            $counter.format = "Table"
+                        }
+                    }
+
+                }
+
+                if ( $exportJson.IsPresent ) {
+
+                    # write to json
+
+                }
+
+                if ( $visHTML.IsPresent ) {
+
+                    # write to json
+
+                    # load HTML
+
                 }
 
 
@@ -246,9 +280,10 @@
 
             # Start monitoring
             $MonitoringParams = @{
-                Config         = $Config
-                UpdateInterval = $UpdateInterval
-                MaxDataPoints  = $MaxHistoryPoints
+                MonitorType     = $monitorType
+                Config          = $Config
+                UpdateInterval  = $UpdateInterval
+                MaxDataPoints   = $MaxHistoryPoints
             }
 
             Start-MonitoringLoop @MonitoringParams
