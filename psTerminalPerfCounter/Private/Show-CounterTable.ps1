@@ -24,6 +24,7 @@
                Min            = if ( $null -ne $Stats.Minimum )   { $Stats.Minimum }  else { "-" }
                Max            = if ( $null -ne $Stats.Maximum )   { $Stats.Maximum }  else { "-" }
                Avg            = if ( $null -ne $Stats.Average )   { $Stats.Average }  else { "-" }
+               ExecutionTime  = if ( $Counter.isRemote )          { $Counter.ExecutionDuration } else { $null }
                ColorMap       = $Counter.colorMap
           }
 
@@ -40,6 +41,12 @@
           Min            = ($tableData | ForEach-Object { $_.Min.ToString().Length } | Measure-Object -Maximum).Maximum + 2
           Max            = ($tableData | ForEach-Object { $_.Max.ToString().Length } | Measure-Object -Maximum).Maximum + 2
           Avg            = ($tableData | ForEach-Object { $_.Avg.ToString().Length } | Measure-Object -Maximum).Maximum + 2
+     }
+
+     # Check for remote counters
+     $hasRemoteCounters = ($tableData | Where-Object { $null -ne $_.ExecutionTime }).Count -gt 0
+     if ( $hasRemoteCounters ) {
+          $widths.ExecutionTime = ($tableData | Where-Object { $null -ne $_.ExecutionTime } | ForEach-Object { $_.ExecutionTime.ToString().Length } | Measure-Object -Maximum).Maximum + 2
      }
 
      # Calculate Last5 width
@@ -61,10 +68,10 @@
 
      # Calculate total Last5 width: sum of all sub-widths plus separators
      if ( $last5SubWidths.Count -gt 0 ) {
-          $totalLast5Width = ($last5SubWidths | Measure-Object -Sum).Sum + (($last5SubWidths.Count - 1) * 3) # 3 chars for " | "
-          $widths.Last5 = $totalLast5Width + 2
+          $totalLast5Width    = ($last5SubWidths | Measure-Object -Sum).Sum + (($last5SubWidths.Count - 1) * 3) # 3 chars for " | "
+          $widths.Last5       = $totalLast5Width + 2
      } else {
-          $widths.Last5 = $headers.Last5.Length + 2
+          $widths.Last5       = $headers.Last5.Length + 2
      }
 
      # Ensure minimum widths for headers
@@ -76,6 +83,9 @@
           Min            = "Min"
           Max            = "Max"
           Avg            = "Avg"
+     }
+     if ( $hasRemoteCounters ) {
+          $headers.ExecutionTime = "Ret (ms)"
      }
 
      foreach ( $key in $headers.Keys ) {
@@ -118,14 +128,26 @@
      }
 
      # Print header
-     $headerLine = " {0} | {1} | {2} | {3} | {4} | {5} | {6} " -f `
-          $headers.CounterName.PadRight($widths.CounterName - 2), `
-          $headers.Unit.PadRight($widths.Unit - 2), `
-          $headers.Current.PadRight($widths.Current - 2), `
-          $headers.Last5.PadRight($widths.Last5 - 2), `
-          $headers.Min.PadRight($widths.Min - 2), `
-          $headers.Max.PadRight($widths.Max - 2), `
-          $headers.Avg.PadRight($widths.Avg - 2)
+     if ( $hasRemoteCounters ) {
+          $headerLine = " {0} | {1} | {2} | {3} | {4} | {5} | {6} | {7} " -f `
+               $headers.CounterName.PadRight($widths.CounterName - 2), `
+               $headers.Unit.PadRight($widths.Unit - 2), `
+               $headers.Current.PadRight($widths.Current - 2), `
+               $headers.Last5.PadRight($widths.Last5 - 2), `
+               $headers.Min.PadRight($widths.Min - 2), `
+               $headers.Max.PadRight($widths.Max - 2), `
+               $headers.Avg.PadRight($widths.Avg - 2), `
+               $headers.ExecutionTime.PadRight($widths.ExecutionTime - 2)
+     } else {
+          $headerLine = " {0} | {1} | {2} | {3} | {4} | {5} | {6} " -f `
+               $headers.CounterName.PadRight($widths.CounterName - 2), `
+               $headers.Unit.PadRight($widths.Unit - 2), `
+               $headers.Current.PadRight($widths.Current - 2), `
+               $headers.Last5.PadRight($widths.Last5 - 2), `
+               $headers.Min.PadRight($widths.Min - 2), `
+               $headers.Max.PadRight($widths.Max - 2), `
+               $headers.Avg.PadRight($widths.Avg - 2)
+     }
 
      Write-Host $headerLine -ForegroundColor Cyan
 
@@ -160,7 +182,7 @@
 
           # Handle Last5 with individual colors
           if ( $row.Last5.Count -gt 0 ) {
-               # Print Last5 values with individual coloring and proper sub-column widths
+               # Print Last5 values with individual coloring
                for ( $i = 0; $i -lt $row.Last5.Count; $i++ ) {
                     $value = $row.Last5[$i]
                     $color = Get-ValueColor -value $value -colorMap $row.ColorMap
@@ -188,11 +210,21 @@
 
                Write-Host -NoNewline ("{0} | " -f "-".PadRight($widths.Last5 - 2)) -ForegroundColor White
 
-          }          Write-Host -NoNewline ("{0} " -f $row.Min.ToString().PadRight($widths.Min - 2)) -ForegroundColor $minColor
+          }
+
+          Write-Host -NoNewline ("{0} " -f $row.Min.ToString().PadRight($widths.Min - 2)) -ForegroundColor $minColor
           Write-Host -NoNewline "| " -ForegroundColor White
           Write-Host -NoNewline ("{0} " -f $row.Max.ToString().PadRight($widths.Max - 2)) -ForegroundColor $maxColor
           Write-Host -NoNewline "| " -ForegroundColor White
-          Write-Host ("{0} " -f $row.Avg.ToString().PadRight($widths.Avg - 2)) -ForegroundColor $avgColor
+
+          if ( $hasRemoteCounters ) {
+               Write-Host -NoNewline ("{0} " -f $row.Avg.ToString().PadRight($widths.Avg - 2)) -ForegroundColor $avgColor
+               Write-Host -NoNewline "| " -ForegroundColor White
+               $executionTimeValue = if ( $null -ne $row.ExecutionTime ) { $row.ExecutionTime.ToString() } else { "-" }
+               Write-Host ("{0} " -f $executionTimeValue.PadRight($widths.ExecutionTime - 2)) -ForegroundColor DarkGray
+          } else {
+               Write-Host ("{0} " -f $row.Avg.ToString().PadRight($widths.Avg - 2)) -ForegroundColor $avgColor
+          }
      }
 
      Write-Host ""
