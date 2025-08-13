@@ -185,8 +185,8 @@ class CounterConfiguration {
     [void] AddDataPoint([int]$value, [int]$maxHistoryPoints) {
 
         $dataPoint = [PSCustomObject]@{
-            Timestamp = Get-Date
-            Value = $value
+            Timestamp   = Get-Date
+            Value       = $value
         }
 
         $this.HistoricalData.Add($dataPoint)
@@ -197,7 +197,6 @@ class CounterConfiguration {
             $this.HistoricalData.RemoveAt(0)
         }
 
-        # Update statistics
         $this.UpdateStatistics()
 
     }

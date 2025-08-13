@@ -82,7 +82,7 @@ function Start-MonitoringLoop {
             # Show table if there are any table counters
             if ( $tableCounters.Count -gt 0 ) {
                 try {
-                    Show-CounterTable -Counters $tableCounters
+                    Show-CounterTable -Counters $tableCounters -MonitorType $monitorType
                 } catch {
                     Write-Host "Table display error: $($_.Exception.Message)" -ForegroundColor Red
                     Write-Host ""
@@ -94,6 +94,55 @@ function Start-MonitoringLoop {
             }
 
         } elseif ( $monitorType -eq 'remoteMulti' ) {
+
+            while ( $true ) {
+
+                $SampleCount++
+
+                # Collect all counters from all servers
+                $allCounters = @()
+
+                foreach ( $server in $Config.Servers ) {
+                    foreach ( $counterConfig in $server.PerformanceCounters ) {
+                        foreach ( $counter in $counterConfig.Counters ) {
+
+                            try {
+                                if ( $counter.IsAvailable ) {
+                                    $return                     = $counter.GetCurrentValue()
+                                    $value                      = $return[0]
+                                    $counter.ExecutionDuration  = $return[1]
+                                    $counter.AddDataPoint($Value, $MaxDataPoints)
+
+                                    $allCounters += $counter
+                                } else {
+                                    Write-Warning "Counter '$($counter.Title)' on $($counter.ComputerName) is not available: $($counter.LastError)"
+                                    Start-Sleep -Milliseconds 500
+                                }
+                            } catch {
+                                Write-Warning "Error reading counter '$($counter.Title)' on $($counter.ComputerName): $($_.Exception.Message)"
+                            }
+                        }
+                    }
+                }
+
+                # Clear screen and show data
+                Clear-Host
+                Show-SessionHeader -ConfigName $Config.Name -StartTime $StartTime -SampleCount $SampleCount
+
+                # Display table with all counters from all servers
+                if ( $allCounters.Count -gt 0 ) {
+                    try {
+                        Show-CounterTable -Counters $allCounters -MonitorType $monitorType
+                    } catch {
+                        Write-Host "Table display error: $($_.Exception.Message)" -ForegroundColor Red
+                        Write-Host ""
+                    }
+                } else {
+                    Write-Host "No data available from any server." -ForegroundColor Yellow
+                }
+
+                Start-Sleep -Seconds $UpdateInterval
+            }
 
         }
 

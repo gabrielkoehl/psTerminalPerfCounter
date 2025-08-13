@@ -14,14 +14,14 @@
                     ]
                },
                {
-                    "computername": "DEV-NODE1",
+                    "computername": "DEV-NODE3",
                     "comment": "Sql Server Node A Production",
                     "counterConfig": [
                          "CPU"
                     ]
                },
                {
-                    "computername": "DEV-NODE2",
+                    "computername": "DEV-NODE4",
                     "comment": "Sql Server Node B Production",
                     "counterConfig": [
                          "CPU"
