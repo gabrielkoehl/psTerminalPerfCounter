@@ -26,7 +26,7 @@
                 #Counters
                 if ( $ServerConfig.CounterConfig ) {
                     foreach ( $CounterConfig in $ServerConfig.CounterConfig ) {
-                        $performanceCounters += Get-CounterConfiguration -ConfigName $CounterConfig
+                        $performanceCounters += Get-CounterConfiguration -ConfigName $CounterConfig -isRemote -computername $ServerConfig.computername -credential $setCredential
                     }
                 }
 
@@ -40,8 +40,6 @@ if ( $performanceCounters.count -gt 1 ) {
                     $ServerConfig.comment,
                     $performanceCounters
                 )
-
-                $serverConfiguration.SetCounterRemoteProperties($ServerConfig.computername, $setCredential)
 
                 $servers += $serverConfiguration
 
