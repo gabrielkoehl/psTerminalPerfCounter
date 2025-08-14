@@ -6,3 +6,5 @@ start-tpcmonitor -RemoteServerConfig ".\_remoteconfigs\AD_SERVER_001.json" -show
 #start-tpcmonitor -ComputerName dev-dc -ConfigName CPU
 
 #start-tpcMonitor -ConfigName CPU
+
+# BEI REMOTE GESAMTHEITLICHES INTERVALL SETZEN

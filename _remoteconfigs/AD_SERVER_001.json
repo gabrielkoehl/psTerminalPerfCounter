@@ -4,7 +4,7 @@
           "description": "SQL Server Environment Production",
           "interval": 2,
           "secretvaultname": "SecretStore",
-          "credentialname": "devadmin",
+          "credentialname": "integrated",
           "servers": [
                {
                     "computername": "DEV-DC",
