@@ -1,20 +1,28 @@
+---
+external help file: psTerminalPerfCounter-help.xml
+Module Name: psTerminalPerfCounter
+online version:
+schema: 2.0.0
+---
+
 # Get-tpcAvailableCounterConfig
 
 ## SYNOPSIS
 Retrieves, validates, and displays detailed information about available performance
-counter configurations including JSON schema validation and optional counter availability testing.
+counter configurations from all configured paths including JSON schema validation and optional counter availability testing.
 
 ## SYNTAX
 
 ```
-Get-tpcAvailableCounterConfig [[-ConfigPath] <String>] [[-SchemaPath] <String>] [-Raw] [-TestCounters]
- [-ProgressAction <ActionPreference>] [<CommonParameters>]
+Get-tpcAvailableCounterConfig [-Raw] [-TestCounters] [-ProgressAction <ActionPreference>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-This function scans the config directory for all JSON files with the 'tpc_' prefix
+This function scans all configured paths (using Get-tpcConfigPaths) for JSON files with the 'tpc_' prefix
 and provides detailed information about each configuration including counter details,
 validation status, and availability checks.
+Results are grouped by path similar to Get-Module -ListAvailable.
+Duplicate configurations across paths are marked to help identify conflicts.
 
 ## EXAMPLES
 
@@ -23,62 +31,23 @@ validation status, and availability checks.
 Get-tpcAvailableCounterConfig
 ```
 
-Shows formatted overview of all available configurations (without counter testing).
+Shows formatted overview of all available configurations from all configured paths (without counter testing).
 
 ### EXAMPLE 2
 ```
 Get-tpcAvailableCounterConfig -TestCounters
 ```
 
-Shows formatted overview with counter availability testing.
+Shows formatted overview with counter availability testing from all configured paths.
 
 ### EXAMPLE 3
-```
-Get-tpcAvailableCounterConfig -ConfigPath "C:\MyConfigs" -TestCounters
-```
-
-Shows formatted overview of configurations from a custom directory with counter testing.
-
-### EXAMPLE 4
 ```
 Get-tpcAvailableCounterConfig -Raw
 ```
 
-Returns raw configuration objects for further processing.
+Returns raw configuration objects for further processing from all configured paths.
 
 ## PARAMETERS
-
-### -ConfigPath
-Optional custom path to configuration files.
-If not specified, uses the module's
-config directory.
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 1
-Default value: $(Join-Path $PSScriptRoot "..\Config")
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -SchemaPath
-Path to Json Schema file
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 2
-Default value: $(Join-Path $ConfigPath "schema.json")
-Accept pipeline input: False
-Accept wildcard characters: False
-```
 
 ### -Raw
 If specified, returns raw PSCustomObject array instead of formatted output.
@@ -133,7 +102,7 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## OUTPUTS
 
-### Formatted output by default, PSCustomObject[] when -Raw is used.
+### Formatted output by default grouped by path, PSCustomObject[] when -Raw is used.
 ## NOTES
 
 ## RELATED LINKS

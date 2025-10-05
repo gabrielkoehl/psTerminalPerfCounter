@@ -1,3 +1,10 @@
+---
+external help file: psTerminalPerfCounter-help.xml
+Module Name: psTerminalPerfCounter
+online version:
+schema: 2.0.0
+---
+
 # Get-tpcPerformanceCounterInfo
 
 ## SYNOPSIS
@@ -10,45 +17,38 @@ Get-tpcPerformanceCounterInfo [-SearchTerm] <String> [-ProgressAction <ActionPre
 ```
 
 ## DESCRIPTION
-This function serves as the primary tool for discovering and validating performance counter IDs used in JSON configuration files.
-It operates with a language-independent approach by using numeric counter IDs instead of localized counter names,
-providing two main evaluation methods:
+This function serves as the primary tool for evaluating correct counter IDs used in configuration templates.
+It operates with a language-independent approach by using numeric IDs instead of localized counter names,
+providing two evaluation methods:
+- ID-based resolution: Validates and resolves composite ID format (SetID-PathID) to counter information
+- Name-based discovery: Searches counter sets and paths to identify correct IDs for template configuration
 
-**ID-based resolution**: Validates and resolves composite ID format (SetID-PathID) to verify counter availability and get localized information
-**Name-based discovery**: Searches counter sets and paths to identify correct IDs for JSON configuration creation
-
-The function translates between localized counter names and universal numeric IDs, ensuring JSON configuration templates
-work across different system languages and locales. All results include the composite counter IDs that are required
-for the counterID property in JSON configuration files.
-
-This is the essential tool for creating new JSON configuration files, as it provides the exact counterID values,
-counterSetType information, and available instances needed for proper configuration setup.
+The function translates between localized counter names and universal IDs, ensuring configuration templates
+work across different system languages.
+Results include the composite IDs needed for config templates.
 
 ## EXAMPLES
 
 ### EXAMPLE 1
-```powershell
+```
 Get-tpcPerformanceCounterInfo -SearchTerm "238-6"
 ```
 
-Validates the composite counter ID "238-6" and returns detailed information including counterSetType and available instances.
-This validation ensures the counter ID is correct for use in JSON configuration files.
+Validates and resolves the composite ID "238-6" to verify counter availability and get localized names.
 
 ### EXAMPLE 2
-```powershell
+```
 Get-tpcPerformanceCounterInfo -SearchTerm "Processor"
 ```
 
-Searches for all processor-related performance counters and returns their corresponding counter IDs.
-The results show the exact counterID values needed for the JSON configuration files.
+Discovers all processor-related counters and their corresponding IDs for template configuration.
 
 ### EXAMPLE 3
-```powershell
+```
 Get-tpcPerformanceCounterInfo -SearchTerm "% Processor Time"
 ```
 
-Finds the specific counter and returns its composite ID (238-6), counterSetType (MultiInstance),
-and available instances for creating JSON configuration entries.
+Finds the specific counter and returns its composite ID for use in configuration templates.
 
 ## PARAMETERS
 
@@ -92,31 +92,16 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## OUTPUTS
 
-### System.Management.Automation.PSCustomObject
-Returns a formatted table with counter information required for JSON configuration creation:
-
-**ID**: Composite counter ID (SetID-PathID) for the counterID property in JSON, or "N/A" if not resolvable
-
-**CounterSet**: Localized performance counter set name for reference purposes
-
-**Path**: Full localized counter path showing what the counter measures
-
-**SetType**: SingleInstance or MultiInstance - determines the counterSetType property in JSON configuration
-
-**Instances**: Available counter instances for MultiInstance counters - helps determine the counterInstance property value
-
+### Formatted table displaying counter information for template configuration:
+### - ID: Composite counter ID (SetID-PathID) for use in config templates, or "N/A" if not resolvable
+### - CounterSet: Localized performance counter set name
+### - Path: Full localized counter path
+### - SetType: SingleInstance or MultiInstance (important for template instance configuration)
+### - Instances: Available counter instances for multi-instance counters
 ## NOTES
-Essential function for JSON configuration file creation in the psTerminalPerfCounter module.
-The language-independent counter ID approach ensures JSON configurations work across different system locales.
-
-**Workflow for JSON Configuration Creation:**
-1. Use this function to discover counter IDs by searching for counter names
-2. Validate counter availability and determine counterSetType
-3. Identify appropriate counterInstance values for MultiInstance counters
-4. Use the returned information to populate JSON configuration files
-
-**Dependencies:** Requires Get-PerformanceCounterId and Get-PerformanceCounterLocalName helper functions.
-
-**Schema Compliance:** All returned counter IDs follow the "SetID-PathID" format required by the JSON schema.
+Primary function for config template ID creation in the psTerminalPerfCounter module.
+Language-independent approach ensures templates work across different system locales.
+Composite IDs returned by this function are used directly in JSON configuration files.
+Requires Get-PerformanceCounterId and Get-PerformanceCounterLocalName helper functions.
 
 ## RELATED LINKS
