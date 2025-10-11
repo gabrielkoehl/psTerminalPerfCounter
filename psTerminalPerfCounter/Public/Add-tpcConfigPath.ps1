@@ -1,18 +1,19 @@
 function Add-tpcConfigPath {
     <#
     .SYNOPSIS
-        Adds a configuration path to the TPC_CONFIGPATH environment variable.
+        Adds a custom configuration path to the TPC_CONFIGPATH environment variable.
 
     .DESCRIPTION
-        This function adds a new path to the TPC_CONFIGPATH environment variable which is used
-        throughout the module to locate configuration files. The function validates the path
-        existence and offers to create it if it doesn't exist. Supports both local and network paths.
+        This function adds a new path to the TPC_CONFIGPATH user environment variable which is used
+        throughout the module to locate performance counter configuration files. The function validates
+        the path existence and offers to create it if it doesn't exist. Supports both local and UNC network paths.
 
-        Paths are stored comma-separated in the environment variable.
+        Added paths are permanently stored in the user-level environment variable and persist across PowerShell sessions.
+        Paths are stored comma-separated in the environment variable and automatically deduplicated.
 
     .PARAMETER Path
-        The path to add to the configuration path list. Can be a local path or UNC network path.
-        The path will be validated for proper format and existence.
+        The absolute path to add to the configuration path list. Can be a local path or UNC network path.
+        Must be a rooted (absolute) path. The path will be validated for proper format and existence.
 
     .PARAMETER Force
         If specified, creates the path without prompting if it doesn't exist.
@@ -20,7 +21,7 @@ function Add-tpcConfigPath {
     .EXAMPLE
         Add-tpcConfigPath -Path "C:\MyConfigs"
 
-        Adds a local path to the configuration path list.
+        Adds a local path to the configuration path list. Prompts for creation if path doesn't exist.
 
     .EXAMPLE
         Add-tpcConfigPath -Path "\\server\share\configs" -Force
@@ -28,7 +29,13 @@ function Add-tpcConfigPath {
         Adds a network path to the configuration path list and creates it if necessary without prompting.
 
     .OUTPUTS
-        None. Updates the TPC_CONFIGPATH environment variable.
+        None. Updates the TPC_CONFIGPATH user environment variable.
+
+    .NOTES
+        Related commands:
+        - Get-tpcConfigPaths: List all configured paths
+        - Remove-tpcConfigPath: Remove paths from configuration
+        - Get-tpcAvailableCounterConfig: View available configurations from all paths
     #>
 
     [CmdletBinding()]
