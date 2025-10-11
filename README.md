@@ -16,8 +16,6 @@ From version 0.2.0 onward, there is already a lot of (commented out) code for mo
 [-- BLOG -- ](https://dbavonnebenan.de)
 </div>
 
-
-
 ## Documentation
 
 - **[Start-tpcMonitor](docs/en-US/Start-tpcMonitor.md)** - Main monitoring function
@@ -26,7 +24,10 @@ From version 0.2.0 onward, there is already a lot of (commented out) code for mo
 - **[Remove-tpcConfigPath](docs/en-US/Remove-tpcConfigPath.md)** - Removes custom pathes
 - **[Get-tpcAvailableCounterConfig](docs/en-US/Get-tpcAvailableCounterConfig.md)** - shows all available confiogurations from all pathes
 - **[Get-tpcPerformanceCounterInfo](docs/en-US/Get-tpcPerformanceCounterInfo.md)** - shows detailed information about performance counters
-- **[DevelopmentStatus](docs/en-US/DevelopmentStatus.md)** - Whats next?
+
+- **[Building Custom Configs](docs/en-US/Building_Custom_Configs.md)** - How to create custom configurations [WIP]
+
+- **[DevelopmentStatus](DevelopmentStatus.md)** - Whats next?
 
 ## Key Features
 

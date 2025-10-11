@@ -8,33 +8,27 @@ schema: 2.0.0
 # Start-tpcMonitor
 
 ## SYNOPSIS
-Starts real-time performance counter monitoring using predefined configuration templates with language-independent counter IDs.
+Starts real-time performance counter monitoring for local or remote systems using predefined configuration templates with language-independent counter IDs.
 
 ## SYNTAX
 
 ### SingleRemoteServer
 ```
 Start-tpcMonitor -ConfigName <String> -ComputerName <String> [-Credential <PSCredential>]
- [-UpdateInterval <Int32>] [-MaxHistoryPoints <Int32>] [-visHTML] [-exportJson]
- [-ProgressAction <ActionPreference>] [<CommonParameters>]
+ [-UpdateInterval <Int32>] [-MaxHistoryPoints <Int32>] [-ProgressAction <ActionPreference>]
+ [<CommonParameters>]
 ```
 
 ### ConfigName
 ```
-Start-tpcMonitor -ConfigName <String> [-UpdateInterval <Int32>] [-MaxHistoryPoints <Int32>] [-visHTML]
- [-exportJson] [-ProgressAction <ActionPreference>] [<CommonParameters>]
+Start-tpcMonitor -ConfigName <String> [-UpdateInterval <Int32>] [-MaxHistoryPoints <Int32>]
+ [-ProgressAction <ActionPreference>] [<CommonParameters>]
 ```
 
 ### ConfigPath
 ```
-Start-tpcMonitor -ConfigPath <String> [-UpdateInterval <Int32>] [-MaxHistoryPoints <Int32>] [-visHTML]
- [-exportJson] [-ProgressAction <ActionPreference>] [<CommonParameters>]
-```
-
-### RemoteServerConfig
-```
-Start-tpcMonitor -RemoteServerConfig <String> [-showConsoleTable] [-UpdateInterval <Int32>]
- [-MaxHistoryPoints <Int32>] [-visHTML] [-exportJson] [-ProgressAction <ActionPreference>] [<CommonParameters>]
+Start-tpcMonitor -ConfigPath <String> [-UpdateInterval <Int32>] [-MaxHistoryPoints <Int32>]
+ [-ProgressAction <ActionPreference>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -47,6 +41,9 @@ The function uses the module's language-independent ID system to ensure configur
 system locales.
 It automatically filters unavailable counters and provides detailed feedback about monitoring status.
 Supports interactive monitoring with graphical displays, tables, and statistics based on configuration settings.
+
+Monitoring can be performed on the local system or on remote computers by specifying ComputerName parameter.
+Remote monitoring requires appropriate permissions and network connectivity to the target system.
 
 ## EXAMPLES
 
@@ -79,13 +76,28 @@ Start-tpcMonitor -ConfigName "Disk" -UpdateInterval 1 -MaxHistoryPoints 200
 
 Starts disk monitoring with 1-second updates and extended data retention of 200 points.
 
+### EXAMPLE 5
+```
+Start-tpcMonitor -ConfigName "CPU" -ComputerName "Server01"
+```
+
+Monitors CPU performance on remote server 'Server01' using current user credentials.
+
+### EXAMPLE 6
+```
+Start-tpcMonitor -ConfigName "Memory" -ComputerName "SQLServer01" -Credential $cred
+```
+
+Monitors memory performance on remote server 'SQLServer01' using specified credentials.
+
 ## PARAMETERS
 
 ### -ConfigName
 Name of the configuration template to load (without 'tpc_' prefix and '.json' extension).
-Must correspond to a JSON file in the config directory (e.g., 'CPU' loads 'tpc_CPU.json').
+Must correspond to a JSON file in the config directories (e.g., 'CPU' loads 'tpc_CPU.json').
 Default: 'CPU'
 Cannot be used together with ConfigPath parameter.
+Required when using remote monitoring with ComputerName parameter.
 
 ```yaml
 Type: String
@@ -103,6 +115,7 @@ Accept wildcard characters: False
 Absolute path to a specific JSON configuration file.
 The file must follow the naming convention 'tpc_*.json' and exist at the specified location.
 Cannot be used together with ConfigName parameter.
+Only available for local monitoring.
 
 ```yaml
 Type: String
@@ -116,38 +129,10 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -RemoteServerConfig
-{{ Fill RemoteServerConfig Description }}
-
-```yaml
-Type: String
-Parameter Sets: RemoteServerConfig
-Aliases:
-
-Required: True
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -showConsoleTable
-{{ Fill showConsoleTable Description }}
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: RemoteServerConfig
-Aliases:
-
-Required: False
-Position: Named
-Default value: False
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
 ### -ComputerName
-{{ Fill ComputerName Description }}
+DNS name of the remote computer to monitor.
+Requires ConfigName parameter to be specified.
+The remote system must be reachable and allow remote performance counter access.
 
 ```yaml
 Type: String
@@ -162,7 +147,9 @@ Accept wildcard characters: False
 ```
 
 ### -Credential
-{{ Fill Credential Description }}
+PSCredential object for authenticating to the remote computer.
+If not specified, uses the current user's credentials.
+Only applicable when ComputerName is specified.
 
 ```yaml
 Type: PSCredential
@@ -213,36 +200,6 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -visHTML
-{{ Fill visHTML Description }}
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: False
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -exportJson
-{{ Fill exportJson Description }}
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: False
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
 ### -ProgressAction
 {{ Fill ProgressAction Description }}
 
@@ -272,7 +229,12 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 ### - Session summary upon completion
 ## NOTES
 Main entry point for the psTerminalPerfCounter monitoring system.
-Requires JSON configuration files in the module's config directory.
+Requires JSON configuration files in the module's config directory or custom directories.
 Press Ctrl+C to stop monitoring and display session summary.
+
+Remote monitoring requires:
+- Network connectivity to target system
+- Appropriate permissions for remote performance counter access
+- Windows Remote Management (WinRM) enabled on target system
 
 ## RELATED LINKS

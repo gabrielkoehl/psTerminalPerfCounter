@@ -8,7 +8,7 @@ schema: 2.0.0
 # Remove-tpcConfigPath
 
 ## SYNOPSIS
-Removes a configuration path from the TPC_CONFIGPATH environment variable.
+Removes custom configuration paths from the TPC_CONFIGPATH environment variable.
 
 ## SYNTAX
 
@@ -17,10 +17,17 @@ Remove-tpcConfigPath [-All] [-ProgressAction <ActionPreference>] [<CommonParamet
 ```
 
 ## DESCRIPTION
-This function displays all currently configured paths in the TPC_CONFIGPATH environment
-variable as a numbered list and allows the user to select which path(s) to remove.
+This function provides an interactive menu to remove custom paths from the TPC_CONFIGPATH user
+environment variable.
+It displays all currently configured paths with their existence status
+and allows the user to select which path(s) to remove.
 
 The function provides an interactive selection menu where users can choose paths by number.
+Paths are displayed with indicators showing whether they exist (✓) or not (✗).
+
+Note: This function only affects custom paths stored in the environment variable.
+The module's
+default config directory cannot be removed through this function.
 
 ## EXAMPLES
 
@@ -29,19 +36,21 @@ The function provides an interactive selection menu where users can choose paths
 Remove-tpcConfigPath
 ```
 
-Shows an interactive menu to select and remove configuration paths.
+Shows an interactive menu to select and remove custom configuration paths.
+Displays path existence status and allows sequential removal with confirmation.
 
 ### EXAMPLE 2
 ```
 Remove-tpcConfigPath -All
 ```
 
-Removes all configuration paths without prompting.
+Removes all custom configuration paths from TPC_CONFIGPATH without prompting.
 
 ## PARAMETERS
 
 ### -All
-If specified, removes all paths from the TPC_CONFIGPATH environment variable without prompting.
+If specified, removes all custom paths from the TPC_CONFIGPATH environment variable without prompting.
+The module's default config directory is not affected.
 
 ```yaml
 Type: SwitchParameter
@@ -77,7 +86,11 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## OUTPUTS
 
-### None. Updates the TPC_CONFIGPATH environment variable.
+### None. Updates the TPC_CONFIGPATH user environment variable.
 ## NOTES
+Related commands:
+- Get-tpcConfigPaths: List all configured paths
+- Add-tpcConfigPath: Add new paths to configuration
+- Get-tpcAvailableCounterConfig: View available configurations from all paths
 
 ## RELATED LINKS
