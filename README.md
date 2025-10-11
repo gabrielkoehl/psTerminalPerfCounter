@@ -168,15 +168,28 @@ Each template includes:
 
 ### Configuration Properties
 
+#### Counter Properties
+- **title**: Display name for the performance counter
+- **unit**: Unit of measurement (e.g., "%", "Threads", "MB/sec")
 - **conversionFactor**: Factor used to convert raw counter values (e.g., 1024 for bytes to KB conversion)
 - **conversionExponent**: Exponent applied during conversion calculations
 - **type**: Data type - "Number" for absolute values, "Percentage" for percentage values
 - **format**: Display format - "both" (graph and table), "table" only, or "graph" only
 - **counterID**: Language-independent performance counter ID (format: "set-counter")
-- **colorMap**: Threshold-based color mapping for visual alerts
+- **counterSetType**: Counter instance type - "MultiInstance" (multiple instances available) or "SingleInstance" (single instance only)
+- **counterInstance**: Specific instance of the counter (e.g., "_Total" for all processors, empty string for SingleInstance counters)
+- **colorMap**: Threshold-based color mapping for visual alerts (format: threshold value: color name)
+
+#### Graph Configuration Properties
 - **Samples**: Number of data points to display in graphs
+- **graphType**: Type of graph visualization (e.g., "Bar", "Line")
+- **showStatistics**: Boolean flag to display statistical information (mean, min, max)
 - **yAxisStep**: Step size for Y-axis scale values
 - **yAxisMaxRows**: Maximum rows for Y-axis display
+- **colors**: Color scheme for graph elements
+  - **title**: Color for the counter title
+  - **statistics**: Color for statistical information
+  - **default**: Default color for graph data
 
 
 
