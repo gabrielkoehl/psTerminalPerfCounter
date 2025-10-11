@@ -1,9 +1,13 @@
 # psTerminalPerfCounter
 
 Initiated from my role as SQL Server consultant since I always want to use what's available, namely PowerShell
+<br>
+<div align="center">
 
-![Monitoring Example](docs/src/example_memory.png)
+<img src="docs/en-US/src/example_memory.png" alt="Alt Text" style="width: 50%;">
 
+</div>
+<br>
 A PowerShell module for creating and using predefined performance counter configurations with real-time terminal-based visualization. This module addresses the challenge of efficiently monitoring system performance by providing ready-to-use presets tailored to specific requirements. It also currently supports remote server checks.
 
 From version 0.2.0 onward, there is already a lot of (commented out) code for monitoring multiple remote servers, but I introduced some hard‑to‑work‑around constraints due to my preference for classes, since classes cannot be streamed across sessions. Therefore, the 0.2.0 release focuses on completing bug fixes and QoL improvements.
@@ -11,23 +15,10 @@ From version 0.2.0 onward, there is already a lot of (commented out) code for mo
 
 
 <div align="center">
-<img src="docs/src/logo.png" alt="Alt Text" style="width: 30%;">
-
-[-- BLOG -- ](https://dbavonnebenan.de)
+<img src="docs/en-US/src/logo.png" alt="Alt Text" style="width: 20%;">
+<br>
+<a href="https://dbavonnebenan.de" style="font-size:1.2em;">-- dbavonnebenan.de --</a>
 </div>
-
-## Documentation
-
-- **[Start-tpcMonitor](docs/en-US/Start-tpcMonitor.md)** - Main monitoring function
-- **[Get-tpcConfigPaths](docs/en-US/Get-tpcConfigPaths.md)** - List configured pathes containing configurations
-- **[Add-tpcConfigPath](docs/en-US/Add-tpcConfigPath.md)** - Adds custom path contianing configurations
-- **[Remove-tpcConfigPath](docs/en-US/Remove-tpcConfigPath.md)** - Removes custom pathes
-- **[Get-tpcAvailableCounterConfig](docs/en-US/Get-tpcAvailableCounterConfig.md)** - shows all available confiogurations from all pathes
-- **[Get-tpcPerformanceCounterInfo](docs/en-US/Get-tpcPerformanceCounterInfo.md)** - shows detailed information about performance counters
-
-- **[Building Custom Configs](docs/en-US/Building_Custom_Configs.md)** - How to create custom configurations [WIP]
-
-- **[DevelopmentStatus](DevelopmentStatus.md)** - Whats next?
 
 ## Key Features
 
@@ -50,6 +41,18 @@ JSON-based configuration files define:
 - Statistical calculations
 
 You can configure any combination of performance counters that your system provides
+
+## Documentation
+
+- **[Start-tpcMonitor](docs/en-US/Start-tpcMonitor.md)** - Main monitoring function
+- **[Get-tpcConfigPaths](docs/en-US/Get-tpcConfigPaths.md)** - List configured pathes containing configurations
+- **[Add-tpcConfigPath](docs/en-US/Add-tpcConfigPath.md)** - Adds custom path contianing configurations
+- **[Remove-tpcConfigPath](docs/en-US/Remove-tpcConfigPath.md)** - Removes custom pathes
+- **[Get-tpcAvailableCounterConfig](docs/en-US/Get-tpcAvailableCounterConfig.md)** - shows all available confiogurations from all pathes
+- **[Get-tpcPerformanceCounterInfo](docs/en-US/Get-tpcPerformanceCounterInfo.md)** - shows detailed information about performance counters
+
+- **[Building Custom Configs](docs/en-US/Building_Custom_Configs.md)** - How to create custom configurations
+- **[DevelopmentStatus](DevelopmentStatus.md)** - Whats next?
 
 ## Installation
 
@@ -124,9 +127,12 @@ Each template includes:
 
 ## Example Output
 
-![Monitoring Example](docs/src/example_cpu.png)
+<br>
+<div align="center">
+<img src="docs/en-US/src/example_cpu.png" alt="Alt Text" style="width: 50%;">
 
 *Example of real-time CPU monitoring with graphical display*
+</div>
 
 ## Creating Custom Configurations
 
