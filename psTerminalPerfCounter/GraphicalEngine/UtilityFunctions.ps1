@@ -2,21 +2,21 @@ Function Write-Graph {
     [CmdletBinding()]
     Param(
         [string]    $YAxisLabelAlphabet,
-        [string]    $YAxisLabel,
+        [string]    $YAxisValue,
         [string]    $Row,
         [string]    $RowColor,
         [string]    $LabelColor,
-        [int]       $LengthOfMaxYAxisLabel
+        [int]       $MaxYValueWidth
     )
 
-    # If LengthOfMaxYAxisLabel is not provided, calculate it
-    if ( -not $LengthOfMaxYAxisLabel ) {
-        $LengthOfMaxYAxisLabel = $YAxisLabel.ToString().Length
+    # If MaxYValueWidth is not provided, calculate it
+    if ( -not $MaxYValueWidth ) {
+        $MaxYValueWidth = $YAxisValue.ToString().Length
     }
 
     Write-Host -Object $([char]9474) -NoNewline
     Write-Host -Object $YAxisLabelAlphabet -ForegroundColor $LabelColor -NoNewline
-    Write-Host -Object "$($YAxisLabel.tostring().PadLeft($LengthOfMaxYAxisLabel+2) + [Char]9508)" -NoNewline
+    Write-Host -Object "$($YAxisValue.tostring().PadLeft($MaxYValueWidth+2) + [Char]9508)" -NoNewline
     Write-Host -Object $Row -ForegroundColor $RowColor -NoNewline
     Write-Host -Object "  " -NoNewline
     Write-Host -Object $([char]9474)

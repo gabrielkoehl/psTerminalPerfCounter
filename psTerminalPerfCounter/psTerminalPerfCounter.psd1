@@ -4,7 +4,7 @@
 RootModule = 'psTerminalPerfCounter.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.1.0'
+ModuleVersion = '0.2.0'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -61,7 +61,7 @@ RequiredModules = @('GripDevJsonSchemaValidator')
 # NestedModules = @()
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-FunctionsToExport = @('Get-tpcAvailableCounterConfig','Get-tpcPerformanceCounterInfo','Start-tpcMonitor')
+FunctionsToExport = @('Get-tpcAvailableCounterConfig','Get-tpcPerformanceCounterInfo','Start-tpcMonitor','Add-tpcConfigPath','Remove-tpcConfigPath','Get-tpcConfigPaths')
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = '*'
@@ -99,10 +99,10 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = 'Initial preview release featuring predefined performance counter configurations with real-time terminal-based visualization. Includes CPU, Memory, and Disk monitoring templates with language-independent counter IDs and integrated graphical engine.'
+        ReleaseNotes = 'Version 0.2.0: Major update featuring remote server monitoring capabilities. Monitor remote servers via -ComputerName parameter with credential support. Added configuration path management (Add/Remove/Get-tpcConfigPath). Enhanced Start-tpcMonitor with -ConfigName/-ConfigPath parameters. Improved Y-axis scaling with compact formatting (5k, 1M). Comprehensive code quality improvements and parameter harmonization throughout the module.'
 
         # Prerelease string of this module
-        Prerelease = 'preview'
+        # Prerelease = 'preview'
 
         # Flag to indicate whether the module requires explicit user acceptance for install/update/save
         # RequireLicenseAcceptance = $false

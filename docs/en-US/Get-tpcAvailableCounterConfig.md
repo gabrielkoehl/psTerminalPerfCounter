@@ -1,20 +1,33 @@
+---
+external help file: psTerminalPerfCounter-help.xml
+Module Name: psTerminalPerfCounter
+online version:
+schema: 2.0.0
+---
+
 # Get-tpcAvailableCounterConfig
 
 ## SYNOPSIS
-Retrieves, validates, and displays detailed information about available performance
-counter configurations including JSON schema validation and optional counter availability testing.
+Retrieves, validates, and displays detailed information about available performance counter configurations from all configured paths.
 
 ## SYNTAX
 
 ```
-Get-tpcAvailableCounterConfig [[-ConfigPath] <String>] [[-SchemaPath] <String>] [-Raw] [-TestCounters]
- [-ProgressAction <ActionPreference>] [<CommonParameters>]
+Get-tpcAvailableCounterConfig [-Raw] [-TestCounters] [-ProgressAction <ActionPreference>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-This function scans the config directory for all JSON files with the 'tpc_' prefix
-and provides detailed information about each configuration including counter details,
-validation status, and availability checks.
+This function scans all configured paths (using Get-tpcConfigPaths) for JSON configuration files with the 'tpc_' prefix
+and provides comprehensive information about each configuration including counter details, JSON schema validation status,
+and optional counter availability testing.
+
+Results are grouped by path similar to Get-Module -ListAvailable.
+Duplicate configurations across paths are automatically
+detected and marked to help identify potential conflicts.
+The function validates each configuration against the module's
+JSON schema and optionally tests counter availability on the system.
+
+Template files (containing 'template' in the basename) are automatically excluded from the results.
 
 ## EXAMPLES
 
@@ -23,65 +36,36 @@ validation status, and availability checks.
 Get-tpcAvailableCounterConfig
 ```
 
-Shows formatted overview of all available configurations (without counter testing).
+Shows formatted overview of all available configurations from all configured paths.
+Displays configuration names, descriptions, counter counts, and validation status.
 
 ### EXAMPLE 2
 ```
 Get-tpcAvailableCounterConfig -TestCounters
 ```
 
-Shows formatted overview with counter availability testing.
+Shows formatted overview with counter availability testing from all configured paths.
+Validates each counter to ensure it's available on the current system.
 
 ### EXAMPLE 3
-```
-Get-tpcAvailableCounterConfig -ConfigPath "C:\MyConfigs" -TestCounters
-```
-
-Shows formatted overview of configurations from a custom directory with counter testing.
-
-### EXAMPLE 4
 ```
 Get-tpcAvailableCounterConfig -Raw
 ```
 
-Returns raw configuration objects for further processing.
+Returns raw configuration objects for further processing or custom filtering.
+
+### EXAMPLE 4
+```
+Get-tpcAvailableCounterConfig | Where-Object { $_.JsonValid -eq $false }
+```
+
+Lists only configurations with JSON validation errors (when used with -Raw).
 
 ## PARAMETERS
 
-### -ConfigPath
-Optional custom path to configuration files.
-If not specified, uses the module's
-config directory.
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 1
-Default value: $(Join-Path $PSScriptRoot "..\Config")
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -SchemaPath
-Path to Json Schema file
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 2
-Default value: $(Join-Path $ConfigPath "schema.json")
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
 ### -Raw
-If specified, returns raw PSCustomObject array instead of formatted output.
+If specified, returns raw PSCustomObject array instead of formatted console output.
+Useful for further processing or filtering of configuration data.
 
 ```yaml
 Type: SwitchParameter
@@ -96,8 +80,8 @@ Accept wildcard characters: False
 ```
 
 ### -TestCounters
-If specified, tests each counter for availability.
-This can be slow with many counters.
+If specified, tests each counter for availability on the current system.
+This validates that counters can actually be queried but may be slow with many counters.
 
 ```yaml
 Type: SwitchParameter
@@ -133,7 +117,14 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## OUTPUTS
 
-### Formatted output by default, PSCustomObject[] when -Raw is used.
+### Formatted console output by default (grouped by path), PSCustomObject[] when -Raw is used.
 ## NOTES
+This function requires the GripDevJsonSchemaValidator module for JSON schema validation.
+If not installed, validation will be skipped with a warning.
+
+Related commands:
+- Get-tpcConfigPaths: List all configured configuration paths
+- Start-tpcMonitor: Start monitoring with a specific configuration
+- Get-tpcPerformanceCounterInfo: Get counter IDs for creating custom configurations
 
 ## RELATED LINKS

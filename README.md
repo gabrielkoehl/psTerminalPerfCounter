@@ -1,28 +1,24 @@
 # psTerminalPerfCounter
 
-![Monitoring Example](docs/src/example_memory.png)
-
-A PowerShell module for creating and using predefined performance counter configurations with real-time terminal-based visualization. This module addresses the challenge of efficiently monitoring system performance by providing ready-to-use presets tailored to specific requirements.
-
 Initiated from my role as SQL Server consultant since I always want to use what's available, namely PowerShell
+<br>
+<div align="center">
+
+<img src="docs/en-US/src/example_memory.png" alt="Alt Text" style="width: 50%;">
+
+</div>
+<br>
+A PowerShell module for creating and using predefined performance counter configurations with real-time terminal-based visualization. This module addresses the challenge of efficiently monitoring system performance by providing ready-to-use presets tailored to specific requirements. It also currently supports remote server checks.
+
+From version 0.2.0 onward, there is already a lot of (commented out) code for monitoring multiple remote servers, but I introduced some hard‑to‑work‑around constraints due to my preference for classes, since classes cannot be streamed across sessions. Therefore, the 0.2.0 release focuses on completing bug fixes and QoL improvements.
+
+
 
 <div align="center">
-<img src="docs/src/logo.png" alt="Alt Text" style="width: 30%;">
-
-[-- BLOG -- ](https://dbavonnebenan.de)
+<img src="docs/en-US/src/logo.png" alt="Alt Text" style="width: 20%;">
+<br>
+<a href="https://dbavonnebenan.de" style="font-size:1.2em;">-- dbavonnebenan.de --</a>
 </div>
-
-
-
-## Documentation
-
-- **[Start-tpcMonitor](docs/en-US/Start-tpcMonitor.md)** - Main monitoring function with real-time display
-- **[Get-tpcAvailableCounterConfig](docs/en-US/Get-tpcAvailableCounterConfig.md)** - List available configuration templates
-- **[Get-tpcPerformanceCounterInfo](docs/en-US/Get-tpcPerformanceCounterInfo.md)** - Get detailed information about performance counters
-- **[Counter Configuration Guide](docs/en-US/CounterConfiguration.md)** - Guide for creating and customizing JSON configurations
-- **[Development Status](docs/en-US/DevelopmentStatus.md)** - Whats next?
-
-
 
 ## Key Features
 
@@ -46,12 +42,24 @@ JSON-based configuration files define:
 
 You can configure any combination of performance counters that your system provides
 
+## Documentation
+
+- **[Start-tpcMonitor](docs/en-US/Start-tpcMonitor.md)** - Main monitoring function
+- **[Get-tpcConfigPaths](docs/en-US/Get-tpcConfigPaths.md)** - List configured pathes containing configurations
+- **[Add-tpcConfigPath](docs/en-US/Add-tpcConfigPath.md)** - Adds custom path contianing configurations
+- **[Remove-tpcConfigPath](docs/en-US/Remove-tpcConfigPath.md)** - Removes custom pathes
+- **[Get-tpcAvailableCounterConfig](docs/en-US/Get-tpcAvailableCounterConfig.md)** - shows all available confiogurations from all pathes
+- **[Get-tpcPerformanceCounterInfo](docs/en-US/Get-tpcPerformanceCounterInfo.md)** - shows detailed information about performance counters
+
+- **[Building Custom Configs](docs/en-US/Building_Custom_Configs.md)** - How to create custom configurations
+- **[DevelopmentStatus](DevelopmentStatus.md)** - Whats next?
+
 ## Installation
 
 ```powershell
 
 # Install module
-Install-Module -Name psTerminalPerfCounter -AllowPrerelease
+Install-Module -Name psTerminalPerfCounter
 
 # Install required dependencies if automatic fails
 Install-Module GripDevJsonSchemaValidator
@@ -119,60 +127,36 @@ Each template includes:
 
 ## Example Output
 
-![Monitoring Example](docs/src/example_cpu.png)
+<br>
+<div align="center">
+<img src="docs/en-US/src/example_cpu.png" alt="Alt Text" style="width: 50%;">
 
 *Example of real-time CPU monitoring with graphical display*
+</div>
 
-## Configuration Structure
+## Creating Custom Configurations
 
-```json
-{
-    "name": "CPU Performance",
-    "description": "CPU utilization and queue monitoring",
-    "counters": [
-        {
-            "title": "Processor Time",
-            "unit": "%",
-            "conversionFactor": 1,
-            "conversionExponent": 1,
-            "type": "Percentage",
-            "format": "both",
-            "counterID": "238-6",
-            "counterSetType": "MultiInstance",
-            "counterInstance": "_Total",
-            "colorMap": {
-                "30": "Green",
-                "70": "Yellow",
-                "80": "Red"
-            },
-            "graphConfiguration": {
-                "Samples": 70,
-                "graphType": "Bar",
-                "showStatistics": true,
-                "yAxisStep": 10,
-                "yAxisMaxRows": 10,
-                "colors": {
-                    "title": "Cyan",
-                    "statistics": "Gray",
-                    "default": "White"
-                }
-            }
-        }
-    ]
-}
+For detailed information on creating custom JSON configuration files, see the [Building Custom Configs Guide](docs/en-US/Building_Custom_Configs.md). The guide covers:
+
+- Configuration file structure and naming conventions
+- Finding counter IDs with `Get-tpcPerformanceCounterInfo`
+- Step-by-step configuration creation
+- Real-world examples (CPU, Memory, Disk)
+- JSON schema validation
+- Best practices and troubleshooting
+
+Quick example:
+
+```powershell
+# Find counter IDs
+Get-tpcPerformanceCounterInfo -SearchTerm "Processor Time"
+
+# Create tpc_MyConfig.json in a configured path
+# See docs/en-US/Building_Custom_Configs.md for complete templates
+
+# Validate configuration
+Get-tpcAvailableCounterConfig -TestCounters
 ```
-
-### Configuration Properties
-
-- **conversionFactor**: Factor used to convert raw counter values (e.g., 1024 for bytes to KB conversion)
-- **conversionExponent**: Exponent applied during conversion calculations
-- **type**: Data type - "Number" for absolute values, "Percentage" for percentage values
-- **format**: Display format - "both" (graph and table), "table" only, or "graph" only
-- **counterID**: Language-independent performance counter ID (format: "set-counter")
-- **colorMap**: Threshold-based color mapping for visual alerts
-- **Samples**: Number of data points to display in graphs
-- **yAxisStep**: Step size for Y-axis scale values
-- **yAxisMaxRows**: Maximum rows for Y-axis display
 
 
 
