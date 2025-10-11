@@ -6,7 +6,7 @@ Initiated from my role as SQL Server consultant since I always want to use what'
 
 A PowerShell module for creating and using predefined performance counter configurations with real-time terminal-based visualization. This module addresses the challenge of efficiently monitoring system performance by providing ready-to-use presets tailored to specific requirements. It also currently supports remote server checks.
 
-From version 0.2.0 onward, there is already a lot of code for monitoring multiple remote servers, but I introduced some hard‑to‑work‑around constraints due to my preference for classes, since classes cannot be streamed across sessions. Therefore, the 0.2.0 release focuses on completing bug fixes and QoL improvements.
+From version 0.2.0 onward, there is already a lot of (commented out) code for monitoring multiple remote servers, but I introduced some hard‑to‑work‑around constraints due to my preference for classes, since classes cannot be streamed across sessions. Therefore, the 0.2.0 release focuses on completing bug fixes and QoL improvements.
 
 
 

@@ -78,11 +78,12 @@
         [Parameter(ParameterSetName = 'ConfigPath',         Mandatory)]
         [string]        $ConfigPath,
 
+<#  for later releases
         [Parameter(ParameterSetName = 'RemoteServerConfig', Mandatory)]
         [string]        $RemoteServerConfig,
         [Parameter(ParameterSetName = 'RemoteServerConfig' )]
         [switch]        $showConsoleTable,
-
+#>
         [Parameter(ParameterSetName = 'SingleRemoteServer', Mandatory)]
         [string]        $ComputerName,
         [Parameter(ParameterSetName = 'SingleRemoteServer')]
@@ -90,7 +91,7 @@
 
         [int]           $UpdateInterval     = 1,
         [int]           $MaxHistoryPoints   = 100,
-        [switch]        $visHTML,
+#       [switch]        $visHTML,
         [switch]        $exportJson
     )
 
@@ -139,7 +140,7 @@
                     $counter.TestAvailability()
                 }
 
-            } elseif ( $PSCmdlet.ParameterSetName -eq 'RemoteServerConfig' ) {
+            <# }  elseif ( $PSCmdlet.ParameterSetName -eq 'RemoteServerConfig' ) {
 
                 $monitorType = 'remoteMulti'
 
@@ -155,7 +156,7 @@
                 if ( $Config.Servers.Count -eq 0 ) {
                     Write-Warning "No valid servers found in remote server configuration '$RemoteServerConfig'"
                     Return
-                }
+                } #>
 
             } elseif ( $PSCmdlet.ParameterSetName -eq 'SingleRemoteServer' ) {
 
@@ -186,6 +187,8 @@
             }
 
             # Validate remote server, server count, only one is allowed to be visualized with graph in console. use -showTable or -visHTML
+
+<# for later releases
             if ( $PSCmdlet.ParameterSetName -eq 'RemoteServerConfig' ) {
 
                 if ( -not $showConsoleTable.IsPresent ) {
@@ -277,6 +280,7 @@
 
 
             }
+#>
 
             # Start monitoring
             $MonitoringParams = @{
