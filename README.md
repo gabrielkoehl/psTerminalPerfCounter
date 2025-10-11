@@ -1,10 +1,14 @@
 # psTerminalPerfCounter
 
+Initiated from my role as SQL Server consultant since I always want to use what's available, namely PowerShell
+
 ![Monitoring Example](docs/src/example_memory.png)
 
-A PowerShell module for creating and using predefined performance counter configurations with real-time terminal-based visualization. This module addresses the challenge of efficiently monitoring system performance by providing ready-to-use presets tailored to specific requirements.
+A PowerShell module for creating and using predefined performance counter configurations with real-time terminal-based visualization. This module addresses the challenge of efficiently monitoring system performance by providing ready-to-use presets tailored to specific requirements. It also currently supports remote server checks.
 
-Initiated from my role as SQL Server consultant since I always want to use what's available, namely PowerShell
+From version 0.2.0 onward, there is already a lot of code for monitoring multiple remote servers, but I introduced some hard‑to‑work‑around constraints due to my preference for classes, since classes cannot be streamed across sessions. Therefore, the 0.2.0 release focuses on completing bug fixes and QoL improvements.
+
+
 
 <div align="center">
 <img src="docs/src/logo.png" alt="Alt Text" style="width: 30%;">
@@ -16,13 +20,13 @@ Initiated from my role as SQL Server consultant since I always want to use what'
 
 ## Documentation
 
-- **[Start-tpcMonitor](docs/en-US/Start-tpcMonitor.md)** - Main monitoring function with real-time display
-- **[Get-tpcAvailableCounterConfig](docs/en-US/Get-tpcAvailableCounterConfig.md)** - List available configuration templates
-- **[Get-tpcPerformanceCounterInfo](docs/en-US/Get-tpcPerformanceCounterInfo.md)** - Get detailed information about performance counters
-- **[Counter Configuration Guide](docs/en-US/CounterConfiguration.md)** - Guide for creating and customizing JSON configurations
-- **[Development Status](docs/en-US/DevelopmentStatus.md)** - Whats next?
-
-
+- **[Start-tpcMonitor](docs/en-US/Start-tpcMonitor.md)** - Main monitoring function
+- **[Get-tpcConfigPaths](docs/en-US/Get-tpcConfigPaths.md)** - List configured pathes containing configurations
+- **[Add-tpcConfigPath](docs/en-US/Add-tpcConfigPath.md)** - Adds custom path contianing configurations
+- **[Remove-tpcConfigPath](docs/en-US/Remove-tpcConfigPath.md)** - Removes custom pathes
+- **[Get-tpcAvailableCounterConfig](docs/en-US/Get-tpcAvailableCounterConfig.md)** - shows all available confiogurations from all pathes
+- **[Get-tpcPerformanceCounterInfo](docs/en-US/Get-tpcPerformanceCounterInfo.md)** - shows detailed information about performance counters
+- **[DevelopmentStatus](docs/en-US/DevelopmentStatus.md)** - Whats next?
 
 ## Key Features
 
@@ -51,7 +55,7 @@ You can configure any combination of performance counters that your system provi
 ```powershell
 
 # Install module
-Install-Module -Name psTerminalPerfCounter -AllowPrerelease
+Install-Module -Name psTerminalPerfCounter
 
 # Install required dependencies if automatic fails
 Install-Module GripDevJsonSchemaValidator
