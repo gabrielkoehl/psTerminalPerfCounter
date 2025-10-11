@@ -4,11 +4,10 @@ This module is actively developed with the following features planned
 
 ### Planned Features
 
-- 🔄 Proper implementation of custom config path or possibility to load single configuration
-- 🔄 Possibility to override configurations with single values while starting monitoring
 - 🔄 Continuous data export to file
   - 🔄 Excel export with ImportExcel module integration
   - 🔄 PSWriteHtml ( It has automatically refreshing pages, possibly for visualization or complex reports )
+- 🔄 Monitoring multiple Remote Servers
 - 🔄 Additional performance counter templates
 - 🔄 User-friendly usage of SQL Server counters through dynamic instance implementation
 
@@ -22,9 +21,4 @@ Any feedback, bug reports, or feature requests are highly appreciated as the mod
 
 Currently identified issues that are being addressed:
 
-- **Y-axis scaling display issue**: When Y-axis scale values become too long, the graph frame shifts position
-  - **Workaround**: Use `conversionFactor` and `conversionExponent` parameter in configuration to shorten the axix values
-
-- **Graph width vs samples configuration vs maxsamples**: The relationship between maxSamples parameter, graph width and samples is not intuitive
-  - **Current behavior**: Graph width is controlled `Samples` property in configuration, translated in Class to `TargetWidth`  what describes graph padding. `MaxSamples` in main function are the max hold historical datapoints in class property `HistoricalData` and affects the average values, but only 5 are used in output (hardcoded). I only really noticed it when writing the readme
-  - **Planned improvement**: Improve
+- none
