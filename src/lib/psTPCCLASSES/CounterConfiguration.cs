@@ -144,8 +144,37 @@ public class CounterConfiguration
 
      private void TestAvailability()
      {
+          try
+          {
+               if (IsRemote)
+               {
+                    GetRemoteValue(1);
+               }
+               else
+               {
+                    // Get-Counter equivalent - PowerShell command ausführen
+                    using var ps = PowerShell.Create();
+                    ps.AddCommand("Get-Counter")
+                    .AddParameter("Counter", CounterPath)
+                    .AddParameter("MaxSamples", 1);
+                    ps.Invoke();
+               }
 
+               IsAvailable    = true;
+               LastError      = string.Empty;
+          }
+          catch (Exception ex)
+          {
+               IsAvailable    = false;
+               LastError      = ex.Message;
+
+               Console.WriteLine($"Warning: Counter '{Title}' is not available: {LastError}");
+               Thread.Sleep(500);
+          }
      }
+
+
+
 
      private string GetCounterPath(string counterID, string counterSetType, string counterInstance)
      {
