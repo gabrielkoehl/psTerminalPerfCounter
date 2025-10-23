@@ -75,38 +75,42 @@ public class CounterConfiguration
           TestAvailability();
      }
 
-     // STATISCHE Orchestrierungs-Methode für parallele Counter-Abfrage
-     // Aufruf: [psTPCCLASSES.CounterConfiguration]::GetValuesParallel($instanceList)
-     //
-     // Zweck: Führt GetCurrentValue() für ALLE übergebenen Instanzen gleichzeitig aus
-     //        statt nacheinander - spart massiv Zeit bei vielen Servern
-     //
-     // Parameter: List<CounterConfiguration> - Alle Counter-Instanzen die parallel abgefragt werden
-     // Return: Dictionary mit ServerName als Key und (counterValue, duration) Tuple als Value
-     //
-     // Beispiel mit 3 Servern:
-     // Thread 1: instance1.GetCurrentValue() für "dev-node3" läuft parallel
-     // Thread 2: instance2.GetCurrentValue() für "dev-node4" läuft parallel
-     // Thread 3: instance3.GetCurrentValue() für "dev-dc" läuft parallel
-     // Alle 3 laufen GLEICHZEITIG, nicht nacheinander
-     //
-     // Task.WaitAll() wartet bis ALLE Threads fertig sind, dann werden die Ergebnisse gesammelt
-
      public async Task<(double counterValue, int? duration)> GetCurrentValueAsync()
      {
           return await Task.Run(() => GetCurrentValue());
      }
 
+     // STATISCHE Orchestrierungs-Methode für parallele Counter-Abfrage
+     // Aufruf: [psTPCCLASSES.CounterConfiguration]::GetValuesParallel($instanceList)
+     //
+     // Zweck: Führt GetCurrentValue() für ALLE übergebenen Counter gleichzeitig aus
+     //        statt nacheinander - spart massiv Zeit bei vielen Countern
+     //
+     // Parameter: List<CounterConfiguration> - Alle Counter-Instanzen die parallel abgefragt werden
+     // Return: Dictionary mit CounterID als Key und Dictionary mit counterValue + duration als Value
+     //
+     // Beispiel mit 3 Countern:
+     // Thread 1: instance1.GetCurrentValue() für Counter "238-6" läuft parallel
+     // Thread 2: instance2.GetCurrentValue() für Counter "2-44" läuft parallel
+     // Thread 3: instance3.GetCurrentValue() für Counter "4-210" läuft parallel
+     // Alle 3 laufen GLEICHZEITIG, nicht nacheinander
+     //
+     // Task.WaitAll() wartet bis ALLE Threads fertig sind, dann werden die Ergebnisse gesammelt
+     //
+     // Hinweis: Später bei Multi-Server-Szenarien wird es eine übergeordnete Computer-Klasse geben,
+     //          die mehrere CounterConfiguration-Instanzen pro Server verwaltet
+
      public static Dictionary<string, Dictionary<string, object>> GetValuesParallel(List<CounterConfiguration> instances)
      {
           var tasks = instances.Select(instance =>
-               Task.Run(() => {
-                    var result = instance.GetCurrentValue();
+               Task.Run(() =>
+               {
+                    var (counterValue, duration) = instance.GetCurrentValue();
                     return new KeyValuePair<string, Dictionary<string, object>>(
                          instance.CounterID,
                          new Dictionary<string, object> {
-                              { "counterValue", result.counterValue },
-                              { "duration", result.duration ?? (object)DBNull.Value } // set explicit null
+                              { "counterValue", counterValue },
+                              { "duration", duration ?? (object)DBNull.Value } // set explicit null
                          }
                     );
                })
