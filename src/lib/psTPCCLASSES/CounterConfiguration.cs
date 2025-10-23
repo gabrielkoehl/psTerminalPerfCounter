@@ -173,7 +173,48 @@ public class CounterConfiguration
           }
      }
 
-     private double[] GetRemoteValue(int maxSamples)
+     public (double counterValue, int? duration) GetCurrentValue()
+     {
+          if (!IsAvailable)
+          {
+               throw new InvalidOperationException($"Counter '{Title}' is not available: {LastError}");
+          }
+
+          try
+          {
+               double counterValue;
+               int?   duration = null;
+
+               if (IsRemote)
+               {
+                    var result     = GetRemoteValue(1);
+                    counterValue   = result.counterValue;
+                    duration       = result.duration;
+               }
+               else
+               {
+                    using var ps = PowerShell.Create();
+                    ps.AddCommand("Get-Counter")
+                    .AddParameter("Counter", CounterPath)
+                    .AddParameter("MaxSamples", 1);
+
+                    var result     = ps.Invoke();
+                    counterValue   = Convert.ToDouble(result[0].BaseObject);
+               }
+
+               // Convert Units
+               counterValue = Math.Round(counterValue / Math.Pow(ConversionFactor, ConversionExponent));
+
+               return (counterValue, duration);
+          }
+          catch (Exception ex)
+          {
+               LastError = ex.Message;
+               throw new Exception($"Error reading counter '{Title}': {ex.Message}", ex);
+          }
+     }
+
+     private (double counterValue, int duration) GetRemoteValue(int maxSamples)
      {
           var scriptBlock = ScriptBlock.Create(@"
                param($CounterPath, $MaxSamples)
@@ -201,7 +242,7 @@ public class CounterConfiguration
                var duration = (dateEnd - dateStart).Milliseconds;
                var counterValue = Convert.ToDouble(result[0].BaseObject);
 
-               return [counterValue, duration];
+               return (counterValue, duration);
           }
           catch (Exception ex)
           {
