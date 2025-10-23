@@ -1,3 +1,5 @@
+dotnet build "src\lib\psTPCLIB.sln"
+
 Add-Type -Path "src\lib\psTPCCLASSES\bin\Debug\net9.0\psTPCCLASSES.dll"
 
 $json = Get-Content "src\psTerminalPerCounter\psTerminalPerfCounter\Config\tpc_CPU.json" -Raw | ConvertFrom-Json
