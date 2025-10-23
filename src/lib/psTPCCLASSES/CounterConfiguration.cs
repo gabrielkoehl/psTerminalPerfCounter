@@ -173,7 +173,41 @@ public class CounterConfiguration
           }
      }
 
+     private double[] GetRemoteValue(int maxSamples)
+     {
+          var scriptBlock = ScriptBlock.Create(@"
+               param($CounterPath, $MaxSamples)
+               $counter = Get-Counter -Counter $CounterPath -MaxSamples $MaxSamples
+               $counter.CounterSamples.CookedValue
+          ");
 
+          try
+          {
+               var dateStart = DateTime.Now;
+
+               using var ps = PowerShell.Create();
+               ps.AddCommand("Invoke-Command");
+
+               foreach (var kvp in ParamRemote)
+               {
+                    ps.AddParameter(kvp.Key, kvp.Value);
+               }
+
+               ps.AddParameter("ScriptBlock", scriptBlock);
+               ps.AddParameter("ArgumentList", new object[] { CounterPath, maxSamples });
+
+               var result = ps.Invoke();
+               var dateEnd = DateTime.Now;
+               var duration = (dateEnd - dateStart).Milliseconds;
+               var counterValue = Convert.ToDouble(result[0].BaseObject);
+
+               return [counterValue, duration];
+          }
+          catch (Exception ex)
+          {
+               throw new Exception($"Error getting remote value for '{Title}': {ex.Message}", ex);
+          }
+     }
 
 
      private string GetCounterPath(string counterID, string counterSetType, string counterInstance)
