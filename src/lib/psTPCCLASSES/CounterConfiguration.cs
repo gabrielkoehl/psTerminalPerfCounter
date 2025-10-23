@@ -399,4 +399,45 @@ public class CounterConfiguration
           return $"PerformanceCounter: {Title} - Available: {IsAvailable} - Data Points: {HistoricalData.Count}";
      }
 
+
+     // Add new data point with timestamp
+     public void AddDataPoint(double value, int maxHistoryPoints)
+     {
+          var dataPoint = new DataPoint(DateTime.Now, value);
+          HistoricalData.Add(dataPoint);
+          LastUpdate = dataPoint.Timestamp;
+
+          // Limit historical data size, drop oldest point
+          while (HistoricalData.Count > maxHistoryPoints)
+          {
+               HistoricalData.RemoveAt(0);
+          }
+
+          UpdateStatistics();
+     }
+
+     // Update statistics
+     public void UpdateStatistics()
+     {
+          if (HistoricalData.Count == 0) return;
+
+          var values = HistoricalData.Select(d => d.Value).ToArray();
+
+          Statistics = new Dictionary<string, object>
+          {
+               { "Current", values[^1] },
+               { "Minimum", values.Min() },
+               { "Maximum", values.Max() },
+               { "Average", Math.Round(values.Average(), 1) },
+               { "Count", values.Length },
+               { "Last5", values.Length >= 5 ? values[^5..] : values }
+          };
+     }
+
+     //Get complete historical data with timestamps for external tools
+     public DataPoint[] GetHistoricalDataWithTimestamps()
+     {
+          return HistoricalData.ToArray();
+     }
+
 }
