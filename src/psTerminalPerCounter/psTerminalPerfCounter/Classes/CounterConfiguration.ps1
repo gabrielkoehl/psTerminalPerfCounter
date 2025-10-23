@@ -279,23 +279,23 @@ class CounterConfiguration {
 
     }
 
-    # Get color for a specific value
-    [string] GetColorForValue([int]$value) {
+    # # Get color for a specific value               ( orphaned )
+    # [string] GetColorForValue([int]$value) {
 
-        if ( $this.ColorMap.Count -eq 0 ) { return "White" }
+    #     if ( $this.ColorMap.Count -eq 0 ) { return "White" }
 
-        # map color by thresholds
-        $sortedThresholds = $this.ColorMap.Keys | Sort-Object -Descending
+    #     # map color by thresholds
+    #     $sortedThresholds = $this.ColorMap.Keys | Sort-Object -Descending
 
-        foreach ( $threshold in $sortedThresholds ) {
-            if ( $value -ge $threshold ) {
-                return $this.ColorMap[$threshold]
-            }
-        }
+    #     foreach ( $threshold in $sortedThresholds ) {
+    #         if ( $value -ge $threshold ) {
+    #             return $this.ColorMap[$threshold]
+    #         }
+    #     }
 
-        return "White"  # Default color
+    #     return "White"  # Default color
 
-    }
+    # }
 
     # Get formatted title with unit
     [string] GetFormattedTitle() {
