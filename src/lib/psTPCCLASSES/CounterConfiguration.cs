@@ -43,7 +43,7 @@ public class CounterConfiguration
           string unit,
           int conversionFactor,
           int conversionExponent,
-          object colorMap,
+          PSObject colorMap,
           object graphConfiguration,
           bool isRemote,
           string computerName,
@@ -90,16 +90,22 @@ public class CounterConfiguration
 
      }
 
-     private string GetCounterPath(string counterID, string counterSetType, string counterInstance)
+     private Dictionary<int, string> SetColorMap(PSObject  colorMap)
      {
+          var returnObject = new Dictionary<int, string>();
 
-          return "";
-     }
+          foreach (PSPropertyInfo property in colorMap.Properties)
+          {
+               if (property.Value == null)
+               {
+                    throw new ArgumentException($"ColorMap value for key '{property.Name}' cannot be null");
+               }
 
-     private Dictionary<int, string> SetColorMap(object colorMap)
-     {
+               returnObject[int.Parse(property.Name)] = property.Value.ToString()!;
+          }
 
-          return new Dictionary<int, string>();
+          return returnObject;
+
      }
 
      private Dictionary<string, object> SetGraphConfig(object graphConfiguration)
@@ -111,6 +117,12 @@ public class CounterConfiguration
      private void TestAvailability()
      {
 
+     }
+
+     private string GetCounterPath(string counterID, string counterSetType, string counterInstance)
+     {
+
+          return "";
      }
 
 }
