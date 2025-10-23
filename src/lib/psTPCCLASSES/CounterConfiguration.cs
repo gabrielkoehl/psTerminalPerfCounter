@@ -49,28 +49,28 @@ public class CounterConfiguration
           string computerName,
           PSCredential? credential)
      {
-          CounterID           = counterID;
-          CounterSetType      = counterSetType;
-          CounterInstance     = counterInstance;
-          Title               = title;
-          Type                = type;
-          Format              = format;
-          Unit                = unit;
-          ConversionFactor    = conversionFactor;
-          ConversionExponent  = conversionExponent;
-          HistoricalData      = new List<DataPoint>();
-          Statistics          = new Dictionary<string, object>();
-          IsAvailable         = false;
-          LastError           = "";
-          IsRemote            = isRemote;
-          ComputerName        = computerName;
-          Credential          = credential;
+          CounterID = counterID;
+          CounterSetType = counterSetType;
+          CounterInstance = counterInstance;
+          Title = title;
+          Type = type;
+          Format = format;
+          Unit = unit;
+          ConversionFactor = conversionFactor;
+          ConversionExponent = conversionExponent;
+          HistoricalData = new List<DataPoint>();
+          Statistics = new Dictionary<string, object>();
+          IsAvailable = false;
+          LastError = "";
+          IsRemote = isRemote;
+          ComputerName = computerName;
+          Credential = credential;
 
           SetRemoteConnectionParameter();
 
-          CounterPath         = GetCounterPath(counterID, counterSetType, counterInstance);
-          ColorMap            = SetColorMap(colorMap);
-          GraphConfiguration  = SetGraphConfig(graphConfiguration);
+          CounterPath = GetCounterPath(counterID, counterSetType, counterInstance);
+          ColorMap = SetColorMap(colorMap);
+          GraphConfiguration = SetGraphConfig(graphConfiguration);
 
           TestAvailability();
      }
@@ -90,7 +90,7 @@ public class CounterConfiguration
 
      }
 
-     private Dictionary<int, string> SetColorMap(PSObject  colorMap)
+     private Dictionary<int, string> SetColorMap(PSObject colorMap)
      {
           var returnObject = new Dictionary<int, string>();
 
@@ -160,13 +160,13 @@ public class CounterConfiguration
                     ps.Invoke();
                }
 
-               IsAvailable    = true;
-               LastError      = string.Empty;
+               IsAvailable = true;
+               LastError = string.Empty;
           }
           catch (Exception ex)
           {
-               IsAvailable    = false;
-               LastError      = ex.Message;
+               IsAvailable = false;
+               LastError = ex.Message;
 
                Console.WriteLine($"Warning: Counter '{Title}' is not available: {LastError}");
                Thread.Sleep(500);
@@ -209,11 +209,113 @@ public class CounterConfiguration
           }
      }
 
-
      private string GetCounterPath(string counterID, string counterSetType, string counterInstance)
      {
+          if (string.IsNullOrEmpty(counterID))
+          {
+               throw new ArgumentException("Counter ID cannot be null or empty.");
+          }
 
-          return "";
+          try
+          {
+               var parts      = counterID.Split('-');
+               var setID      = parts[0];
+               var pathID     = parts[1];
+
+               // https://powershell.one/tricks/performance/performance-counters
+               // Licensed under the CC BY 4.0 ( https://creativecommons.org/licenses/by/4.0/ )
+               var scriptBlock = ScriptBlock.Create(@"
+                    param([UInt32]$Id)
+                    $code     = '[DllImport(""pdh.dll"", SetLastError=true, CharSet=CharSet.Unicode)] public static extern UInt32 PdhLookupPerfNameByIndex(string szMachineName, uint dwNameIndex, System.Text.StringBuilder szNameBuffer, ref uint pcchNameBufferSize);'
+                    $type     = Add-Type -MemberDefinition $code -PassThru -Name PerfCounter1 -Namespace Utility -ErrorAction SilentlyContinue
+                    $Buffer   = [System.Text.StringBuilder]::new(1024)
+                    [UInt32]$BufferSize = $Buffer.Capacity
+                    $rv       = $type::PdhLookupPerfNameByIndex($env:COMPUTERNAME, $Id, $Buffer, [Ref]$BufferSize)
+
+                    if ($rv -eq 0) {
+                         $Buffer.ToString().Substring(0, $BufferSize-1)
+                    } else {
+                         throw 'Unable to retrieve localized name.'
+                    }
+               ");
+               // ------------------------------------------------------------------------------
+
+               string setName;
+               string pathName;
+
+               using var ps = PowerShell.Create();
+
+               if (IsRemote)
+               {
+
+                    // SetName
+                    ps.AddCommand("Invoke-Command");
+                    foreach (var kvp in ParamRemote)
+                    {
+                         ps.AddParameter(kvp.Key, kvp.Value);
+                    }
+                    ps.AddParameter("ScriptBlock", scriptBlock);
+                    ps.AddParameter("ArgumentList", new object[] { setID });
+
+                    var resultSet = ps.Invoke();
+                    setName = resultSet[0].BaseObject.ToString()!;  // <- FIX
+
+                    // -------
+                         ps.Commands.Clear();
+                    // -------
+
+                    // PathName
+                    ps.AddCommand("Invoke-Command");
+                    foreach (var kvp in ParamRemote)
+                    {
+                         ps.AddParameter(kvp.Key, kvp.Value);
+                    }
+                    ps.AddParameter("ScriptBlock", scriptBlock);
+                    ps.AddParameter("ArgumentList", new object[] { pathID });
+
+                    var resultPath = ps.Invoke();
+                    pathName = resultPath[0].BaseObject.ToString()!;
+               }
+               else
+               {
+                    // SetName
+                    ps.AddCommand("Invoke-Command")
+                    .AddParameter("ScriptBlock", scriptBlock)
+                    .AddParameter("ArgumentList", new object[] { setID });
+
+                    var resultSet = ps.Invoke();
+                    setName = resultSet[0].BaseObject.ToString()!;
+
+                    // -------
+                         ps.Commands.Clear();
+                    // -------
+
+                    // PathName
+                    ps.AddCommand("Invoke-Command")
+                    .AddParameter("ScriptBlock", scriptBlock)
+                    .AddParameter("ArgumentList", new object[] { pathID });
+
+                    var resultPath = ps.Invoke();
+                    pathName = resultPath[0].BaseObject.ToString()!;
+               }
+
+               if (counterSetType == "SingleInstance")
+               {
+                    return $"\\{setName}\\{pathName}";
+               }
+               else if (counterSetType == "MultiInstance")
+               {
+                    return $"\\{setName}({counterInstance})\\{pathName}";
+               }
+               else
+               {
+                    throw new ArgumentException($"Unknown counter set type: {counterSetType}");
+               }
+          }
+          catch (Exception ex)
+          {
+               throw new Exception($"Error getting counter path for ID '{counterID}': {ex.Message}", ex);
+          }
      }
 
 }
