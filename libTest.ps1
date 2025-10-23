@@ -2,32 +2,52 @@ Add-Type -Path "src\lib\psTPCCLASSES\bin\Debug\net9.0\psTPCCLASSES.dll"
 
 $json = Get-Content "src\psTerminalPerCounter\psTerminalPerfCounter\Config\tpc_CPU.json" -Raw | ConvertFrom-Json
 
-$cfg = $json.counters[0]
+# Erstelle ALLE Counter-Instanzen VORHER
+$instances = [System.Collections.Generic.List[psTPCCLASSES.CounterConfiguration]]::new()
 
-$counter = [psTPCCLASSES.CounterConfiguration]::new(
-    $cfg.counterID,
-    $cfg.counterSetType,
-    $cfg.counterInstance,
-    $cfg.title,
-    $cfg.type,
-    $cfg.format,
-    $cfg.unit,
-    $cfg.conversionFactor,
-    $cfg.conversionExponent,
-    $cfg.colorMap,
-    $cfg.graphConfiguration,
-    $false,
-    $env:COMPUTERNAME,
-    $null
-)
+foreach ($cfg in $json.counters) {
+    $counter = [psTPCCLASSES.CounterConfiguration]::new(
+        $cfg.counterID,
+        $cfg.counterSetType,
+        $cfg.counterInstance,
+        $cfg.title,
+        $cfg.type,
+        $cfg.format,
+        $cfg.unit,
+        $cfg.conversionFactor,
+        $cfg.conversionExponent,
+        $cfg.colorMap,
+        $cfg.graphConfiguration,
+        $false,
+        $env:COMPUTERNAME,
+        $null
+    )
 
-Write-Host "Title: $($counter.Title)" -ForegroundColor Cyan
-Write-Host "Path: $($counter.CounterPath)"
-Write-Host "Available: $($counter.IsAvailable)"
-
-if ($counter.IsAvailable) {
-    $result = $counter.GetCurrentValue()
-    Write-Host "Value: $($result[0]) $($counter.Unit)"
+    $instances.Add($counter)
 }
 
-$(get-counter -Counter "\Processor(_Total)\% Processor Time").CounterSamples.CookedValue
+function run {
+    # Parallel alle auf einmal abfragen - gibt Dictionary zurück
+    $results = [psTPCCLASSES.CounterConfiguration]::GetValuesParallel($instances)
+
+    # Timestamp für alle Counter gleich
+    $timestamp = Get-Date
+
+    # Ergebnisse ausgeben
+    foreach ($counter in $instances) {
+        Write-Host "`n--- $($counter.Title) ---" -ForegroundColor Cyan
+        Write-Host "Path: $($counter.CounterPath)"
+        Write-Host "Available: $($counter.IsAvailable)"
+
+        if ($counter.IsAvailable) {
+            $result = $results[$counter.CounterID]
+            Write-Host "Value: $($result['counterValue']) $($counter.Unit)" -ForegroundColor Green
+
+            if ($null -ne $result['duration']) {
+                Write-Host "Duration: $($result['duration']) ms" -ForegroundColor Gray
+            }
+        }
+    }
+}
+
+run
