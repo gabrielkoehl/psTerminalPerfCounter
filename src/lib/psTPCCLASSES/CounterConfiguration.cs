@@ -368,4 +368,35 @@ public class CounterConfiguration
           return $"{Title} ({Unit})";
      }
 
+     // Get data for graphing (padded to target sample count)
+     public double[] GetGraphData(int sampleCount)
+     {
+          var dataCount = HistoricalData.Count;
+          if (dataCount == 0)
+          {
+               return [];
+          }
+
+          // Extract values from timestamped data points
+          var values = HistoricalData.Select(d => d.Value).ToArray();
+
+          // Take the last sampleCount points
+          if (dataCount >= sampleCount)
+          {
+               return values.Skip(dataCount - sampleCount).ToArray();
+          }
+          else
+          {
+               // Pad with zeros at the beginning
+               var padding = new double[sampleCount - dataCount];
+               return padding.Concat(values).ToArray();
+          }
+     }
+
+     // ToString override for output
+     public override string ToString()
+     {
+          return $"PerformanceCounter: {Title} - Available: {IsAvailable} - Data Points: {HistoricalData.Count}";
+     }
+
 }
