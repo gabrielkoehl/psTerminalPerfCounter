@@ -124,11 +124,11 @@ public class CounterConfiguration
                          returnObject["Colors"] = colors;
                          break;
 
-                    case "Samples" when (int)property.Value! < 70:
+                    case "Samples" when Convert.ToInt32(property.Value!) < 70:
                          returnObject[property.Name] = 70;
                          break;
 
-                    case "yAxisMaxRows" when (int)property.Value! < 10:
+                    case "yAxisMaxRows" when Convert.ToInt32(property.Value!) < 10:
                          returnObject[property.Name] = 10;
                          break;
 
@@ -198,8 +198,16 @@ public class CounterConfiguration
                     .AddParameter("Counter", CounterPath)
                     .AddParameter("MaxSamples", 1);
 
-                    var result     = ps.Invoke();
-                    counterValue   = Convert.ToDouble(result[0].BaseObject);
+                    var result = ps.Invoke();
+
+                    // Use dynamic to access the PerformanceCounterSampleSet properties at runtime
+                    // PowerShell always returns collections, even for single results
+                    // Therefore we need [0] to access the first (and only) CounterSample
+                    // Without dynamic, we would need explicit casting or reflection to access CounterSamples property
+
+                    var sampleSet = (dynamic)result[0].BaseObject;
+                    counterValue = Convert.ToDouble(sampleSet.CounterSamples[0].CookedValue);
+
                }
 
                // Convert Units
