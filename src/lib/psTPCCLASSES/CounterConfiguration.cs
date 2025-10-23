@@ -44,33 +44,33 @@ public class CounterConfiguration
           int conversionFactor,
           int conversionExponent,
           PSObject colorMap,
-          object graphConfiguration,
+          PSObject graphConfiguration,
           bool isRemote,
           string computerName,
           PSCredential? credential)
      {
-          CounterID             = counterID;
-          CounterSetType        = counterSetType;
-          CounterInstance       = counterInstance;
-          Title                 = title;
-          Type                  = type;
-          Format                = format;
-          Unit                  = unit;
-          ConversionFactor      = conversionFactor;
-          ConversionExponent    = conversionExponent;
-          HistoricalData        = new List<DataPoint>();
-          Statistics            = new Dictionary<string, object>();
-          IsAvailable           = false;
-          LastError             = "";
-          IsRemote              = isRemote;
-          ComputerName          = computerName;
-          Credential            = credential;
+          CounterID           = counterID;
+          CounterSetType      = counterSetType;
+          CounterInstance     = counterInstance;
+          Title               = title;
+          Type                = type;
+          Format              = format;
+          Unit                = unit;
+          ConversionFactor    = conversionFactor;
+          ConversionExponent  = conversionExponent;
+          HistoricalData      = new List<DataPoint>();
+          Statistics          = new Dictionary<string, object>();
+          IsAvailable         = false;
+          LastError           = "";
+          IsRemote            = isRemote;
+          ComputerName        = computerName;
+          Credential          = credential;
 
           SetRemoteConnectionParameter();
 
-          CounterPath           = GetCounterPath(counterID, counterSetType, counterInstance);
-          ColorMap              = SetColorMap(colorMap);
-          GraphConfiguration    = SetGraphConfig(graphConfiguration);
+          CounterPath         = GetCounterPath(counterID, counterSetType, counterInstance);
+          ColorMap            = SetColorMap(colorMap);
+          GraphConfiguration  = SetGraphConfig(graphConfiguration);
 
           TestAvailability();
      }
@@ -96,11 +96,6 @@ public class CounterConfiguration
 
           foreach (PSPropertyInfo property in colorMap.Properties)
           {
-               if (property.Value == null)
-               {
-                    throw new ArgumentException($"ColorMap value for key '{property.Name}' cannot be null");
-               }
-
                returnObject[int.Parse(property.Name)] = property.Value.ToString()!;
           }
 
@@ -108,10 +103,43 @@ public class CounterConfiguration
 
      }
 
-     private Dictionary<string, object> SetGraphConfig(object graphConfiguration)
+     private Dictionary<string, object> SetGraphConfig(PSObject graphConfiguration)
      {
 
-          return new Dictionary<string, object>();
+          var returnObject = new Dictionary<string, object>();
+
+          foreach (PSPropertyInfo property in graphConfiguration.Properties)
+          {
+               switch (property.Name)
+               {
+                    case "colors" when property.Value is not null:
+                         var colorObject = (PSObject)property.Value;
+                         var colors = new Dictionary<string, string>();
+
+                         foreach (PSPropertyInfo colorProperty in colorObject.Properties)
+                         {
+                              colors[colorProperty.Name] = colorProperty.Value?.ToString() ?? string.Empty;
+                         }
+
+                         returnObject["Colors"] = colors;
+                         break;
+
+                    case "Samples" when (int)property.Value! < 70:
+                         returnObject[property.Name] = 70;
+                         break;
+
+                    case "yAxisMaxRows" when (int)property.Value! < 10:
+                         returnObject[property.Name] = 10;
+                         break;
+
+                    default:
+                         returnObject[property.Name] = property.Value!;
+                         break;
+               }
+          }
+
+          return returnObject;
+
      }
 
      private void TestAvailability()
