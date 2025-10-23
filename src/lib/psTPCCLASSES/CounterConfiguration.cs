@@ -259,9 +259,9 @@ public class CounterConfiguration
 
           try
           {
-               var parts      = counterID.Split('-');
-               var setID      = parts[0];
-               var pathID     = parts[1];
+               var parts = counterID.Split('-');
+               var setID = parts[0];
+               var pathID = parts[1];
 
                // https://powershell.one/tricks/performance/performance-counters
                // Licensed under the CC BY 4.0 ( https://creativecommons.org/licenses/by/4.0/ )
@@ -302,7 +302,7 @@ public class CounterConfiguration
                     setName = resultSet[0].BaseObject.ToString()!;  // <- FIX
 
                     // -------
-                         ps.Commands.Clear();
+                    ps.Commands.Clear();
                     // -------
 
                     // PathName
@@ -328,7 +328,7 @@ public class CounterConfiguration
                     setName = resultSet[0].BaseObject.ToString()!;
 
                     // -------
-                         ps.Commands.Clear();
+                    ps.Commands.Clear();
                     // -------
 
                     // PathName
@@ -357,6 +357,15 @@ public class CounterConfiguration
           {
                throw new Exception($"Error getting counter path for ID '{counterID}': {ex.Message}", ex);
           }
+     }
+
+     public string GetFormattedTitle()
+     {
+          if (string.IsNullOrEmpty(Unit))
+          {
+               return Title;
+          }
+          return $"{Title} ({Unit})";
      }
 
 }
