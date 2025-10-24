@@ -5,8 +5,8 @@ import-module -fullyqualifiedname ".\src\psTerminalPerCounter\psTerminalPerfCoun
 
 #start-tpcmonitor -RemoteServerConfig ".\_remoteconfigs\AD_SERVER_001.json" -showconsoletable
 
-#start-tpcmonitor -ComputerName DEV-NODE3 -ConfigName CPU
+start-tpcmonitor -ComputerName DEV-NODE3 -ConfigName CPU
 
-start-tpcMonitor -ConfigName CPU
+#start-tpcMonitor -ConfigName CPU
 
 # BEI REMOTE GESAMTHEITLICHES INTERVALL SETZEN

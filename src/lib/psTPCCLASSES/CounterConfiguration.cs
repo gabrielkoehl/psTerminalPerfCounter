@@ -100,25 +100,18 @@ public class CounterConfiguration
      // Hinweis: Später bei Multi-Server-Szenarien wird es eine übergeordnete Computer-Klasse geben,
      //          die mehrere CounterConfiguration-Instanzen pro Server verwaltet
 
-     public static Dictionary<string, Dictionary<string, object>> GetValuesParallel(List<CounterConfiguration> instances)
+     public static void GetValuesParallel(List<CounterConfiguration> instances)
      {
           var tasks = instances.Select(instance =>
                Task.Run(() =>
                {
                     var (counterValue, duration) = instance.GetCurrentValue();
-                    return new KeyValuePair<string, Dictionary<string, object>>(
-                         instance.CounterID,
-                         new Dictionary<string, object> {
-                              { "counterValue", counterValue },
-                              { "duration", duration ?? (object)DBNull.Value } // set explicit null
-                         }
-                    );
+                    instance.AddDataPoint(counterValue, 100); // 2DO move datapoints to json
+                    instance.ExecutionDuration = duration ?? 0;
                })
           ).ToArray();
 
           Task.WaitAll(tasks);
-
-          return tasks.Select(t => t.Result).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
      }
 
      private void SetRemoteConnectionParameter()

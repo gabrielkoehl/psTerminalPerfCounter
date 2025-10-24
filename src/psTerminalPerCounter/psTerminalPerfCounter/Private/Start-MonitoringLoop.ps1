@@ -7,7 +7,7 @@ function Start-MonitoringLoop {
         [psobject]  $Config,
         [Parameter(Mandatory=$true)]
         [int]       $UpdateInterval,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$true)] # 2do deprecated
         [int]       $MaxDataPoints
     )
 
@@ -27,25 +27,8 @@ function Start-MonitoringLoop {
             $SampleCount++
 
             # Collect data from all counters
-            $results = [psTPCCLASSES.CounterConfiguration]::GetValuesParallel($Config.Counters)
+            [psTPCCLASSES.CounterConfiguration]::GetValuesParallel($Config.Counters)
 
-            foreach ( $result in $results ) {
-
-                try {
-                    if ( $result.IsAvailable ) {
-                        $value                      = $result['counterValue']
-                        $Counter.ExecutionDuration  = $result['duration']
-                        $Counter.AddDataPoint($Value, $MaxDataPoints)
-                    } else {
-                        Write-Warning "Counter '$($Counter.Title)' is not available: $($Counter.LastError)"
-                        Start-Sleep -Milliseconds 500 # Clear-Host is to fast to read anything
-                    }
-                } catch {
-                    Write-Warning "Error reading counter '$($Counter.Title)': $($_.Exception.Message)"
-                    Pause # Clear-Host is to fast to read anything
-                }
-
-            }
 
             Show-SessionHeader -ConfigName $Config.Name -StartTime $StartTime -SampleCount $SampleCount
 
