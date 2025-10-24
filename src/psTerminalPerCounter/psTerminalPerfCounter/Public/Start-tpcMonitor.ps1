@@ -155,20 +155,12 @@
                 Write-Host "Loading configuration from '$ConfigPath'..." -ForegroundColor Yellow
                 $Config = Get-CounterConfiguration -ConfigPath $ConfigPath
 
-                foreach ( $counter in $Config.Counters ) {
-                    $counter.TestAvailability()
-                }
-
             } elseif ( $PSCmdlet.ParameterSetName -eq 'ConfigName' ) {
 
                 $monitorType = 'local'
 
                 Write-Host "Loading configuration '$ConfigName'..." -ForegroundColor Yellow
                 $Config = Get-CounterConfiguration -ConfigName $ConfigName
-
-                foreach ( $counter in $Config.Counters ) {
-                    $counter.TestAvailability()
-                }
 
             <# }  elseif ( $PSCmdlet.ParameterSetName -eq 'RemoteServerConfig' ) {
 

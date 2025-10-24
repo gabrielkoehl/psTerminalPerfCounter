@@ -7,6 +7,6 @@ import-module -fullyqualifiedname ".\src\psTerminalPerCounter\psTerminalPerfCoun
 
 #start-tpcmonitor -ComputerName DEV-NODE3 -ConfigName CPU
 
-#start-tpcMonitor -ConfigName CPU
+start-tpcMonitor -ConfigName CPU
 
 # BEI REMOTE GESAMTHEITLICHES INTERVALL SETZEN
