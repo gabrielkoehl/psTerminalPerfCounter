@@ -1,4 +1,6 @@
-import-module -fullyqualifiedname .\psTerminalPerfCounter\psTerminalPerfCounter.psd1 -force
+#dotnet build "src\lib\psTPCLIB.sln"
+
+import-module -fullyqualifiedname ".\src\psTerminalPerCounter\psTerminalPerfCounter\psTerminalPerfCounter.psd1" -force
 
 
 #start-tpcmonitor -RemoteServerConfig ".\_remoteconfigs\AD_SERVER_001.json" -showconsoletable

@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased]
 
+## Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+### Code Quality
+
+### Known Issued
+
+* **Bitdefender False-Positive**
+  * PowerShell tried to load a malicious resource detected as CMD:Heur.BZC.ZFV.Boxter.602.098EEC9F and was blocked.
+
 ## [0.2.0] - 2025-10-11
 
 ### Added
