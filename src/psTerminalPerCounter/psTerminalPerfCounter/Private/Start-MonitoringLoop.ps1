@@ -27,13 +27,14 @@ function Start-MonitoringLoop {
             $SampleCount++
 
             # Collect data from all counters
-            foreach ( $Counter in $Config.Counters ) {
+            $results = [psTPCCLASSES.CounterConfiguration]::GetValuesParallel($Config.Counters)
+
+            foreach ( $result in $results ) {
 
                 try {
-                    if ( $Counter.IsAvailable ) {
-                        $result                     = $Counter.GetCurrentValue()
-                        $value                      = $result['Item1']
-                        $Counter.ExecutionDuration  = $result['Item2']
+                    if ( $result.IsAvailable ) {
+                        $value                      = $result['counterValue']
+                        $Counter.ExecutionDuration  = $result['duration']
                         $Counter.AddDataPoint($Value, $MaxDataPoints)
                     } else {
                         Write-Warning "Counter '$($Counter.Title)' is not available: $($Counter.LastError)"

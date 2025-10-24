@@ -2,9 +2,11 @@
      [CmdletBinding()]
      param(
           [Parameter(Mandatory=$true)]
-          [CounterConfiguration[]]$Counters,
+          [System.Collections.Generic.List[psTPCCLASSES.CounterConfiguration]]
+          $Counters,
           [Parameter(Mandatory=$true)]
-          [string]$MonitorType
+          [string]
+          $MonitorType
      )
 
      begin {

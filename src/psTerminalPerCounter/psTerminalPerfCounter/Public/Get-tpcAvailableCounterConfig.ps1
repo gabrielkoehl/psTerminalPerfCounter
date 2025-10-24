@@ -166,7 +166,7 @@
 
                          try {
 
-                              $Counter = [CounterConfiguration]::new(
+                              $Counter = [psTPCCLASSES.CounterConfiguration]::new(
                                    $CounterConfig.counterID,
                                    $CounterConfig.counterSetType,
                                    $CounterConfig.counterInstance,
