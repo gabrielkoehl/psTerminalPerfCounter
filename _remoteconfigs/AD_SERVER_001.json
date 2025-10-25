@@ -7,20 +7,6 @@
           "credentialname": "integrated",
           "servers": [
                {
-                    "computername": "DEV-DC",
-                    "comment": "Domain Controller",
-                    "counterConfig": [
-                         "CPU"
-                    ]
-               },
-               {
-                    "computername": "DEV-NODE3",
-                    "comment": "Sql Server Node A Production",
-                    "counterConfig": [
-                         "CPU"
-                    ]
-               },
-               {
                     "computername": "DEV-NODE4",
                     "comment": "Sql Server Node B Production",
                     "counterConfig": [

@@ -1,6 +1,6 @@
 ﻿function New-ServerConfigurationFromJson {
     [CmdletBinding()]
-    [OutputType([ServerConfiguration[]])]
+    [OutputType([psTPCCLASSES.ServerConfiguration[]])]
     param(
         [Parameter(Mandatory=$true)]
         [PSCustomObject] $JsonConfig
@@ -23,19 +23,15 @@
 
                 $performanceCounters = @()
 
-                #Counters
                 if ( $ServerConfig.CounterConfig ) {
                     foreach ( $CounterConfig in $ServerConfig.CounterConfig ) {
-                        $performanceCounters += Get-CounterConfiguration -ConfigName $CounterConfig -isRemote -computername $ServerConfig.computername -credential $setCredential
+                        $config = Get-CounterConfiguration -ConfigName $CounterConfig -isRemote -computername $ServerConfig.computername -credential $setCredential
+                        $performanceCounters += $config.Counters
                     }
                 }
 
-# in development, the selection of 1st one is in start-tpcMonitor, server count validation
-if ( $performanceCounters.count -gt 1 ) {
-    Write-Warning "Currently only one performance counter is supported for each server. You can add more counter to config itself. Monitoring only $($performanceCounters.title)"
-}
-
-                $serverConfiguration = [ServerConfiguration]::new(
+                $serverConfiguration = [psTPCCLASSES.ServerConfiguration]::new(
+                    $script:logger,
                     $ServerConfig.computername,
                     $ServerConfig.comment,
                     $performanceCounters
