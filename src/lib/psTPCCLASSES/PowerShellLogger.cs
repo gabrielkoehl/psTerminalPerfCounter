@@ -35,7 +35,7 @@ public class PowerShellLogger
 
      private void ExecuteScript(string script)
      {
-          using var ps = PowerShell.Create(RunspaceMode.CurrentRunspace);
+          using var ps = PowerShell.Create(RunspaceMode.NewRunspace);
           ps.AddScript(script);
           ps.Invoke();
      }

@@ -1,6 +1,7 @@
 bin/
 obj/
 Output/
+_notes/
 
 # Syncthing temporary files
 *syncthing*
