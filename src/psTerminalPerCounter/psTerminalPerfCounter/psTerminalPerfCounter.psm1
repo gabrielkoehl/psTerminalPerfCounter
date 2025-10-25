@@ -19,6 +19,8 @@ foreach ($import in @($public + $private + $GraphicalEngine)) {
     }
 }
 
-Add-Type -Path "src\lib\psTPCCLASSES\bin\Debug\net9.0\psTPCCLASSES.dll"
+# Load Libraries
+Add-Type -Path "$PSScriptRoot\Lib\psTPCCLASSES.dll"
+
 
 Export-ModuleMember -Function $public.Basename
