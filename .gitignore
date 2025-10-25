@@ -1,3 +1,9 @@
 bin/
 obj/
 Output/
+
+# Syncthing temporary files
+*syncthing*
+*~syncthing~*
+.stfolder
+.stversions
