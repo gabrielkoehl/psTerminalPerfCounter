@@ -44,12 +44,6 @@
         Graph time span = Samples (from JSON config) × UpdateInterval seconds.
         Default: 1 second
 
-    .PARAMETER MaxHistoryPoints
-        Maximum number of historical data points to retain in memory for each counter.
-        This is the complete historical data used for statistics and future export.
-        Independent of graph display width. Time span covered by graph display = Samples × UpdateInterval seconds.
-        Default: 100 historical data points
-
     .EXAMPLE
         Start-tpcMonitor
 
@@ -67,7 +61,7 @@
         Starts memory monitoring with 2-second update intervals using the 'tpc_Memory.json' configuration.
 
     .EXAMPLE
-        Start-tpcMonitor -ConfigName "Disk" -UpdateInterval 1 -MaxHistoryPoints 200
+        Start-tpcMonitor -ConfigName "Disk" -UpdateInterval 1
 
         Starts disk monitoring with 1-second updates and extended data retention of 200 points.
 
@@ -119,8 +113,7 @@
         [Parameter(ParameterSetName = 'SingleRemoteServer')]
         [pscredential]  $Credential = $null,
 
-        [int]           $UpdateInterval     = 1,
-        [int]           $MaxHistoryPoints   = 100
+        [int]           $UpdateInterval     = 1
 #       [switch]        $visHTML,
 #       [switch]        $exportJson
     )
@@ -309,7 +302,6 @@
                 MonitorType     = $monitorType
                 Config          = $Config
                 UpdateInterval  = $UpdateInterval
-                MaxDataPoints   = $MaxHistoryPoints
             }
 
             Start-MonitoringLoop @MonitoringParams

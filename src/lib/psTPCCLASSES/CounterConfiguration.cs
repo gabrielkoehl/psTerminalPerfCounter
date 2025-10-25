@@ -18,6 +18,7 @@ public class CounterConfiguration
      public string Title { get; set; }
      public string Type { get; set; }
      public string Format { get; set; }
+     public int MaxHistoryPoints { get; set; }
      public int ConversionFactor { get; set; }
      public int ConversionExponent { get; set; }
      public string Unit { get; set; }
@@ -62,6 +63,7 @@ public class CounterConfiguration
           Type                = type;
           Format              = format;
           Unit                = unit;
+          MaxHistoryPoints    = 100;
           ConversionFactor    = conversionFactor;
           ConversionExponent  = conversionExponent;
           HistoricalData      = new List<DataPoint>();
@@ -112,7 +114,7 @@ public class CounterConfiguration
                Task.Run(() =>
                {
                     var (counterValue, duration) = instance.GetCurrentValue();
-                    instance.AddDataPoint(counterValue, 100); // 2DO move datapoints to json
+                    instance.AddDataPoint(counterValue);
                     instance.ExecutionDuration = duration ?? 0;
                })
           ).ToArray();
@@ -457,14 +459,14 @@ public class CounterConfiguration
 
 
      // Add new data point with timestamp
-     public void AddDataPoint(double value, int maxHistoryPoints)
+     public void AddDataPoint(double value)
      {
           var dataPoint = new DataPoint(DateTime.Now, value);
           HistoricalData.Add(dataPoint);
           LastUpdate = dataPoint.Timestamp;
 
           // Limit historical data size, drop oldest point
-          while (HistoricalData.Count > maxHistoryPoints)
+          while (HistoricalData.Count > MaxHistoryPoints)
           {
                HistoricalData.RemoveAt(0);
           }

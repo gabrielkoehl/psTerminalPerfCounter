@@ -95,7 +95,7 @@ function Start-MonitoringLoop {
                                     $return                     = $counter.GetCurrentValue()
                                     $value                      = $return[0]
                                     $counter.ExecutionDuration  = $return[1]
-                                    $counter.AddDataPoint($Value, $MaxDataPoints)
+                                    $counter.AddDataPoint($Value)
 
                                     $allCounters += $counter
                                 } else {
@@ -124,6 +124,61 @@ function Start-MonitoringLoop {
                 } else {
                     Write-Host "No data available from any server." -ForegroundColor Yellow
                 }
+
+                Start-Sleep -Seconds $UpdateInterval
+            }
+
+        } elseif ( $monitorType -eq 'environment' ) {
+
+            # Environment monitoring: Parallel queries across all servers
+            while ( $true ) {
+
+                $SampleCount++
+
+                # Query ALL servers and counters in PARALLEL using async method
+                # This sets a common timestamp for all measurements
+                $Config.GetAllValuesParallelAsync().GetAwaiter().GetResult()
+
+                # Clear screen
+                Clear-Host
+
+                # Show header with environment info
+                Write-Host "=== $($Config.Name) ===" -ForegroundColor Cyan
+                Write-Host "Sample: $SampleCount | Started: $($StartTime.ToString('HH:mm:ss')) | Query Time: $($Config.QueryTimestamp.ToString('HH:mm:ss.fff')) | Duration: $($Config.QueryDuration)ms" -ForegroundColor Gray
+                Write-Host ""
+
+                # Collect all counters from all servers for display
+                $allCounters = @()
+
+                foreach ( $server in $Config.Servers ) {
+                    if ( $server.IsAvailable ) {
+                        foreach ( $counter in $server.Counters ) {
+                            if ( $counter.IsAvailable -and $counter.HistoricalData.Count -gt 0 ) {
+                                $allCounters += $counter
+                            }
+                        }
+                    }
+                }
+
+                # Display table with all counters from all servers
+                if ( $allCounters.Count -gt 0 ) {
+                    try {
+                        Show-CounterTable -Counters $allCounters -MonitorType 'environment'
+                    } catch {
+                        Write-Host "Table display error: $($_.Exception.Message)" -ForegroundColor Red
+                        Write-Host ""
+                    }
+                } else {
+                    Write-Host "No data available from any server." -ForegroundColor Yellow
+                }
+
+                # Show environment statistics
+                Write-Host ""
+                Write-Host "Environment Statistics:" -ForegroundColor Cyan
+                $stats = $Config.GetEnvironmentStatistics()
+                Write-Host "  Total Servers: $($stats['TotalServers']) | Available: $($stats['AvailableServers'])" -ForegroundColor White
+                Write-Host "  Total Counters: $($stats['TotalCounters']) | Available: $($stats['AvailableCounters'])" -ForegroundColor White
+                Write-Host "  Last Query: $($stats['LastQueryTimestamp']) | Duration: $($stats['LastQueryDuration']) | Interval: $($stats['Interval'])" -ForegroundColor White
 
                 Start-Sleep -Seconds $UpdateInterval
             }
