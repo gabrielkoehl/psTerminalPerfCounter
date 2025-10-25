@@ -15,4 +15,4 @@
 
 #start-tpcMonitor -ConfigName CPU
 
-Start-tpcEnvironmentMonitor -ConfigPath "C:\SyncThing\gabi_development\repositories\psTerminalPerfCounter\_remoteconfigs\AD_SERVER_001.json"
+Start-tpcEnvironmentMonitor -ConfigPath ".\_remoteconfigs\AD_SERVER_001.json"
