@@ -12,7 +12,7 @@
 
 [CmdletBinding()]
 param(
-    [string] $ComputerName = 'DEV-NODE1',
+    [string] $ComputerName = 'DEV-NODE3',
     [string] $ConfigName = "CPU",
     [int] $Iterations = 5
 )
