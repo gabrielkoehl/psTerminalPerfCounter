@@ -61,7 +61,7 @@ public class CounterConfiguration
           HistoricalData      = new List<DataPoint>();
           Statistics          = new Dictionary<string, object>();
           IsAvailable         = false;
-          LastError           = "";
+          LastError           = string.Empty;
           IsRemote            = isRemote;
           ComputerName        = computerName;
           Credential          = credential;
