@@ -83,11 +83,6 @@ public class CounterConfiguration
           TestAvailability();
      }
 
-     public async Task<(double counterValue, int? duration)> GetCurrentValueAsync()
-     {
-          return await Task.Run(() => GetCurrentValue());
-     }
-
      // STATISCHE Orchestrierungs-Methode für parallele Counter-Abfrage
      // Aufruf: [psTPCCLASSES.CounterConfiguration]::GetValuesParallel($instanceList)
      //
@@ -203,7 +198,7 @@ public class CounterConfiguration
                else
                {
                     // Get-Counter equivalent - PowerShell command ausführen
-                    using var ps = PowerShell.Create();
+                    using var ps = PowerShell.Create(RunspaceMode.NewRunspace);
                     ps.AddCommand("Get-Counter")
                     .AddParameter("Counter", CounterPath)
                     .AddParameter("MaxSamples", 1);
@@ -243,7 +238,7 @@ public class CounterConfiguration
                }
                else
                {
-                    using var ps = PowerShell.Create();
+                    using var ps = PowerShell.Create(RunspaceMode.NewRunspace);
                     ps.AddCommand("Get-Counter")
                     .AddParameter("Counter", CounterPath)
                     .AddParameter("MaxSamples", 1);
@@ -284,7 +279,7 @@ public class CounterConfiguration
           {
                var dateStart = DateTime.Now;
 
-               using var ps = PowerShell.Create();
+               using var ps = PowerShell.Create(RunspaceMode.NewRunspace);
                ps.AddCommand("Invoke-Command");
 
                foreach (var kvp in ParamRemote)
@@ -342,7 +337,7 @@ public class CounterConfiguration
                string setName;
                string pathName;
 
-               using var ps = PowerShell.Create();
+               using var ps = PowerShell.Create(RunspaceMode.NewRunspace);
 
                if (IsRemote)
                {

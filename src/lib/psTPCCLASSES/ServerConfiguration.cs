@@ -43,7 +43,7 @@ public class ServerConfiguration
      {
           try
           {
-               using var ps = PowerShell.Create();
+               using var ps = PowerShell.Create(RunspaceMode.NewRunspace);
 
                ps.AddCommand("Test-Connection")
                .AddParameter("ComputerName", ComputerName)
@@ -83,30 +83,32 @@ public class ServerConfiguration
                return;
           }
 
-          // LINQ: Für jeden Counter einen async Task erstellen
-          // Select() = wie ForEach-Object in PowerShell
-          // async/await = Asynchrone Ausführung ohne Thread-Blocking
-          var tasks = Counters.Select(async counter =>
-          {
-               try
+          // LINQ: Für jeden Counter einen Task erstellen
+          // Task.Run() verschiebt die Arbeit in Thread-Pool für echte Parallelität
+          // Jeder Counter wird in einem eigenen Thread abgefragt
+          var tasks = Counters.Select(counter =>
+               Task.Run(() =>
                {
-                    var (counterValue, duration) = await counter.GetCurrentValueAsync();
+                    try
+                    {
+                         var (counterValue, duration) = counter.GetCurrentValue();
 
-                    // Datenpunkt zur Historie hinzufügen
-                    counter.AddDataPoint(counterValue);
+                         // Datenpunkt zur Historie hinzufügen
+                         counter.AddDataPoint(counterValue);
 
-                    // Ausführungszeit speichern (falls null, dann 0)
-                    counter.ExecutionDuration = duration ?? 0;
-               }
-               catch (Exception ex)
-               {
-                    // Fehler für diesen Counter speichern, aber andere Counter weiterlaufen lassen
-                    counter.LastError = ex.Message;
-                    _logger.Error(_source, $"Error reading {counter.Title} on {ComputerName}: {ex.Message}");
-               }
-          }).ToArray();
+                         // Ausführungszeit speichern (falls null, dann 0)
+                         counter.ExecutionDuration = duration ?? 0;
+                    }
+                    catch (Exception ex)
+                    {
+                         // Fehler für diesen Counter speichern, aber andere Counter weiterlaufen lassen
+                         counter.LastError = ex.Message;
+                         _logger.Error(_source, $"Error reading {counter.Title} on {ComputerName}: {ex.Message}");
+                    }
+               })
+          ).ToArray();
 
-          // Warten bis ALLE async Tasks fertig sind
+          // Warten bis ALLE Tasks fertig sind
           // await Task.WhenAll() = Wartet auf alle parallelen Tasks
           await Task.WhenAll(tasks);
 
