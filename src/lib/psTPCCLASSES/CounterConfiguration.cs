@@ -216,7 +216,7 @@ public class CounterConfiguration
                IsAvailable = false;
                LastError = ex.Message;
 
-               Console.WriteLine($"Warning: Counter '{Title}' is not available: {LastError}");
+               _logger.Warning(_source, $"Counter '{Title}' is not available: {LastError}");
                Thread.Sleep(500);
           }
      }
