@@ -192,7 +192,7 @@ public class CounterConfiguration
           try
           {
 
-               _logger.Info(_source, $"Testing {CounterID}");
+               _logger.Info(_source, $"Testing {CounterPath}");
 
                if (IsRemote)
                {
