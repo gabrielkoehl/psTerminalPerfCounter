@@ -20,6 +20,7 @@
 
         # Create CounterConfiguration Instance
         $CounterConfiguration = [psTPCCLASSES.CounterConfiguration]::new(
+            $script:logger,
             $CounterConfig.counterID,
             $CounterConfig.counterSetType,
             $CounterConfig.counterInstance,
