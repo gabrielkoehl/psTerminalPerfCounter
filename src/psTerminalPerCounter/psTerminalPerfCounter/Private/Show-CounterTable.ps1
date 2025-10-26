@@ -12,7 +12,6 @@
      begin {
 
           $tableData     = @()
-          $isRemote      = $MonitorType -eq 'remoteMulti'
 
           # Helper function to get color for value
           function Get-ValueColor {
@@ -68,8 +67,8 @@
                     Min                 = if ( $null -ne $Stats.Minimum )   { $Stats.Minimum }  else { "-" }
                     Max                 = if ( $null -ne $Stats.Maximum )   { $Stats.Maximum }  else { "-" }
                     Avg                 = if ( $null -ne $Stats.Average )   { $Stats.Average }  else { "-" }
-                    LastUpdate          = if ( $Counter.isRemote -and $Counter.LastUpdate ) { $Counter.LastUpdate.ToString("HH:mm:ss") } else { $null }
-                    ExecutionDuration   = if ( $Counter.isRemote )          { $Counter.ExecutionDuration } else { $null }
+                    LastUpdate          = if ( $null -ne $Counter.LastUpdate )       { $Counter.LastUpdate.ToString("HH:mm:ss") } else { $null }
+                    ExecutionDuration   = if ( $null -ne $Counter.ExecutionDuration) { $Counter.ExecutionDuration } else { $null }
                     ColorMap            = $Counter.colorMap
                }
 
@@ -79,22 +78,17 @@
 
           # Calculate column widths
           $widths = @{
-               CounterName    = ($tableData | ForEach-Object { $_.CounterName.Length } | Measure-Object -Maximum).Maximum + 2
-               Unit           = ($tableData | ForEach-Object { $_.Unit.Length } | Measure-Object -Maximum).Maximum + 2
-               Current        = ($tableData | ForEach-Object { $_.Current.ToString().Length } | Measure-Object -Maximum).Maximum + 2
-               Last5          = 0
-               Min            = ($tableData | ForEach-Object { $_.Min.ToString().Length } | Measure-Object -Maximum).Maximum + 2
-               Max            = ($tableData | ForEach-Object { $_.Max.ToString().Length } | Measure-Object -Maximum).Maximum + 2
-               Avg            = ($tableData | ForEach-Object { $_.Avg.ToString().Length } | Measure-Object -Maximum).Maximum + 2
+               ComputerName        = ($tableData | ForEach-Object { $_.ComputerName.Length } | Measure-Object -Maximum).Maximum + 2
+               CounterName         = ($tableData | ForEach-Object { $_.CounterName.Length } | Measure-Object -Maximum).Maximum + 2
+               Unit                = ($tableData | ForEach-Object { $_.Unit.Length } | Measure-Object -Maximum).Maximum + 2
+               Current             = ($tableData | ForEach-Object { $_.Current.ToString().Length } | Measure-Object -Maximum).Maximum + 2
+               Last5               = 0
+               Min                 = ($tableData | ForEach-Object { $_.Min.ToString().Length } | Measure-Object -Maximum).Maximum + 2
+               Max                 = ($tableData | ForEach-Object { $_.Max.ToString().Length } | Measure-Object -Maximum).Maximum + 2
+               Avg                 = ($tableData | ForEach-Object { $_.Avg.ToString().Length } | Measure-Object -Maximum).Maximum + 2
+               LastUpdate          = ($tableData | Where-Object { $_.LastUpdate }                   | ForEach-Object { $_.LastUpdate.Length }                   | Measure-Object -Maximum).Maximum + 2
+               ExecutionDuration   = ($tableData | Where-Object { $null -ne $_.ExecutionDuration }  | ForEach-Object { $_.ExecutionDuration.ToString().Length } | Measure-Object -Maximum).Maximum + 2
           }
-
-          # Add column width for remoteMulti
-          if ( $isRemote ) {
-               $widths.ComputerName          = ($tableData | Where-Object { $_.ComputerName }                 | ForEach-Object { $_.ComputerName.Length }                 | Measure-Object -Maximum).Maximum + 2
-               $widths.LastUpdate            = ($tableData | Where-Object { $_.LastUpdate }                   | ForEach-Object { $_.LastUpdate.Length }                   | Measure-Object -Maximum).Maximum + 2
-               $widths.ExecutionDuration     = ($tableData | Where-Object { $null -ne $_.ExecutionDuration }  | ForEach-Object { $_.ExecutionDuration.ToString().Length } | Measure-Object -Maximum).Maximum + 2
-          }
-
 
           # Calculate Last5 width
           $maxLast5Count      = ($tableData | ForEach-Object { $_.Last5.Count } | Measure-Object -Maximum).Maximum
@@ -123,22 +117,17 @@
 
           # Ensure minimum widths for headers
           $headers = @{
-               CounterName    = "Counter Name"
-               Unit           = "Unit"
-               Current        = "Current"
-               Last5          = "Last 5 Values"
-               Min            = "Min"
-               Max            = "Max"
-               Avg            = "Avg"
+               ComputerName        = "Computer Name"
+               CounterName         = "Counter Name"
+               Unit                = "Unit"
+               Current             = "Current"
+               Last5               = "Last 5 Values"
+               Min                 = "Min"
+               Max                 = "Max"
+               Avg                 = "Avg"
+               LastUpdate          = "ExecTime"
+               ExecutionDuration   = "EDur (ms)"
           }
-
-          # remote only headers
-          if ( $isRemote ) {
-               $headers.ComputerName         = "Computer"
-               $headers.LastUpdate           = "ExecTime"
-               $headers.ExecutionDuration    = "RT (ms)"
-          }
-
 
           foreach ( $key in $headers.Keys ) {
                if ( $widths[$key] -lt ($headers[$key].Length + 2) ) {
@@ -149,10 +138,7 @@
           # Print header
           $headerParts = @()
 
-          if ( $isRemote ) {
-               $headerParts += $headers.ComputerName.PadRight($widths.ComputerName - 2)
-          }
-
+          $headerParts += $headers.ComputerName.PadRight($widths.ComputerName - 2)
           $headerParts += $headers.CounterName.PadRight($widths.CounterName - 2)
           $headerParts += $headers.Unit.PadRight($widths.Unit - 2)
           $headerParts += $headers.Current.PadRight($widths.Current - 2)
@@ -160,11 +146,8 @@
           $headerParts += $headers.Min.PadRight($widths.Min - 2)
           $headerParts += $headers.Max.PadRight($widths.Max - 2)
           $headerParts += $headers.Avg.PadRight($widths.Avg - 2)
-
-          if ( $isRemote ) {
-               $headerParts += $headers.LastUpdate.PadRight($widths.LastUpdate - 2)
-               $headerParts += $headers.ExecutionDuration.PadRight($widths.ExecutionDuration - 2)
-          }
+          $headerParts += $headers.LastUpdate.PadRight($widths.LastUpdate - 2)
+          $headerParts += $headers.ExecutionDuration.PadRight($widths.ExecutionDuration - 2)
 
           $headerLine = " " + ($headerParts -join " | ") + " "
 
@@ -196,14 +179,14 @@
                # Print row parts
                $rowParts = @()
 
-               # Computer name column (first, if needed)
-               if ( $isRemote ) {
-                    $rowParts += @{
-                         Value = $row.ComputerName
-                         Width = $widths.ComputerName
-                         Color = "White"
-                    }
+               # Computer name
+
+               $rowParts += @{
+                    Value = $row.ComputerName
+                    Width = $widths.ComputerName
+                    Color = "White"
                }
+
 
                # Counter name
                $rowParts += @{
@@ -273,22 +256,16 @@
                Write-Host -NoNewline ("{0} " -f $row.Max.ToString().PadRight($widths.Max - 2)) -ForegroundColor $maxColor
                Write-Host -NoNewline "| " -ForegroundColor White
                Write-Host -NoNewline ("{0} " -f $row.Avg.ToString().PadRight($widths.Avg - 2)) -ForegroundColor $avgColor
+               Write-Host -NoNewline "| " -ForegroundColor White
 
-               if ( $isRemote ) {
+               # LastUpdate (ExecTime)
+               $execTimeValue = if ($row.LastUpdate) { $row.LastUpdate } else { "-" }
+               Write-Host -NoNewline ("{0} " -f $execTimeValue.PadRight($widths.LastUpdate - 2)) -ForegroundColor White
+               Write-Host -NoNewline "| " -ForegroundColor White
 
-                    Write-Host -NoNewline "| " -ForegroundColor White
-                    $timestampValue = if ( $null -ne $row.LastUpdate ) { $row.LastUpdate } else { "-" }
-                    Write-Host -NoNewline ("{0} " -f $timestampValue.PadRight($widths.LastUpdate - 2)) -ForegroundColor DarkGray
-
-                    Write-Host -NoNewline "| " -ForegroundColor White
-                    $ExecutionDurationValue = if ( $null -ne $row.ExecutionDuration ) { $row.ExecutionDuration.ToString() } else { "-" }
-                    Write-Host ("{0} " -f $ExecutionDurationValue.PadRight($widths.ExecutionDuration - 2)) -ForegroundColor DarkGray
-
-               } else {
-
-                    Write-Host ""
-
-               }
+               # ExecutionDuration (EDur (ms))
+               $durationValue = if ($null -ne $row.ExecutionDuration) { $row.ExecutionDuration } else { "-" }
+               Write-Host ("{0}" -f $durationValue.ToString().PadRight($widths.ExecutionDuration - 2)) -ForegroundColor White
 
           }
 
