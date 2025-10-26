@@ -165,23 +165,8 @@ public class CounterConfiguration
      {
           try
           {
-
                _logger.Info(_source, $"Testing {CounterPath}");
-
-               if (IsRemote)
-               {
-                    GetRemoteValue(1);
-               }
-               else
-               {
-                    // Get-Counter equivalent - PowerShell command ausführen
-                    using var ps = PowerShell.Create(RunspaceMode.NewRunspace);
-                    ps.AddCommand("Get-Counter")
-                    .AddParameter("Counter", CounterPath)
-                    .AddParameter("MaxSamples", 1);
-                    ps.Invoke();
-               }
-
+               GetValue(1);
                IsAvailable = true;
                LastError = string.Empty;
           }
@@ -204,37 +189,10 @@ public class CounterConfiguration
 
           try
           {
-               double counterValue;
-               int?   duration = null;
+               var result = GetValue(1);
+               var counterValue = Math.Round(result.counterValue / Math.Pow(ConversionFactor, ConversionExponent));
 
-               if (IsRemote)
-               {
-                    var result     = GetRemoteValue(1);
-                    counterValue   = result.counterValue;
-                    duration       = result.duration;
-               }
-               else
-               {
-                    var startTime = DateTime.Now;
-
-                    using var ps = PowerShell.Create(RunspaceMode.NewRunspace);
-                    ps.AddCommand("Get-Counter")
-                    .AddParameter("Counter", CounterPath)
-                    .AddParameter("MaxSamples", 1);
-
-                    var result = ps.Invoke();
-
-                    var endTime = DateTime.Now;
-                    duration = (int)(endTime - startTime).TotalMilliseconds;
-
-                    var sampleSet = (dynamic)result[0].BaseObject; // dynamic --> at this point the compiler doesn't know the type of baseobject
-                    counterValue = Convert.ToDouble(sampleSet.CounterSamples[0].CookedValue);
-
-               }
-
-               counterValue = Math.Round(counterValue / Math.Pow(ConversionFactor, ConversionExponent));
-
-               return (counterValue, duration);
+               return (counterValue, result.duration);
           }
           catch (Exception ex)
           {
@@ -243,7 +201,7 @@ public class CounterConfiguration
           }
      }
 
-     private (double counterValue, int duration) GetRemoteValue(int maxSamples)
+     private (double counterValue, int duration) GetValue(int maxSamples)
      {
           var scriptBlock = ScriptBlock.Create(@"
                param($CounterPath, $MaxSamples)
@@ -258,9 +216,13 @@ public class CounterConfiguration
                using var ps = PowerShell.Create(RunspaceMode.NewRunspace);
                ps.AddCommand("Invoke-Command");
 
-               foreach (var kvp in ParamRemote)
+               // Add remote parameters only if this is a remote counter
+               if (IsRemote)
                {
-                    ps.AddParameter(kvp.Key, kvp.Value);
+                    foreach (var kvp in ParamRemote)
+                    {
+                         ps.AddParameter(kvp.Key, kvp.Value);
+                    }
                }
 
                ps.AddParameter("ScriptBlock", scriptBlock);
@@ -275,7 +237,7 @@ public class CounterConfiguration
           }
           catch (Exception ex)
           {
-               throw new Exception($"Error getting remote value for '{Title}': {ex.Message}", ex);
+               throw new Exception($"Error getting value for '{Title}': {ex.Message}", ex);
           }
      }
 
@@ -315,59 +277,43 @@ public class CounterConfiguration
 
                using var ps = PowerShell.Create(RunspaceMode.NewRunspace);
 
+               // SetName
+               ps.AddCommand("Invoke-Command");
+
                if (IsRemote)
                {
-
-                    // SetName
-                    ps.AddCommand("Invoke-Command");
                     foreach (var kvp in ParamRemote)
                     {
                          ps.AddParameter(kvp.Key, kvp.Value);
                     }
-                    ps.AddParameter("ScriptBlock", scriptBlock);
-                    ps.AddParameter("ArgumentList", new object[] { setID });
-
-                    var resultSet = ps.Invoke();
-                    setName = resultSet[0].BaseObject.ToString()!;  // <- FIX
-
-                    // -------
-                    ps.Commands.Clear();
-                    // -------
-
-                    // PathName
-                    ps.AddCommand("Invoke-Command");
-                    foreach (var kvp in ParamRemote)
-                    {
-                         ps.AddParameter(kvp.Key, kvp.Value);
-                    }
-                    ps.AddParameter("ScriptBlock", scriptBlock);
-                    ps.AddParameter("ArgumentList", new object[] { pathID });
-
-                    var resultPath = ps.Invoke();
-                    pathName = resultPath[0].BaseObject.ToString()!;
                }
-               else
+
+               ps.AddParameter("ScriptBlock", scriptBlock);
+               ps.AddParameter("ArgumentList", new object[] { setID });
+
+               var resultSet = ps.Invoke();
+               setName = resultSet[0].BaseObject.ToString()!;
+
+               // -------
+               ps.Commands.Clear();
+               // -------
+
+               // PathName
+               ps.AddCommand("Invoke-Command");
+
+               if (IsRemote)
                {
-                    // SetName
-                    ps.AddCommand("Invoke-Command")
-                    .AddParameter("ScriptBlock", scriptBlock)
-                    .AddParameter("ArgumentList", new object[] { setID });
-
-                    var resultSet = ps.Invoke();
-                    setName = resultSet[0].BaseObject.ToString()!;
-
-                    // -------
-                    ps.Commands.Clear();
-                    // -------
-
-                    // PathName
-                    ps.AddCommand("Invoke-Command")
-                    .AddParameter("ScriptBlock", scriptBlock)
-                    .AddParameter("ArgumentList", new object[] { pathID });
-
-                    var resultPath = ps.Invoke();
-                    pathName = resultPath[0].BaseObject.ToString()!;
+                    foreach (var kvp in ParamRemote)
+                    {
+                         ps.AddParameter(kvp.Key, kvp.Value);
+                    }
                }
+
+               ps.AddParameter("ScriptBlock", scriptBlock);
+               ps.AddParameter("ArgumentList", new object[] { pathID });
+
+               var resultPath = ps.Invoke();
+               pathName = resultPath[0].BaseObject.ToString()!;
 
                if (counterSetType == "SingleInstance")
                {
