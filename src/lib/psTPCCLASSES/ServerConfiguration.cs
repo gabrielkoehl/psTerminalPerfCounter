@@ -74,27 +74,29 @@ public class ServerConfiguration
                return;
           }
 
-          var tasks = Counters.Select(counter =>
-               Task.Run(() =>
-               {
-                    try
+          var tasks = Counters
+               .Where(counter => counter.IsAvailable)
+               .Select(counter =>
+                    Task.Run(() =>
                     {
-                         var (counterValue, duration) = counter.GetCurrentValue();
+                         try
+                         {
+                              var (counterValue, duration) = counter.GetCurrentValue();
 
-                         // Datenpunkt zur Historie hinzufügen
-                         counter.AddDataPoint(counterValue);
+                              // Datenpunkt zur Historie hinzufügen
+                              counter.AddDataPoint(counterValue);
 
-                         // Ausführungszeit speichern (falls null, dann 0)
-                         counter.ExecutionDuration = duration ?? 0;
-                    }
-                    catch (Exception ex)
-                    {
-                         // Fehler für diesen Counter speichern, aber andere Counter weiterlaufen lassen
-                         counter.LastError = ex.Message;
-                         _logger.Error(_source, $"Error reading {counter.Title} on {ComputerName}: {ex.Message}");
-                    }
-               })
-          ).ToArray();
+                              // Ausführungszeit speichern (falls null, dann 0)
+                              counter.ExecutionDuration = duration ?? 0;
+                         }
+                         catch (Exception ex)
+                         {
+                              // Fehler für diesen Counter speichern, aber andere Counter weiterlaufen lassen
+                              counter.LastError = ex.Message;
+                              _logger.Error(_source, $"Error reading {counter.Title} on {ComputerName}: {ex.Message}");
+                         }
+                    })
+               ).ToArray();
 
           await Task.WhenAll(tasks);
 

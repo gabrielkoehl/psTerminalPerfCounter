@@ -82,14 +82,16 @@ public class CounterConfiguration
 
      public static void GetValuesParallel(List<CounterConfiguration> instances)
      {
-          var tasks = instances.Select(instance =>
-               Task.Run(() =>
-               {
-                    var (counterValue, duration) = instance.GetCurrentValue();
-                    instance.AddDataPoint(counterValue);
-                    instance.ExecutionDuration = duration ?? 0;
-               })
-          ).ToArray();
+          var tasks = instances
+               .Where(instance => instance.IsAvailable)
+               .Select(instance =>
+                    Task.Run(() =>
+                    {
+                         var (counterValue, duration) = instance.GetCurrentValue();
+                         instance.AddDataPoint(counterValue);
+                         instance.ExecutionDuration = duration ?? 0;
+                    })
+               ).ToArray();
 
           Task.WaitAll(tasks);
      }
@@ -166,7 +168,7 @@ public class CounterConfiguration
           try
           {
                _logger.Info(_source, $"Testing {CounterPath}");
-               GetValue(1);
+               _ = GetCurrentValue(); // _ = discard
                IsAvailable = true;
                LastError = string.Empty;
           }
@@ -181,27 +183,6 @@ public class CounterConfiguration
      }
 
      public (double counterValue, int? duration) GetCurrentValue()
-     {
-          if (!IsAvailable)
-          {
-               throw new InvalidOperationException($"Counter '{Title}' is not available: {LastError}");
-          }
-
-          try
-          {
-               var result = GetValue(1);
-               var counterValue = Math.Round(result.counterValue / Math.Pow(ConversionFactor, ConversionExponent));
-
-               return (counterValue, result.duration);
-          }
-          catch (Exception ex)
-          {
-               LastError = ex.Message;
-               throw new Exception($"Error reading counter '{Title}': {ex.Message}", ex);
-          }
-     }
-
-     private (double counterValue, int duration) GetValue(int maxSamples)
      {
           var scriptBlock = ScriptBlock.Create(@"
                param($CounterPath, $MaxSamples)
@@ -226,18 +207,21 @@ public class CounterConfiguration
                }
 
                ps.AddParameter("ScriptBlock", scriptBlock);
-               ps.AddParameter("ArgumentList", new object[] { CounterPath, maxSamples });
+               ps.AddParameter("ArgumentList", new object[] { CounterPath, 1 });
 
                var result = ps.Invoke();
                var dateEnd = DateTime.Now;
                var duration = (int)(dateEnd - dateStart).TotalMilliseconds;
-               var counterValue = Convert.ToDouble(result[0].BaseObject);
+               var rawValue = Convert.ToDouble(result[0].BaseObject);
+
+               var counterValue = Math.Round(rawValue / Math.Pow(ConversionFactor, ConversionExponent));
 
                return (counterValue, duration);
           }
           catch (Exception ex)
           {
-               throw new Exception($"Error getting value for '{Title}': {ex.Message}", ex);
+               LastError = ex.Message;
+               throw new Exception($"Error reading counter '{Title}': {ex.Message}", ex);
           }
      }
 
