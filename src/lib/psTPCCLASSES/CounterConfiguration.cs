@@ -80,26 +80,6 @@ public class CounterConfiguration
           TestAvailability();
      }
 
-     // STATISCHE Orchestrierungs-Methode für parallele Counter-Abfrage
-     // Aufruf: [psTPCCLASSES.CounterConfiguration]::GetValuesParallel($instanceList)
-     //
-     // Zweck: Führt GetCurrentValue() für ALLE übergebenen Counter gleichzeitig aus
-     //        statt nacheinander - spart massiv Zeit bei vielen Countern
-     //
-     // Parameter: List<CounterConfiguration> - Alle Counter-Instanzen die parallel abgefragt werden
-     // Return: Dictionary mit CounterID als Key und Dictionary mit counterValue + duration als Value
-     //
-     // Beispiel mit 3 Countern:
-     // Thread 1: instance1.GetCurrentValue() für Counter "238-6" läuft parallel
-     // Thread 2: instance2.GetCurrentValue() für Counter "2-44" läuft parallel
-     // Thread 3: instance3.GetCurrentValue() für Counter "4-210" läuft parallel
-     // Alle 3 laufen GLEICHZEITIG, nicht nacheinander
-     //
-     // Task.WaitAll() wartet bis ALLE Threads fertig sind, dann werden die Ergebnisse gesammelt
-     //
-     // Hinweis: Später bei Multi-Server-Szenarien wird es eine übergeordnete Computer-Klasse geben,
-     //          die mehrere CounterConfiguration-Instanzen pro Server verwaltet
-
      public static void GetValuesParallel(List<CounterConfiguration> instances)
      {
           var tasks = instances.Select(instance =>
@@ -235,7 +215,6 @@ public class CounterConfiguration
                }
                else
                {
-                    // Measure execution time for local counters
                     var startTime = DateTime.Now;
 
                     using var ps = PowerShell.Create(RunspaceMode.NewRunspace);
@@ -248,17 +227,11 @@ public class CounterConfiguration
                     var endTime = DateTime.Now;
                     duration = (int)(endTime - startTime).TotalMilliseconds;
 
-                    // Use dynamic to access the PerformanceCounterSampleSet properties at runtime
-                    // PowerShell always returns collections, even for single results
-                    // Therefore we need [0] to access the first (and only) CounterSample
-                    // Without dynamic, we would need explicit casting or reflection to access CounterSamples property
-
-                    var sampleSet = (dynamic)result[0].BaseObject;
+                    var sampleSet = (dynamic)result[0].BaseObject; // dynamic --> at this point the compiler doesn't know the type of baseobject
                     counterValue = Convert.ToDouble(sampleSet.CounterSamples[0].CookedValue);
 
                }
 
-               // Convert Units
                counterValue = Math.Round(counterValue / Math.Pow(ConversionFactor, ConversionExponent));
 
                return (counterValue, duration);

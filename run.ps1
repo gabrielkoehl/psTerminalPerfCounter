@@ -14,6 +14,6 @@
 
 #start-tpcmonitor -ComputerName DEV-NODE3 -ConfigName CPU
 
-#start-tpcMonitor -ConfigName CPU
+start-tpcMonitor -ConfigName CPU
 
-Start-tpcEnvironmentMonitor -ConfigPath ".\_remoteconfigs\AD_SERVER_001.json"
+#Start-tpcEnvironmentMonitor -ConfigPath ".\_remoteconfigs\AD_SERVER_001.json"

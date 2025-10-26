@@ -126,7 +126,7 @@
                Max                 = "Max"
                Avg                 = "Avg"
                LastUpdate          = "ExecTime"
-               ExecutionDuration   = "EDur (ms)"
+               ExecutionDuration   = "Dur.Time (ms)"
           }
 
           foreach ( $key in $headers.Keys ) {
@@ -135,7 +135,6 @@
                }
           }
 
-          # Print header
           $headerParts = @()
 
           $headerParts += $headers.ComputerName.PadRight($widths.ComputerName - 2)
@@ -258,12 +257,10 @@
                Write-Host -NoNewline ("{0} " -f $row.Avg.ToString().PadRight($widths.Avg - 2)) -ForegroundColor $avgColor
                Write-Host -NoNewline "| " -ForegroundColor White
 
-               # LastUpdate (ExecTime)
                $execTimeValue = if ($row.LastUpdate) { $row.LastUpdate } else { "-" }
                Write-Host -NoNewline ("{0} " -f $execTimeValue.PadRight($widths.LastUpdate - 2)) -ForegroundColor White
                Write-Host -NoNewline "| " -ForegroundColor White
 
-               # ExecutionDuration (EDur (ms))
                $durationValue = if ($null -ne $row.ExecutionDuration) { $row.ExecutionDuration } else { "-" }
                Write-Host ("{0}" -f $durationValue.ToString().PadRight($widths.ExecutionDuration - 2)) -ForegroundColor White
 
