@@ -235,12 +235,18 @@ public class CounterConfiguration
                }
                else
                {
+                    // Measure execution time for local counters
+                    var startTime = DateTime.Now;
+
                     using var ps = PowerShell.Create(RunspaceMode.NewRunspace);
                     ps.AddCommand("Get-Counter")
                     .AddParameter("Counter", CounterPath)
                     .AddParameter("MaxSamples", 1);
 
                     var result = ps.Invoke();
+
+                    var endTime = DateTime.Now;
+                    duration = (int)(endTime - startTime).TotalMilliseconds;
 
                     // Use dynamic to access the PerformanceCounterSampleSet properties at runtime
                     // PowerShell always returns collections, even for single results
@@ -289,7 +295,7 @@ public class CounterConfiguration
 
                var result = ps.Invoke();
                var dateEnd = DateTime.Now;
-               var duration = (dateEnd - dateStart).Milliseconds;
+               var duration = (int)(dateEnd - dateStart).TotalMilliseconds;
                var counterValue = Convert.ToDouble(result[0].BaseObject);
 
                return (counterValue, duration);
