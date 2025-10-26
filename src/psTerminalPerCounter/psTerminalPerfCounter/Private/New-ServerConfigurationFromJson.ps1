@@ -21,13 +21,25 @@
 
             try {
 
-                $performanceCounters = @()
+                $performanceCounters    = @()
+                $skipServer             = $false
 
                 if ( $ServerConfig.CounterConfig ) {
                     foreach ( $CounterConfig in $ServerConfig.CounterConfig ) {
                         $config = Get-CounterConfiguration -ConfigName $CounterConfig -isRemote -computername $ServerConfig.computername -credential $setCredential
+
+                        if ( $config.SkipServer ) {
+                            $skipServer = $true
+                            break
+                        }
+
                         $performanceCounters += $config.Counters
                     }
+                }
+
+                if ( $skipServer ) {
+                    Write-Warning "Skipping server '$($ServerConfig.computername)' - marked as unreachable during counter configuration."
+                    continue
                 }
 
                 $serverConfiguration = [psTPCCLASSES.ServerConfiguration]::new(

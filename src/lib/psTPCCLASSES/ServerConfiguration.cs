@@ -66,13 +66,6 @@ public class ServerConfiguration
           }
      }
 
-     // Fragt alle Counter dieses Servers PARALLEL ab
-     // Public Methode - kann von außen aufgerufen werden
-     // Beispiel: await myServer.GetValuesParallelAsync()
-     //
-     // Verwendet async/await Pattern für bessere Performance und Skalierbarkeit
-     // Jeder Counter wird parallel über GetCurrentValueAsync() abgefragt
-
      public async Task GetValuesParallelAsync()
      {
           if (!IsAvailable)
@@ -81,9 +74,6 @@ public class ServerConfiguration
                return;
           }
 
-          // LINQ: Für jeden Counter einen Task erstellen
-          // Task.Run() verschiebt die Arbeit in Thread-Pool für echte Parallelität
-          // Jeder Counter wird in einem eigenen Thread abgefragt
           var tasks = Counters.Select(counter =>
                Task.Run(() =>
                {
@@ -106,11 +96,8 @@ public class ServerConfiguration
                })
           ).ToArray();
 
-          // Warten bis ALLE Tasks fertig sind
-          // await Task.WhenAll() = Wartet auf alle parallelen Tasks
           await Task.WhenAll(tasks);
 
-          // Timestamp setzen für letztes erfolgreiches Update
           LastUpdate = DateTime.Now;
      }
 
