@@ -37,27 +37,18 @@ public class EnvironmentConfiguration
 
     public async Task GetAllValuesParallelAsync()
     {
-        // Timestamp VOR der Abfrage setzen
-        // Dieser Timestamp gilt für ALLE Server und Counter
         var startTime = DateTime.Now;
         QueryTimestamp = startTime;
 
-        _logger.Info(_source, $"Starting parallel query for environment '{Name}' with {Servers.Count} servers");
-
         try
         {
-            // Für jeden verfügbaren Server einen async Task erstellen
-            // Jeder Server fragt intern seine Counter parallel ab
             var serverTasks = Servers
                 .Where(s => s.IsAvailable)
                 .Select(async server =>
                 {
                     try
                     {
-                        // Jeder Server fragt seine Counter parallel ab
                         await server.GetValuesParallelAsync();
-
-                        // Server-Statistiken aktualisieren
                         server.UpdateStatistics();
                     }
                     catch (Exception ex)
@@ -67,10 +58,8 @@ public class EnvironmentConfiguration
                     }
                 }).ToArray();
 
-            // Warten bis ALLE Server fertig sind
             await Task.WhenAll(serverTasks);
 
-            // Gesamtdauer berechnen (Ende - Start)
             var endTime = DateTime.Now;
             QueryDuration = (int)(endTime - startTime).TotalMilliseconds;
 
@@ -84,12 +73,10 @@ public class EnvironmentConfiguration
     }
 
 
-    // Gibt Umgebungs-Statistiken zurück
-
     public Dictionary<string, object> GetEnvironmentStatistics()
     {
         var availableServers = Servers.Where(s => s.IsAvailable).ToList();
-        var totalCounters = Servers.Sum(s => s.Counters.Count);                // Sum() = Measure-Object -Sum
+        var totalCounters = Servers.Sum(s => s.Counters.Count);
         var availableCounters = availableServers.Sum(s => s.Counters.Count(c => c.IsAvailable));
 
         return new Dictionary<string, object>
