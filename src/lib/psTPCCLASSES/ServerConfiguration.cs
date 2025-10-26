@@ -11,7 +11,7 @@ namespace psTPCCLASSES;
 
 public class ServerConfiguration
 {
-     private readonly PowerShellLogger _logger;
+     private static readonly PowerShellLogger _logger = PowerShellLogger.Instance;
      private readonly string _source;
      public string ComputerName { get; set; }
      public string Comment { get; set; }
@@ -22,12 +22,10 @@ public class ServerConfiguration
      public DateTime? LastUpdate { get; set; }
 
      public ServerConfiguration(
-          PowerShellLogger logger,
           string computerName,
           string comment,
           List<CounterConfiguration> counters)
      {
-          _logger        = logger;
           _source        = "ServerConfiguration";
           ComputerName   = computerName;
           Comment        = comment;

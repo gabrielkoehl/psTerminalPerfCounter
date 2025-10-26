@@ -9,7 +9,7 @@ namespace psTPCCLASSES;
 
 public class CounterConfiguration
 {
-     private readonly PowerShellLogger _logger;
+     private static readonly PowerShellLogger _logger = PowerShellLogger.Instance;
      private readonly string _source;
      public string CounterID { get; set; }
      public string CounterSetType { get; set; }
@@ -37,8 +37,6 @@ public class CounterConfiguration
      public DateTime? LastUpdate { get; set; }
 
      public CounterConfiguration(
-
-          PowerShellLogger logger,
           string counterID,
           string counterSetType,
           string counterInstance,
@@ -54,7 +52,6 @@ public class CounterConfiguration
           string computerName,
           PSCredential? credential)
      {
-          _logger             = logger;
           _source             = "CounterConfiguration";
           CounterID           = counterID;
           CounterSetType      = counterSetType;

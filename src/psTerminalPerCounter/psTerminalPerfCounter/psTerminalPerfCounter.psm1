@@ -9,8 +9,8 @@ $script:JSON_SCHEMA_FILE    = Join-Path $script:DEFAULT_CONFIG_PATH -ChildPath "
 # Load Libraries
 Add-Type -Path "$PSScriptRoot\Lib\psTPCCLASSES.dll"
 
-# Loading Logger
-$script:logger = [psTPCCLASSES.PowerShellLogger]::new()
+# Loading Logger (Singleton)
+$script:logger = [psTPCCLASSES.PowerShellLogger]::Instance
 
 # Dot source public/private functions
 $public             = @(Get-ChildItem -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Public/*.ps1')  -Recurse -ErrorAction Stop)

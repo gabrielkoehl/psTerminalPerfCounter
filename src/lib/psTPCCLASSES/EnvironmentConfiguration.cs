@@ -11,7 +11,7 @@ namespace psTPCCLASSES;
 
 public class EnvironmentConfiguration
 {
-    private readonly PowerShellLogger _logger;
+    private static readonly PowerShellLogger _logger = PowerShellLogger.Instance;
     private readonly string _source;
     public string Name { get; set; }
     public string Description { get; set; }
@@ -21,13 +21,11 @@ public class EnvironmentConfiguration
     public int QueryDuration { get; set; }
 
     public EnvironmentConfiguration(
-        PowerShellLogger logger,
         string name,
         string description,
         int interval,
         List<ServerConfiguration> servers)
     {
-        _logger           = logger;
         _source           = "EnvironmentConfiguration";
         Name              = name;
         Description       = description;

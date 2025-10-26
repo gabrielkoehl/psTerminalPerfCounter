@@ -31,7 +31,6 @@
                 }
 
                 $serverConfiguration = [psTPCCLASSES.ServerConfiguration]::new(
-                    $script:logger,
                     $ServerConfig.computername,
                     $ServerConfig.comment,
                     $performanceCounters

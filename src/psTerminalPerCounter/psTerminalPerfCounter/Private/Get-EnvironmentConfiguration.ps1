@@ -75,7 +75,6 @@ function Get-EnvironmentConfiguration {
 
         # Create EnvironmentConfiguration object
         $environment = [psTPCCLASSES.EnvironmentConfiguration]::new(
-            $script:logger,
             $jsonContent.name,
             $jsonContent.description,
             $jsonContent.interval,

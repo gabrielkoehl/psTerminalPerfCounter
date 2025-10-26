@@ -1,10 +1,10 @@
-  # dotnet build "src\lib\psTPCLIB.sln"
+  dotnet build "src\lib\psTPCLIB.sln"
 
 
 
 
-  #  Copy-Item "src\lib\psTPCCLASSES\bin\Debug\net9.0\psTPCCLASSES.dll" "src\psTerminalPerCounter\psTerminalPerfCounter\Lib"
-  #  Copy-Item "src\lib\psTPCCLASSES\bin\Debug\net9.0\psTPCCLASSES.deps.json" "src\psTerminalPerCounter\psTerminalPerfCounter\Lib"
+   Copy-Item "src\lib\psTPCCLASSES\bin\Debug\net9.0\psTPCCLASSES.dll" "src\psTerminalPerCounter\psTerminalPerfCounter\Lib"
+   Copy-Item "src\lib\psTPCCLASSES\bin\Debug\net9.0\psTPCCLASSES.deps.json" "src\psTerminalPerCounter\psTerminalPerfCounter\Lib"
 
   import-module -fullyqualifiedname ".\src\psTerminalPerCounter\psTerminalPerfCounter\psTerminalPerfCounter.psd1" -force
 
