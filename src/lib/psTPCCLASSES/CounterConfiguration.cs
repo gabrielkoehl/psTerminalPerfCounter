@@ -168,7 +168,7 @@ public class CounterConfiguration
           try
           {
                _logger.Info(_source, $"Testing {CounterPath}");
-               _ = GetCurrentValue(); // _ = discard
+               _ = GetCurrentValue(); // _ = discard return
                IsAvailable = true;
                LastError = string.Empty;
           }
@@ -197,7 +197,6 @@ public class CounterConfiguration
                using var ps = PowerShell.Create(RunspaceMode.NewRunspace);
                ps.AddCommand("Invoke-Command");
 
-               // Add remote parameters only if this is a remote counter
                if (IsRemote)
                {
                     foreach (var kvp in ParamRemote)

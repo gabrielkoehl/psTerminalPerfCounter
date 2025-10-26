@@ -7,7 +7,7 @@
           "credentialname": "integrated",
           "servers": [
                {
-                    "computername": "DEV-NODE5",
+                    "computername": "DEV-NODE4",
                     "comment": "Sql Server Node B Production",
                     "counterConfig": [
                          "CPU"
@@ -24,7 +24,15 @@
                     "computername": "DEV-DC",
                     "comment": "Sql Server Node A Production",
                     "counterConfig": [
-                         "CPU"
+                         "CPU",
+                         "Memory"
+                    ]
+               },
+               {
+                    "computername": "DEV-MAIN",
+                    "comment": "Sql Server Node A Production",
+                    "counterConfig": [
+                         "DISK"
                     ]
                }
           ]
