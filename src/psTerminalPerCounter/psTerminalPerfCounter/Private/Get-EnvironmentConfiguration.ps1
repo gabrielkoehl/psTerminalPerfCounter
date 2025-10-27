@@ -56,13 +56,40 @@ function Get-EnvironmentConfiguration {
             Return
         }
 
-        # Validate JSON structure
-        if ( -not $jsonContent.name ) {
-            throw "Environment configuration missing required property 'name'"
+        # JSON Schema Validation
+        # ------------------------------------
+
+        $skipSchemaValidation = $false
+
+        if ( -not (Get-Module -Name GripDevJsonSchemaValidator -ListAvailable) ) {
+            Write-Warning "Module 'GripDevJsonSchemaValidator' not found. Please install it with: Install-Module -Name GripDevJsonSchemaValidator"
+            Write-Warning "JSON schema validation will be skipped."
+            $skipSchemaValidation = $true
         }
 
-        if ( -not $jsonContent.servers ) {
-            throw "Environment configuration missing required property 'servers'"
+        if ( -not (Test-Path $script:JSON_SCHEMA_ENVIRONMENT_FILE) ) {
+            Write-Warning "Environment schema file not found at: $script:JSON_SCHEMA_ENVIRONMENT_FILE. Skipping schema validation."
+            $skipSchemaValidation = $true
+        }
+
+        # Perform schema validation if module and schema are available
+        if ( -not $skipSchemaValidation ) {
+            try {
+                $ValidationResult = Test-JsonSchema -SchemaPath $script:JSON_SCHEMA_ENVIRONMENT_FILE -JsonPath $ConfigPath -ErrorAction Stop 6>$null
+
+                if ( -not $ValidationResult.Valid ) {
+                    $errorMessages = $ValidationResult.Errors | ForEach-Object {
+                        "  - $($_.Message) | Path: $($_.Path) | Line: $($_.LineNumber)"
+                    }
+                    $errorDetails = $errorMessages -join "`n"
+                    throw "Environment configuration JSON schema validation failed:`n$errorDetails"
+                }
+
+                Write-Verbose "Environment configuration passed JSON schema validation"
+
+            } catch {
+                throw "Schema validation error for environment configuration '$ConfigPath': $($_.Exception.Message)"
+            }
         }
 
         # Create server configurations from JSON
