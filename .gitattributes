@@ -1,1 +1,9 @@
 * -crlf
+*.ps1 linguist-language=PowerShell
+*.psm1 linguist-language=PowerShell
+*.cs linguist-language=C#
+*.csproj linguist-language=C#
+*.sln linguist-language=C#
+**/docs/** linguist-vendored
+*.html linguist-generated
+*.md linguist-documentation
