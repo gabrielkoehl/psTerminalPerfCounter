@@ -76,8 +76,8 @@
           }
 
           # Check if central schema file exists
-          if ( -not (Test-Path $script:JSON_SCHEMA_FILE) ) {
-               Write-Warning "Central schema file not found at: $script:JSON_SCHEMA_FILE. Skipping schema validation."
+          if ( -not (Test-Path $script:JSON_SCHEMA_CONFIG_FILE) ) {
+               Write-Warning "Central schema file not found at: $script:JSON_SCHEMA_CONFIG_FILE. Skipping schema validation."
                $skipSchemaValidation = $true
           }
 
@@ -141,7 +141,7 @@
 
                          try {
 
-                              $ValidationResult = Test-JsonSchema -SchemaPath $script:JSON_SCHEMA_FILE -JsonPath $ConfigFile.FullName -ErrorAction Stop 6>$null
+                              $ValidationResult = Test-JsonSchema -SchemaPath $script:JSON_SCHEMA_CONFIG_FILE -JsonPath $ConfigFile.FullName -ErrorAction Stop 6>$null
                               $SchemaValidation.IsValid = $ValidationResult.Valid
                               if ( -not $ValidationResult.Valid ) {
                                    $SchemaValidation.Errors = @($ValidationResult.Errors | ForEach-Object { "$($_.Message) | Path: $($_.Path) | Line: $($_.LineNumber)" })

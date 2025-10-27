@@ -16,7 +16,7 @@ Configuration files define which performance counters to monitor and how to disp
 
 Configuration files must:
 - Be named with the prefix `tpc_` (e.g., `tpc_CustomMonitor.json`)
-- Follow the JSON schema defined in `psTerminalPerfCounter\Config\schema.json`
+- Follow the JSON schema defined in `psTerminalPerfCounter\Config\schema_config.json`
 - Be placed in a configured configuration path (see `Get-tpcConfigPaths` and `Add-tpcConfigPath`)
 
 ### Basic Template
@@ -330,7 +330,7 @@ Start-tpcMonitor -ConfigName "MyCustomCPU"
 
 All configurations are validated against the schema located at:
 ```
-psTerminalPerfCounter\Config\schema.json
+psTerminalPerfCounter\Config\schema_config.json
 ```
 
 **Important:** The schema file should not be modified as it ensures configuration compatibility with the module. The schema enforces:

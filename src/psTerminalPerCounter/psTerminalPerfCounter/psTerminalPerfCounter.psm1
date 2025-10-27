@@ -2,9 +2,10 @@
 $ErrorActionPreference = "Stop"
 
 # Config Path Management
-$script:TPC_CONFIG_PATH_VAR = "TPC_CONFIGPATH"
-$script:DEFAULT_CONFIG_PATH = Join-Path $PSScriptRoot -ChildPath "Config"
-$script:JSON_SCHEMA_FILE    = Join-Path $script:DEFAULT_CONFIG_PATH -ChildPath "schema.json"
+$script:TPC_CONFIG_PATH_VAR             = "TPC_CONFIGPATH"
+$script:DEFAULT_CONFIG_PATH             = Join-Path $PSScriptRoot -ChildPath "Config"
+$script:JSON_SCHEMA_CONFIG_FILE         = Join-Path $script:DEFAULT_CONFIG_PATH -ChildPath "schema_config.json"
+$script:JSON_SCHEMA_ENVIRONMENT_FILE    = Join-Path $script:DEFAULT_CONFIG_PATH -ChildPath "schema_environment.json"
 
 # Load Libraries
 Add-Type -Path "$PSScriptRoot\Lib\psTPCCLASSES.dll"
