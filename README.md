@@ -158,15 +158,11 @@ Get-tpcPerformanceCounterInfo -SearchTerm "Processor Time"
 Get-tpcAvailableCounterConfig -TestCounters
 ```
 
-
-
 ## Acknowledgments
 
 Special thanks to:
 
-- [PowerShell.One](https://powershell.one/tricks/performance/performance-counters) for the excellent research on performance counter IDs and locale-independent monitoring techniques
 - [Prateek Singh](https://github.com/PrateekKumarSingh/PSConsoleGraph) for the foundational graphical engine that powers the terminal visualization
-
 
 ## License
 
