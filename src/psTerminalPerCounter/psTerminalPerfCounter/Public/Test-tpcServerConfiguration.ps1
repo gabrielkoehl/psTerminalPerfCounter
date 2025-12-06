@@ -106,7 +106,6 @@ function Test-tpcServerConfiguration {
             Write-Host "[2/4] Creating ServerConfiguration object..." -ForegroundColor Yellow
 
             $server = [psTPCCLASSES.ServerConfiguration]::new(
-                $script:logger,
                 $ComputerName,
                 "Test Server",
                 $counters.Counters
