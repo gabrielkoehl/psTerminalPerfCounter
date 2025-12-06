@@ -82,7 +82,10 @@ public class CounterConfiguration
         ColorMap            = SetColorMap(colorMap);
         GraphConfiguration  = SetGraphConfig(graphConfiguration);
 
-        //TestAvailability();
+        // TestAvailability(); // is already checked when loading becaufe of loading countermap before
+        // overrides, delete method later
+        IsAvailable         = true;
+        LastError           = string.Empty;
     }
 
     public static void GetValuesParallel(List<CounterConfiguration> instances)
