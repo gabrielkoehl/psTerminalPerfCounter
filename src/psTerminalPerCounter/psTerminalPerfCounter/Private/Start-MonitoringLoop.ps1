@@ -25,7 +25,7 @@ function Start-MonitoringLoop {
                 $SampleCount++
 
                 # Collect data from all counters
-                [psTPCCLASSES.CounterConfiguration]::GetValuesParallel($Config.Counters)
+                [psTPCCLASSES.CounterConfiguration]::GetValuesBatched($Config.Counters)
 
 
                 Show-SessionHeader -ConfigName $Config.Name -StartTime $StartTime -SampleCount $SampleCount
@@ -81,7 +81,7 @@ function Start-MonitoringLoop {
 
                 $SampleCount++
 
-                $Config.GetAllValuesParallelAsync().GetAwaiter().GetResult()
+                $Config.GetAllValuesBatched()
 
                 # Clear screen
                 Clear-Host

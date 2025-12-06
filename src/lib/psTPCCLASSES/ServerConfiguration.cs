@@ -66,46 +66,9 @@ public class ServerConfiguration
           }
      }
 
-     public async Task GetValuesParallelAsync()
-     {
-          if (!IsAvailable)
-          {
-               _logger.Warning(_source, $"Skipping server '{ComputerName}': {LastError}");
-               return;
-          }
-
-          var tasks = Counters
-               .Where(counter => counter.IsAvailable)
-               .Select(counter =>
-                    Task.Run(() =>
-                    {
-                         try
-                         {
-                              var (counterValue, duration) = counter.GetCurrentValue();
-
-                              // Datenpunkt zur Historie hinzufügen
-                              counter.AddDataPoint(counterValue);
-
-                              // Ausführungszeit speichern (falls null, dann 0)
-                              counter.ExecutionDuration = duration ?? 0;
-                         }
-                         catch (Exception ex)
-                         {
-                              // Fehler für diesen Counter speichern, aber andere Counter weiterlaufen lassen
-                              counter.LastError = ex.Message;
-                              _logger.Error(_source, $"Error reading {counter.Title} on {ComputerName}: {ex.Message}");
-                         }
-                    })
-               ).ToArray();
-
-          await Task.WhenAll(tasks);
-
-          LastUpdate = DateTime.Now;
-     }
-
      public void UpdateStatistics()
      {
-          if (Counters.Count == 0) return;        // Keine Counter = nichts zu tun
+          if (Counters.Count == 0) return;
 
           // LINQ: Filtere nur verfügbare Counter
           // Where() = wie Where-Object in PowerShell

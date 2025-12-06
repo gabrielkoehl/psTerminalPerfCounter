@@ -88,20 +88,116 @@ public class CounterConfiguration
         LastError           = string.Empty;
     }
 
-    public static void GetValuesParallel(List<CounterConfiguration> instances)
+    public static void GetValuesBatched(List<CounterConfiguration> allCounters)
     {
-        var tasks = instances
-            .Where(instance => instance.IsAvailable)
-            .Select(instance =>
-                Task.Run(() =>
-                {
-                        var (counterValue, duration) = instance.GetCurrentValue();
-                        instance.AddDataPoint(counterValue);
-                        instance.ExecutionDuration = duration ?? 0;
-                })
-            ).ToArray();
 
-        Task.WaitAll(tasks);
+        var activeCounters = allCounters.Where(c => c.IsAvailable).ToList();
+
+        if (activeCounters.Count == 0) return;
+
+        // Group by computerName and credentials
+        var serverGroups = activeCounters.GroupBy(c => new { c.ComputerName, c.IsRemote, c.Credential });
+
+        // parallel per server
+        Parallel.ForEach(serverGroups, group =>
+        {
+            var serverConfig        = group.Key;
+            var countersOnServer    = group.ToList();
+
+            // create mapping - Path --> Counterobject
+            var pathMap = countersOnServer.ToDictionary(c => c.CounterPath, c => c);
+
+            // All counter path in one array
+            string[] pathsToQuery = pathMap.Keys.ToArray();
+
+            // Script queries all counter at once
+            var scriptBlock = ScriptBlock.Create(@"
+                param([string[]]$Paths)
+
+                # ErrorAction SilentlyContinue falls ein einzelner Counter spackt
+
+                $result = Get-Counter -Counter $Paths -MaxSamples 1 -ErrorAction SilentlyContinue
+
+                if ($result) {
+                    return $result.CounterSamples
+                }
+            ");
+
+            try
+            {
+                var dateStart = DateTime.Now;
+
+                // one runspace per server
+                using (var ps = PowerShell.Create(RunspaceMode.NewRunspace))
+                {
+                    ps.AddCommand("Invoke-Command");
+
+                    if (serverConfig.IsRemote)
+                    {
+                        ps.AddParameter("ComputerName", serverConfig.ComputerName);
+                        if (serverConfig.Credential != null)
+                        {
+                            ps.AddParameter("Credential", serverConfig.Credential);
+                        }
+                    }
+
+                    ps.AddParameter("ScriptBlock", scriptBlock);
+                    ps.AddParameter("ArgumentList", new object[] { pathsToQuery });
+
+                    var psResults = ps.Invoke();
+
+                    var duration = (int)(DateTime.Now - dateStart).TotalMilliseconds;
+
+                    foreach (PSObject sample in psResults)
+                    {
+                        // Pread dynamic
+                        var path            = sample.Properties["Path"]?.Value?.ToString();
+                        var cookedValueObj  = sample.Properties["CookedValue"]?.Value;
+
+                        // Find counter in map
+                        // check end of, in case get-counter adds some stuff
+                        var matchedCounter = countersOnServer.FirstOrDefault(c =>
+                            path != null && path.EndsWith(c.CounterPath, StringComparison.OrdinalIgnoreCase));
+
+                        if (matchedCounter != null && cookedValueObj != null)
+                        {
+                            try
+                            {
+                                var rawValue = Convert.ToDouble(cookedValueObj);
+
+                                // factorize
+                                var calculatedValue = Math.Round(rawValue / Math.Pow(matchedCounter.ConversionFactor, matchedCounter.ConversionExponent), 2);
+
+                                matchedCounter.AddDataPoint(calculatedValue);
+                                matchedCounter.ExecutionDuration = duration;
+                                matchedCounter.LastError = string.Empty;
+                            }
+                            catch
+                            {
+                                matchedCounter.LastError = "NaN (Conversion Error)";
+                            }
+                        }
+                    }
+
+                    // check for failed counter
+                    foreach (var counter in countersOnServer)
+                    {
+                        if (counter.LastUpdate < dateStart)
+                        {
+                            counter.LastError = "No Data returned in Batch";
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                foreach (var counter in countersOnServer)
+                {
+                    counter.LastError = $"Batch Error: {ex.Message}";
+                    counter.IsAvailable = false;
+                }
+            }
+        });
     }
 
     private void SetRemoteConnectionParameter()
@@ -198,6 +294,7 @@ public class CounterConfiguration
                         ps.AddParameter(kvp.Key, kvp.Value);
                     }
             }
+
 
             ps.AddParameter("ScriptBlock", scriptBlock);
             ps.AddParameter("ArgumentList", new object[] { CounterPath, 1 });

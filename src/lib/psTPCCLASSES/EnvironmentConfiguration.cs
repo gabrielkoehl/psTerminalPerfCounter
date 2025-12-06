@@ -6,13 +6,11 @@ using System;
 
 namespace psTPCCLASSES;
 
-
-// Repräsentiert eine komplette Umgebung mit mehreren Servern
-
 public class EnvironmentConfiguration
 {
     private static readonly PowerShellLogger _logger = PowerShellLogger.Instance;
     private readonly string _source;
+
     public string Name { get; set; }
     public string Description { get; set; }
     public int Interval { get; set; }
@@ -35,33 +33,32 @@ public class EnvironmentConfiguration
         _logger.Info(_source, $"Environment '{Name}' initialized with {Servers.Count} servers");
     }
 
-    public async Task GetAllValuesParallelAsync()
+    public void GetAllValuesBatched()
     {
-        var startTime = DateTime.Now;
-        QueryTimestamp = startTime;
+        var startTime   = DateTime.Now;
+        QueryTimestamp  = startTime;
 
         try
         {
-            var serverTasks = Servers
-                .Where(s => s.IsAvailable)
-                .Select(async server =>
-                {
-                    try
-                    {
-                        await server.GetValuesParallelAsync();
-                        server.UpdateStatistics();
-                    }
-                    catch (Exception ex)
-                    {
-                        server.LastError = ex.Message;
-                        _logger.Error(_source, $"Error querying server '{server.ComputerName}': {ex.Message}");
-                    }
-                }).ToArray();
+            // collect all counters from all available servers
+            var allCounters = new List<CounterConfiguration>();
+            foreach(var server in Servers.Where(s => s.IsAvailable))
+            {
+                allCounters.AddRange(server.Counters); //addrange is an alternative method for sub loop ( for each counter )
+            }
 
-            await Task.WhenAll(serverTasks);
+            if (allCounters.Count > 0)
+            {
+                CounterConfiguration.GetValuesBatched(allCounters);
+            }
 
-            var endTime = DateTime.Now;
-            QueryDuration = (int)(endTime - startTime).TotalMilliseconds;
+            foreach(var server in Servers)
+            {
+                server.UpdateStatistics();
+            }
+
+            var endTime     = DateTime.Now;
+            QueryDuration   = (int)(endTime - startTime).TotalMilliseconds;
 
             _logger.Info(_source, $"Environment '{Name}' query completed in {QueryDuration}ms");
         }
@@ -72,12 +69,11 @@ public class EnvironmentConfiguration
         }
     }
 
-
     public Dictionary<string, object> GetEnvironmentStatistics()
     {
-        var availableServers = Servers.Where(s => s.IsAvailable).ToList();
-        var totalCounters = Servers.Sum(s => s.Counters.Count);
-        var availableCounters = availableServers.Sum(s => s.Counters.Count(c => c.IsAvailable));
+        var availableServers    = Servers.Where(s => s.IsAvailable).ToList();
+        var totalCounters       = Servers.Sum(s => s.Counters.Count);
+        var availableCounters   = availableServers.Sum(s => s.Counters.Count(c => c.IsAvailable));
 
         return new Dictionary<string, object>
         {
@@ -90,5 +86,4 @@ public class EnvironmentConfiguration
             { "Interval", $"{Interval}s" }
         };
     }
-
 }
