@@ -1,9 +1,31 @@
-* -crlf
-*.ps1 linguist-language=PowerShell
-*.psm1 linguist-language=PowerShell
-*.cs linguist-language=C#
-*.csproj linguist-language=C#
-*.sln linguist-language=C#
+# Language detection for GitHub stats
+*.ps1 text eol=crlf linguist-language=PowerShell
+*.psm1 text eol=crlf linguist-language=PowerShell
+*.cs text eol=lf linguist-language=C#
+*.csproj text eol=lf linguist-language=C#
+*.sln text eol=lf linguist-language=C#
+
+# GitHub linguist overrides
 **/docs/** linguist-vendored
 *.html linguist-generated
-*.md linguist-documentation
+*.md text eol=crlf linguist-documentation
+
+# Default behavior
+* text=auto eol=crlf
+
+# Text files
+*.sql text eol=crlf
+*.txt text eol=crlf
+*.json text eol=crlf
+*.xml text eol=crlf
+*.yml text eol=crlf
+*.yaml text eol=crlf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.dll binary
+*.exe binary
