@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+* **Counter Translation ID <> NAME**
+  * Removed DLL-based lookups to drastically improve remote startup speed and fixed ID resolution for multi-instance SQL counters.
+
 ### Deprecated
 
 ### Removed
