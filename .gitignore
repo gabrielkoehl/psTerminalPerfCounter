@@ -3,6 +3,8 @@ obj/
 Output/
 _notes/
 
+dev_plan.md
+
 # Syncthing temporary files
 *syncthing*
 *~syncthing~*
