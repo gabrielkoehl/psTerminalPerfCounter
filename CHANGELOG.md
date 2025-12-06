@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+* **Ported all classes to C#**
+  * I discovered significant limitations in PowerShell classes that were showstoppers. Consequently, I decided to take the difficult path and rewrote half of the codebase.
+
 * **Counter Translation ID <> NAME**
   * Removed DLL-based lookups to drastically improve remote startup speed and fixed ID resolution for multi-instance SQL counters.
 
