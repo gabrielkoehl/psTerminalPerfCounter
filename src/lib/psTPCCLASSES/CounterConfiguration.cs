@@ -3,399 +3,323 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using System;
-
+using System.Threading;
 
 namespace psTPCCLASSES;
 
 public class CounterConfiguration
 {
-     private static readonly PowerShellLogger _logger = PowerShellLogger.Instance;
-     private readonly string _source;
-     public string CounterID { get; set; }
-     public string CounterSetType { get; set; }
-     public string CounterInstance { get; set; }
-     public string CounterPath { get; set; }
-     public string Title { get; set; }
-     public string Type { get; set; }
-     public string Format { get; set; }
-     public int MaxHistoryPoints { get; set; }
-     public int ConversionFactor { get; set; }
-     public int ConversionExponent { get; set; }
-     public string Unit { get; set; }
-     public Dictionary<string, object> GraphConfiguration { get; set; }
-     public record DataPoint(DateTime Timestamp, double Value);
-     public List<DataPoint> HistoricalData { get; set; }
-     public int ExecutionDuration { get; set; }
-     public Dictionary<int, string> ColorMap { get; set; }
-     public Dictionary<string, object> Statistics { get; set; }
-     public bool IsAvailable { get; set; }
-     public bool IsRemote { get; set; }
-     public string ComputerName { get; set; }
-     public PSCredential? Credential { get; set; }
-     public Dictionary<string, object> ParamRemote { get; set; } = new(); // supress error in build, compiler missing method in constructor
-     public string LastError { get; set; }
-     public DateTime? LastUpdate { get; set; }
+    private static readonly PowerShellLogger _logger = PowerShellLogger.Instance;
+    private readonly string _source;
 
-     public CounterConfiguration(
-          string counterID,
-          string counterSetType,
-          string counterInstance,
-          string title,
-          string type,
-          string format,
-          string unit,
-          int conversionFactor,
-          int conversionExponent,
-          PSObject colorMap,
-          PSObject graphConfiguration,
-          bool isRemote,
-          string computerName,
-          PSCredential? credential)
-     {
-          _source             = "CounterConfiguration";
-          CounterID           = counterID;
-          CounterSetType      = counterSetType;
-          CounterInstance     = counterInstance;
-          Title               = title;
-          Type                = type;
-          Format              = format;
-          Unit                = unit;
-          MaxHistoryPoints    = 100;
-          ConversionFactor    = conversionFactor;
-          ConversionExponent  = conversionExponent;
-          HistoricalData      = new List<DataPoint>();
-          Statistics          = new Dictionary<string, object>();
-          IsAvailable         = false;
-          LastError           = string.Empty;
-          IsRemote            = isRemote;
-          ComputerName        = computerName;
-          Credential          = credential;
+    public string CounterID { get; set; }
+    public string CounterSetType { get; set; }
+    public string CounterInstance { get; set; }
+    public string CounterPath { get; set; }
+    public string Title { get; set; }
+    public string Type { get; set; }
+    public string Format { get; set; }
+    public int MaxHistoryPoints { get; set; }
+    public int ConversionFactor { get; set; }
+    public int ConversionExponent { get; set; }
+    public string Unit { get; set; }
+    public Dictionary<string, object> GraphConfiguration { get; set; }
 
-          SetRemoteConnectionParameter();
+    public record DataPoint(DateTime Timestamp, double Value);
+    public List<DataPoint> HistoricalData { get; set; }
 
-          CounterPath         = GetCounterPath(counterID, counterSetType, counterInstance);
-          ColorMap            = SetColorMap(colorMap);
-          GraphConfiguration  = SetGraphConfig(graphConfiguration);
+    public int ExecutionDuration { get; set; }
+    public Dictionary<int, string> ColorMap { get; set; }
+    public Dictionary<string, object> Statistics { get; set; }
+    public bool IsAvailable { get; set; }
+    public bool IsRemote { get; set; }
+    public string ComputerName { get; set; }
+    public PSCredential? Credential { get; set; }
+    public Dictionary<string, object> ParamRemote { get; set; } = new();
+    public string LastError { get; set; }
+    public DateTime? LastUpdate { get; set; }
 
-          TestAvailability();
-     }
+    public CounterConfiguration(
+        string counterID,
+        string counterSetType,
+        string counterInstance,
+        string title,
+        string type,
+        string format,
+        string unit,
+        int conversionFactor,
+        int conversionExponent,
+        PSObject colorMap,
+        PSObject graphConfiguration,
+        bool isRemote,
+        string computerName,
+        PSCredential? credential,
+        Dictionary<int, string> counterMap)
+    {
+        _source             = "CounterConfiguration";
+        CounterID           = counterID;
+        CounterSetType      = counterSetType;
+        CounterInstance     = counterInstance;
+        Title               = title;
+        Type                = type;
+        Format              = format;
+        Unit                = unit;
+        MaxHistoryPoints    = 100;
+        ConversionFactor    = conversionFactor;
+        ConversionExponent  = conversionExponent;
+        HistoricalData      = new List<DataPoint>();
+        Statistics          = new Dictionary<string, object>();
+        IsAvailable         = false;
+        LastError           = string.Empty;
+        IsRemote            = isRemote;
+        ComputerName        = computerName;
+        Credential          = credential;
 
-     public static void GetValuesParallel(List<CounterConfiguration> instances)
-     {
-          var tasks = instances
-               .Where(instance => instance.IsAvailable)
-               .Select(instance =>
-                    Task.Run(() =>
-                    {
-                         var (counterValue, duration) = instance.GetCurrentValue();
-                         instance.AddDataPoint(counterValue);
-                         instance.ExecutionDuration = duration ?? 0;
-                    })
-               ).ToArray();
+        SetRemoteConnectionParameter();
 
-          Task.WaitAll(tasks);
-     }
+        CounterPath         = GetCounterPath(counterID, counterSetType, counterInstance, counterMap);
 
-     private void SetRemoteConnectionParameter()
-     {
+        ColorMap            = SetColorMap(colorMap);
+        GraphConfiguration  = SetGraphConfig(graphConfiguration);
 
-          ParamRemote = new Dictionary<string, object>
-          {
-               { "ComputerName", ComputerName }
-          };
+        //TestAvailability();
+    }
 
-          if (Credential is not null)
-          {
-               ParamRemote.Add("Credential", Credential);
-          }
+    public static void GetValuesParallel(List<CounterConfiguration> instances)
+    {
+        var tasks = instances
+            .Where(instance => instance.IsAvailable)
+            .Select(instance =>
+                Task.Run(() =>
+                {
+                        var (counterValue, duration) = instance.GetCurrentValue();
+                        instance.AddDataPoint(counterValue);
+                        instance.ExecutionDuration = duration ?? 0;
+                })
+            ).ToArray();
 
-     }
+        Task.WaitAll(tasks);
+    }
 
-     private Dictionary<int, string> SetColorMap(PSObject colorMap)
-     {
-          var returnObject = new Dictionary<int, string>();
+    private void SetRemoteConnectionParameter()
+    {
+        ParamRemote = new Dictionary<string, object>
+        {
+            { "ComputerName", ComputerName }
+        };
+        if (Credential is not null)
+        {
+            ParamRemote.Add("Credential", Credential);
+        }
+    }
 
-          foreach (PSPropertyInfo property in colorMap.Properties)
-          {
-               returnObject[int.Parse(property.Name)] = property.Value.ToString()!;
-          }
+    private Dictionary<int, string> SetColorMap(PSObject colorMap)
+    {
+        var returnObject = new Dictionary<int, string>();
+        foreach (PSPropertyInfo property in colorMap.Properties)
+        {
+            returnObject[int.Parse(property.Name)] = property.Value.ToString()!;
+        }
+        return returnObject;
+    }
 
-          return returnObject;
-
-     }
-
-     private Dictionary<string, object> SetGraphConfig(PSObject graphConfiguration)
-     {
-
-          var returnObject = new Dictionary<string, object>();
-
-          foreach (PSPropertyInfo property in graphConfiguration.Properties)
-          {
-               switch (property.Name)
-               {
+    private Dictionary<string, object> SetGraphConfig(PSObject graphConfiguration)
+    {
+        var returnObject = new Dictionary<string, object>();
+        foreach (PSPropertyInfo property in graphConfiguration.Properties)
+        {
+            switch (property.Name)
+            {
                     case "colors" when property.Value is not null:
-                         var colorObject = (PSObject)property.Value;
-                         var colors = new Dictionary<string, string>();
-
-                         foreach (PSPropertyInfo colorProperty in colorObject.Properties)
-                         {
-                              colors[colorProperty.Name] = colorProperty.Value?.ToString() ?? string.Empty;
-                         }
-
-                         returnObject["Colors"] = colors;
-                         break;
+                        var colorObject = (PSObject)property.Value;
+                        var colors = new Dictionary<string, string>();
+                        foreach (PSPropertyInfo colorProperty in colorObject.Properties)
+                        {
+                            colors[colorProperty.Name] = colorProperty.Value?.ToString() ?? string.Empty;
+                        }
+                        returnObject["Colors"] = colors;
+                        break;
 
                     case "Samples" when Convert.ToInt32(property.Value!) < 70:
-                         returnObject[property.Name] = 70;
-                         break;
+                        returnObject[property.Name] = 70;
+                        break;
 
                     case "yAxisMaxRows" when Convert.ToInt32(property.Value!) < 10:
-                         returnObject[property.Name] = 10;
-                         break;
+                        returnObject[property.Name] = 10;
+                        break;
 
                     default:
-                         returnObject[property.Name] = property.Value!;
-                         break;
-               }
-          }
+                        returnObject[property.Name] = property.Value!;
+                        break;
+            }
+        }
+        return returnObject;
+    }
 
-          return returnObject;
+    private void TestAvailability()
+    {
+        try
+        {
+            _logger.Info(_source, $"Testing {CounterPath}");
+            _ = GetCurrentValue();
+            IsAvailable = true;
+            LastError = string.Empty;
+        }
+        catch (Exception ex)
+        {
+            IsAvailable = false;
+            LastError = ex.Message;
+            _logger.Warning(_source, $"Counter '{Title}' is not available: {LastError}");
+        }
+    }
 
-     }
+    public (double counterValue, int? duration) GetCurrentValue()
+    {
+        var scriptBlock = ScriptBlock.Create(@"
+            param($CounterPath, $MaxSamples)
+            $counter = Get-Counter -Counter $CounterPath -MaxSamples $MaxSamples
+            $counter.CounterSamples.CookedValue
+        ");
 
-     private void TestAvailability()
-     {
-          try
-          {
-               _logger.Info(_source, $"Testing {CounterPath}");
-               _ = GetCurrentValue(); // _ = discard return
-               IsAvailable = true;
-               LastError = string.Empty;
-          }
-          catch (Exception ex)
-          {
-               IsAvailable = false;
-               LastError = ex.Message;
+        try
+        {
+            var dateStart = DateTime.Now;
 
-               _logger.Warning(_source, $"Counter '{Title}' is not available: {LastError}");
-               Thread.Sleep(500);
-          }
-     }
+            using var ps = PowerShell.Create(RunspaceMode.NewRunspace);
+            ps.AddCommand("Invoke-Command");
 
-     public (double counterValue, int? duration) GetCurrentValue()
-     {
-          var scriptBlock = ScriptBlock.Create(@"
-               param($CounterPath, $MaxSamples)
-               $counter = Get-Counter -Counter $CounterPath -MaxSamples $MaxSamples
-               $counter.CounterSamples.CookedValue
-          ");
-
-          try
-          {
-               var dateStart = DateTime.Now;
-
-               using var ps = PowerShell.Create(RunspaceMode.NewRunspace);
-               ps.AddCommand("Invoke-Command");
-
-               if (IsRemote)
-               {
+            if (IsRemote)
+            {
                     foreach (var kvp in ParamRemote)
                     {
-                         ps.AddParameter(kvp.Key, kvp.Value);
+                        ps.AddParameter(kvp.Key, kvp.Value);
                     }
-               }
+            }
 
-               ps.AddParameter("ScriptBlock", scriptBlock);
-               ps.AddParameter("ArgumentList", new object[] { CounterPath, 1 });
+            ps.AddParameter("ScriptBlock", scriptBlock);
+            ps.AddParameter("ArgumentList", new object[] { CounterPath, 1 });
 
-               var result = ps.Invoke();
-               var dateEnd = DateTime.Now;
-               var duration = (int)(dateEnd - dateStart).TotalMilliseconds;
-               var rawValue = Convert.ToDouble(result[0].BaseObject);
+            var result = ps.Invoke();
+            var dateEnd = DateTime.Now;
+            var duration = (int)(dateEnd - dateStart).TotalMilliseconds;
 
-               var counterValue = Math.Round(rawValue / Math.Pow(ConversionFactor, ConversionExponent));
+            if (result.Count == 0) throw new Exception("No value returned from Get-Counter");
 
-               return (counterValue, duration);
-          }
-          catch (Exception ex)
-          {
-               LastError = ex.Message;
-               throw new Exception($"Error reading counter '{Title}': {ex.Message}", ex);
-          }
-     }
+            var rawValue = Convert.ToDouble(result[0].BaseObject);
+            var counterValue = Math.Round(rawValue / Math.Pow(ConversionFactor, ConversionExponent));
 
-     private string GetCounterPath(string counterID, string counterSetType, string counterInstance)
-     {
-          if (string.IsNullOrEmpty(counterID))
-          {
-               throw new ArgumentException("Counter ID cannot be null or empty.");
-          }
+            return (counterValue, duration);
+        }
+        catch (Exception ex)
+        {
+            LastError = ex.Message;
+            throw new Exception($"Error reading counter '{Title}': {ex.Message}", ex);
+        }
+    }
 
-          try
-          {
-               var parts = counterID.Split('-');
-               var setID = parts[0];
-               var pathID = parts[1];
+    private string GetCounterPath(string counterID, string counterSetType, string counterInstance, Dictionary<int, string> counterMap)
+    {
+        if (string.IsNullOrEmpty(counterID))
+        {
+            throw new ArgumentException("Counter ID cannot be null or empty.");
+        }
 
-               // https://powershell.one/tricks/performance/performance-counters
-               // Licensed under the CC BY 4.0 ( https://creativecommons.org/licenses/by/4.0/ )
-               var scriptBlock = ScriptBlock.Create(@"
-                    param([UInt32]$Id)
-                    $code     = '[DllImport(""pdh.dll"", SetLastError=true, CharSet=CharSet.Unicode)] public static extern UInt32 PdhLookupPerfNameByIndex(string szMachineName, uint dwNameIndex, System.Text.StringBuilder szNameBuffer, ref uint pcchNameBufferSize);'
-                    $type     = Add-Type -MemberDefinition $code -PassThru -Name PerfCounter1 -Namespace Utility -ErrorAction SilentlyContinue
-                    $Buffer   = [System.Text.StringBuilder]::new(1024)
-                    [UInt32]$BufferSize = $Buffer.Capacity
-                    $rv       = $type::PdhLookupPerfNameByIndex($env:COMPUTERNAME, $Id, $Buffer, [Ref]$BufferSize)
+        try
+        {
+            // Split ID "238-6" -> 238 (Set), 6 (Path)
+            var parts = counterID.Split('-');
+            if (parts.Length != 2) throw new ArgumentException($"Invalid CounterID format: {counterID}");
 
-                    if ($rv -eq 0) {
-                         $Buffer.ToString().Substring(0, $BufferSize-1)
-                    } else {
-                         throw 'Unable to retrieve localized name.'
-                    }
-               ");
-               // ------------------------------------------------------------------------------
+            var setID = int.Parse(parts[0]);
+            var pathID = int.Parse(parts[1]);
 
-               string setName;
-               string pathName;
+            string setName;
+            string pathName;
 
-               using var ps = PowerShell.Create(RunspaceMode.NewRunspace);
+            // O(1) Lookup - speed up
+            if (!counterMap.TryGetValue(setID, out setName!))
+            {
+                throw new KeyNotFoundException($"SetID {setID} not found in provided CounterMap.");
+            }
 
-               // SetName
-               ps.AddCommand("Invoke-Command");
+            if (!counterMap.TryGetValue(pathID, out pathName!))
+            {
+                throw new KeyNotFoundException($"PathID {pathID} not found in provided CounterMap.");
+            }
 
-               if (IsRemote)
-               {
-                    foreach (var kvp in ParamRemote)
-                    {
-                         ps.AddParameter(kvp.Key, kvp.Value);
-                    }
-               }
+            // String Building
+            if (counterSetType == "SingleInstance")
+            {
+                return $"\\{setName}\\{pathName}";
+            }
+            else if (counterSetType == "MultiInstance")
+            {
+                return $"\\{setName}({counterInstance})\\{pathName}";
+            }
+            else
+            {
+                throw new ArgumentException($"Unknown counter set type: {counterSetType}");
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Error building counter path for ID '{counterID}': {ex.Message}", ex);
+        }
+    }
 
-               ps.AddParameter("ScriptBlock", scriptBlock);
-               ps.AddParameter("ArgumentList", new object[] { setID });
+    public string GetFormattedTitle()
+    {
+        if (string.IsNullOrEmpty(Unit)) return Title;
+        return $"{Title} ({Unit})";
+    }
 
-               var resultSet = ps.Invoke();
-               setName = resultSet[0].BaseObject.ToString()!;
+    public double[] GetGraphData(int sampleCount)
+    {
+        var dataCount = HistoricalData.Count;
+        if (dataCount == 0) return [];
+        var values = HistoricalData.Select(d => d.Value).ToArray();
+        if (dataCount >= sampleCount)
+        {
+            return values.Skip(dataCount - sampleCount).ToArray();
+        }
+        else
+        {
+            var padding = new double[sampleCount - dataCount];
+            return padding.Concat(values).ToArray();
+        }
+    }
 
-               // -------
-               ps.Commands.Clear();
-               // -------
+    public override string ToString() => $"PerformanceCounter: {Title} - Available: {IsAvailable} - Data Points: {HistoricalData.Count}";
 
-               // PathName
-               ps.AddCommand("Invoke-Command");
+    public void AddDataPoint(double value)
+    {
+        var dataPoint = new DataPoint(DateTime.Now, value);
+        HistoricalData.Add(dataPoint);
+        LastUpdate = dataPoint.Timestamp;
+        while (HistoricalData.Count > MaxHistoryPoints)
+        {
+            HistoricalData.RemoveAt(0);
+        }
+        UpdateStatistics();
+    }
 
-               if (IsRemote)
-               {
-                    foreach (var kvp in ParamRemote)
-                    {
-                         ps.AddParameter(kvp.Key, kvp.Value);
-                    }
-               }
+    public void UpdateStatistics()
+    {
+        if (HistoricalData.Count == 0) return;
+        var values = HistoricalData.Select(d => d.Value).ToArray();
+        Statistics = new Dictionary<string, object>
+        {
+            { "Current", values[^1] },
+            { "Minimum", values.Min() },
+            { "Maximum", values.Max() },
+            { "Average", Math.Round(values.Average(), 1) },
+            { "Count", values.Length },
+            { "Last5", values.Length >= 5 ? values[^5..] : values }
+        };
+    }
 
-               ps.AddParameter("ScriptBlock", scriptBlock);
-               ps.AddParameter("ArgumentList", new object[] { pathID });
-
-               var resultPath = ps.Invoke();
-               pathName = resultPath[0].BaseObject.ToString()!;
-
-               if (counterSetType == "SingleInstance")
-               {
-                    return $"\\{setName}\\{pathName}";
-               }
-               else if (counterSetType == "MultiInstance")
-               {
-                    return $"\\{setName}({counterInstance})\\{pathName}";
-               }
-               else
-               {
-                    throw new ArgumentException($"Unknown counter set type: {counterSetType}");
-               }
-          }
-          catch (Exception ex)
-          {
-               throw new Exception($"Error getting counter path for ID '{counterID}': {ex.Message}", ex);
-          }
-     }
-
-     public string GetFormattedTitle()
-     {
-          if (string.IsNullOrEmpty(Unit))
-          {
-               return Title;
-          }
-          return $"{Title} ({Unit})";
-     }
-
-     // Get data for graphing (padded to target sample count)
-     public double[] GetGraphData(int sampleCount)
-     {
-          var dataCount = HistoricalData.Count;
-          if (dataCount == 0)
-          {
-               return [];
-          }
-
-          // Extract values from timestamped data points
-          var values = HistoricalData.Select(d => d.Value).ToArray();
-
-          // Take the last sampleCount points
-          if (dataCount >= sampleCount)
-          {
-               return values.Skip(dataCount - sampleCount).ToArray();
-          }
-          else
-          {
-               // Pad with zeros at the beginning
-               var padding = new double[sampleCount - dataCount];
-               return padding.Concat(values).ToArray();
-          }
-     }
-
-     // ToString override for output
-     public override string ToString()
-     {
-          return $"PerformanceCounter: {Title} - Available: {IsAvailable} - Data Points: {HistoricalData.Count}";
-     }
-
-
-     // Add new data point with timestamp
-     public void AddDataPoint(double value)
-     {
-          var dataPoint = new DataPoint(DateTime.Now, value);
-          HistoricalData.Add(dataPoint);
-          LastUpdate = dataPoint.Timestamp;
-
-          // Limit historical data size, drop oldest point
-          while (HistoricalData.Count > MaxHistoryPoints)
-          {
-               HistoricalData.RemoveAt(0);
-          }
-
-          UpdateStatistics();
-     }
-
-     // Update statistics
-     public void UpdateStatistics()
-     {
-          if (HistoricalData.Count == 0) return;
-
-          var values = HistoricalData.Select(d => d.Value).ToArray();
-
-          Statistics = new Dictionary<string, object>
-          {
-               { "Current", values[^1] },
-               { "Minimum", values.Min() },
-               { "Maximum", values.Max() },
-               { "Average", Math.Round(values.Average(), 1) },
-               { "Count", values.Length },
-               { "Last5", values.Length >= 5 ? values[^5..] : values }
-          };
-     }
-
-     //Get complete historical data with timestamps for external tools
-     public DataPoint[] GetHistoricalDataWithTimestamps()
-     {
-          return HistoricalData.ToArray();
-     }
-
+    public DataPoint[] GetHistoricalDataWithTimestamps()
+    {
+        return HistoricalData.ToArray();
+    }
 }

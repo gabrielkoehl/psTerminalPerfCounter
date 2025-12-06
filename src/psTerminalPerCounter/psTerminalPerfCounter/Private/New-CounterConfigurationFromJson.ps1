@@ -4,6 +4,8 @@
     param(
         [Parameter(Mandatory=$true)]
         [PSCustomObject]    $JsonConfig,
+        [Parameter(Mandatory=$true)]
+        [System.Collections.Generic.Dictionary[int, string]] $counterMap,
 
         # Remote params
         [Parameter()]
@@ -33,7 +35,8 @@
             $CounterConfig.graphConfiguration,
             $isRemote,
             $computername,
-            $credential
+            $credential,
+            $counterMap
         )
 
         $PerformanceCounters.Add($CounterConfiguration)

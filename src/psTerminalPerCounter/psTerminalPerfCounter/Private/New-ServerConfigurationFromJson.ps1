@@ -26,7 +26,14 @@
 
                 if ( $ServerConfig.CounterConfig ) {
                     foreach ( $CounterConfig in $ServerConfig.CounterConfig ) {
-                        $config = Get-CounterConfiguration -ConfigName $CounterConfig -isRemote -computername $ServerConfig.computername -credential $setCredential
+
+                        $param = @{}
+
+                        if ( $null -eq $setCredential ) { $param['Credential'] = $setCredential }
+
+                        $serverCounterMap = Get-CounterMap @param
+
+                        $config = Get-CounterConfiguration -ConfigName $CounterConfig -isRemote -computername $ServerConfig.computername -credential $setCredential -counterMap $serverCounterMap
 
                         if ( $config.SkipServer ) {
                             $skipServer = $true

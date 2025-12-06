@@ -2,6 +2,9 @@ function Get-CounterConfiguration {
     [CmdletBinding()]
     [OutputType([hashtable])]
     param(
+        [Parameter(Mandatory)]
+        [System.Collections.Generic.Dictionary[int, string]] $counterMap,
+
         [Parameter(ParameterSetName = 'ConfigName',   Mandatory)]
         [Parameter(ParameterSetName = 'RemoteServer', Mandatory)]
         [string]        $ConfigName,
@@ -23,6 +26,7 @@ function Get-CounterConfiguration {
             isRemote        = $isRemote.IsPresent
             computername    = $computername
             credential      = $credential
+            counterMap      = $counterMap
         }
 
     }
@@ -43,8 +47,11 @@ function Get-CounterConfiguration {
                             ConfigPath  = ""
                             SkipServer  = $true
                         }
+
                     }
+
                 } catch {
+
                     Write-Warning "Cannot reach server '$computername': $_. Skipping counter configuration."
                     return @{
                         Name        = if ( $ConfigName ) { $ConfigName } else { "Unknown" }
@@ -55,6 +62,7 @@ function Get-CounterConfiguration {
                     }
                 }
             }
+
 
             if ( $PSCmdlet.ParameterSetName -eq 'ConfigPath' ) {
                 if ( [string]::IsNullOrWhiteSpace($ConfigPath) ) {
