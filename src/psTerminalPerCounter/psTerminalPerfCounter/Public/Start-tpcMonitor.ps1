@@ -44,12 +44,6 @@
         Graph time span = Samples (from JSON config) × UpdateInterval seconds.
         Default: 1 second
 
-    .PARAMETER MaxHistoryPoints
-        Maximum number of historical data points to retain in memory for each counter.
-        This is the complete historical data used for statistics and future export.
-        Independent of graph display width. Time span covered by graph display = Samples × UpdateInterval seconds.
-        Default: 100 historical data points
-
     .EXAMPLE
         Start-tpcMonitor
 
@@ -67,7 +61,7 @@
         Starts memory monitoring with 2-second update intervals using the 'tpc_Memory.json' configuration.
 
     .EXAMPLE
-        Start-tpcMonitor -ConfigName "Disk" -UpdateInterval 1 -MaxHistoryPoints 200
+        Start-tpcMonitor -ConfigName "Disk" -UpdateInterval 1
 
         Starts disk monitoring with 1-second updates and extended data retention of 200 points.
 
@@ -119,8 +113,7 @@
         [Parameter(ParameterSetName = 'SingleRemoteServer')]
         [pscredential]  $Credential = $null,
 
-        [int]           $UpdateInterval     = 1,
-        [int]           $MaxHistoryPoints   = 100
+        [int]           $UpdateInterval     = 1
 #       [switch]        $visHTML,
 #       [switch]        $exportJson
     )
@@ -153,40 +146,14 @@
                 }
 
                 Write-Host "Loading configuration from '$ConfigPath'..." -ForegroundColor Yellow
-                $Config = Get-CounterConfiguration -ConfigPath $ConfigPath
-
-                foreach ( $counter in $Config.Counters ) {
-                    $counter.TestAvailability()
-                }
+                $Config = Get-CounterConfiguration -ConfigPath $ConfigPath -counterMap $(Get-CounterMap)
 
             } elseif ( $PSCmdlet.ParameterSetName -eq 'ConfigName' ) {
 
                 $monitorType = 'local'
 
                 Write-Host "Loading configuration '$ConfigName'..." -ForegroundColor Yellow
-                $Config = Get-CounterConfiguration -ConfigName $ConfigName
-
-                foreach ( $counter in $Config.Counters ) {
-                    $counter.TestAvailability()
-                }
-
-            <# }  elseif ( $PSCmdlet.ParameterSetName -eq 'RemoteServerConfig' ) {
-
-                $monitorType = 'remoteMulti'
-
-                Write-Host "Loading remote server configuration from '$RemoteServerConfig'..." -ForegroundColor Yellow
-
-                if ( -not (Test-Path $RemoteServerConfig) ) {
-                    Write-Warning "Server Configuration file not found: $RemoteServerConfig"
-                    Return
-                }
-
-                $Config = Get-ServerConfiguration -pathServerConfiguration $RemoteServerConfig
-
-                if ( $Config.Servers.Count -eq 0 ) {
-                    Write-Warning "No valid servers found in remote server configuration '$RemoteServerConfig'"
-                    Return
-                } #>
+                $Config = Get-CounterConfiguration -ConfigName $ConfigName  -counterMap $(Get-CounterMap)
 
             } elseif ( $PSCmdlet.ParameterSetName -eq 'SingleRemoteServer' ) {
 
@@ -202,7 +169,7 @@
 
                 if ( Test-Connection -ComputerName $ComputerName -Count 1 -Quiet ) {
 
-                    $Config = Get-CounterConfiguration -ConfigName $ConfigName -isRemote -computername $ComputerName -credential $credential
+                    $Config = Get-CounterConfiguration -ConfigName $ConfigName -isRemote -computername $ComputerName -credential $credential -counterMap $(Get-CounterMap)
 
                     $config.name = "$($Config.Name) @ REMOTE $($ComputerName)"
 
@@ -317,7 +284,6 @@
                 MonitorType     = $monitorType
                 Config          = $Config
                 UpdateInterval  = $UpdateInterval
-                MaxDataPoints   = $MaxHistoryPoints
             }
 
             Start-MonitoringLoop @MonitoringParams

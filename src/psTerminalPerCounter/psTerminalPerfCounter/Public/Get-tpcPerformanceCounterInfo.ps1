@@ -62,145 +62,138 @@ function Get-tpcPerformanceCounterInfo {
           - Add-tpcConfigPath: Add custom configuration paths
      #>
 
-     [CmdletBinding()]
-     param(
-          [Parameter(Mandatory)]
-          [string] $SearchTerm
-     )
+   [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [string] $SearchTerm
+    )
 
-     $Result = @()
+    $Result = @()
 
-     try {
+    try {
 
-          # Check if SearchTerm is ID format (number-number)
-          if ( $SearchTerm -match '^\d+-\d+$' ) {
+        # is ID
+        if ( $SearchTerm -match '^\d+-\d+$' ) {
 
-               $IdParts  = $SearchTerm -split '-'
-               $SetId    = [uint32]$IdParts[0]
-               $PathId   = [uint32]$IdParts[1]
+            $IdParts  = $SearchTerm -split '-'
+            $SetId    = [int]$IdParts[0]
+            $PathId   = [int]$IdParts[1]
 
-               try {
-                    $SetName  = Get-PerformanceCounterLocalName -ID $SetId      -ErrorAction SilentlyContinue
-                    $PathName = Get-PerformanceCounterLocalName -ID $PathId     -ErrorAction SilentlyContinue
+            try {
+                # Lookup IDs -> Names
+                $SetName  = Get-PerformanceCounterLookup -ID $SetId  -ErrorAction SilentlyContinue
+                $PathName = Get-PerformanceCounterLookup -ID $PathId -ErrorAction SilentlyContinue
 
-                    if ( $SetName -and $PathName ) {
+                if ( $SetName -and $PathName ) {
 
-                         $SetType                 = $(get-counter -ListSet $SetName).CounterSetType.ToString()
-                         $counterInstancesValues  = @("-")
+                    $ListSetObj = Get-Counter -ListSet $SetName -ErrorAction SilentlyContinue
+                    if (-not $ListSetObj) { throw "CounterSet '$SetName' found by ID but not accessible via Get-Counter." }
 
-                         if ( $SetType -eq 'MultiInstance' ) {
+                    $SetType = $ListSetObj.CounterSetType.ToString()
+                    $counterInstancesValues = @("-")
 
-                              $counterInstances = $(get-counter -ListSet $SetName).PathsWithInstances
-                              $searchPattern = '\(([^)]+)\)'
+                    # Handle MultiInstance counters
+                    if ( $SetType -eq 'MultiInstance' ) {
+                        $counterInstances = $ListSetObj.PathsWithInstances
+                        # Regex to extract instance name between parenthesis
+                        $searchPattern = '\(([^)]+)\)\\'
 
-                              $counterInstancesValues = $counterInstances | ForEach-Object {
-                                                       if ( $_ -match $searchPattern ) {$matches[1] }
-                                                  } | Select-Object -Unique
-
-                         } elseif ( $SetType -ne 'SingleInstance' ) {
-
-                              throw "Unknown counter set type: $SetType"
-
-                         }
-
-                         $Result = [PSCustomObject]@{
-                              ID          = $SearchTerm
-                              CounterSet  = $SetName
-                              Path        = $PathName
-                              SetType     = $SetType
-                              Instances   = $($counterInstancesValues -join ', ')
-                         }
-
-                    } else {
-
-                         Write-Host "Could not resolve ID '$SearchTerm' to counter names." -ForegroundColor Red
-                         if (-not $SetName)  { Write-Host "  Set ID $SetId not found" -ForegroundColor Yellow }
-                         if (-not $PathName) { Write-Host "  Path ID $PathId not found" -ForegroundColor Yellow }
-
+                        $counterInstancesValues = $counterInstances | ForEach-Object {
+                             if ( $_ -match $searchPattern ) { $matches[1] }
+                        } | Select-Object -Unique
                     }
 
-               } catch {
-                    Write-Error "Error resolving ID '$SearchTerm': $($_.Exception.Message)"
-               }
-
-          # search by name
-          } else {
-               Get-Counter -ListSet * | ForEach-Object {
-                    $CounterSet = $_
-
-                    if ( $CounterSet.Paths ) {
-
-                         $CounterSet.Paths | ForEach-Object {
-
-                              $CounterPath = $_
-
-                              # path or counter match
-                              $PathMatches        = $CounterPath -like "*$SearchTerm*"
-                              $CounterSetMatches  = $CounterSet.CounterSetName -like "*$SearchTerm*"
-
-                              if ( $PathMatches -or ( $CounterSetMatches -and $CounterPath -like "*$SearchTerm*" ) ) {
-
-                                   # Create composite ID
-                                   try {
-
-                                        $SetId         = Get-PerformanceCounterId -Name $CounterSet.CounterSetName -ErrorAction SilentlyContinue
-                                        $PathName      = ($CounterPath -split '\\')[-1] -replace '\(\*\)', '' -replace '[(){}]', ''
-                                        $PathId        = Get-PerformanceCounterId -Name $PathName -ErrorAction SilentlyContinue
-                                        $CompositeId   = if ( $SetId -and $PathId ) { "$SetId-$PathId" } else { "N/A" }
-
-                                        $SetType       = $CounterSet.CounterSetType.ToString()
-                                        $counterInstancesValues = @("-")
-
-                                        if ( $SetType -eq 'MultiInstance' ) {
-
-                                             $counterInstances   = $CounterSet.PathsWithInstances
-                                             $searchPattern      = '\(([^)]+)\)'
-
-                                             $counterInstancesValues = $counterInstances | ForEach-Object {
-                                                                           if ( $_ -match $searchPattern ) {$matches[1] }
-                                                                       } | Select-Object -Unique
-
-                                        } elseif ( $SetType -ne 'SingleInstance' ) {
-
-                                             throw "Unknown counter set type: $SetType"
-
-                                        }
-
-                                   } catch {
-
-                                        $CompositeId   = "N/A"
-                                        $SetType       = "Unknown"
-                                        $counterInstancesValues = @("-")
-
-                                   }
-
-                                   $Result += [PSCustomObject]@{
-                                        ID          = $CompositeId
-                                        CounterSet  = $CounterSet.CounterSetName
-                                        Path        = $CounterPath
-                                        SetType     = $SetType
-                                        Instances   = $($counterInstancesValues -join ', ')
-                                   }
-                              }
-                         }
+                    $Result = [PSCustomObject]@{
+                        ID          = $SearchTerm
+                        CounterSet  = $SetName
+                        Path        = $PathName
+                        SetType     = $SetType
+                        Instances   = $($counterInstancesValues -join ', ')
                     }
-               }
-          }
 
-          if ( $Result.Count -gt 0)  {
+                } else {
+                    Write-Host "Could not resolve ID '$SearchTerm' to counter names." -ForegroundColor Red
+                    if (-not $SetName)  { Write-Host "  Set ID $SetId not found" -ForegroundColor Yellow }
+                    if (-not $PathName) { Write-Host "  Path ID $PathId not found" -ForegroundColor Yellow }
+                }
 
-               $Result | Sort-Object -Property CounterSet, Path, SetType | Format-Table -AutoSize -Wrap
+            } catch {
+                Write-Error "Error resolving ID '$SearchTerm': $($_.Exception.Message)"
+            }
 
-          } else {
+        # Input is a Name (Search Term)
+        } else {
 
-               Write-Host "No matching performance counters found for search term: $SearchTerm" -ForegroundColor Yellow
+            # Retrieve ALL sets... takes time
+            $AllSets = Get-Counter -ListSet *
 
-          }
+            foreach ( $CounterSet in $AllSets ) {
 
-     } catch {
+                # Performance Optimization: Only process this set if the Set Name OR one of its paths matches the search term.
+                if ( -not $CounterSet.Paths ) { continue }
 
-          Write-Error "Error occurred while retrieving performance counter information: $($_.Exception.Message)"
+                $MatchingPaths = $CounterSet.Paths | Where-Object {
+                    ($_ -like "*$SearchTerm*") -or ($CounterSet.CounterSetName -like "*$SearchTerm*")
+                }
 
-     }
+                foreach ($CounterPath in $MatchingPaths) {
 
+                    try {
+                        # 1. Get SET ID
+                        $SetId = Get-PerformanceCounterLookup -Name $CounterSet.CounterSetName -ErrorAction SilentlyContinue
+
+                        # 2. Clean PATH NAME
+                        $RawName = ($CounterPath -split '\\')[-1]
+
+                        # Only remove '(*)' if strictly necessary (wildcard placeholder)
+                        $PathName = $RawName -replace '\(\*\)', ''
+
+                        # 3. Get PATH ID
+                        $PathId = Get-PerformanceCounterLookup -Name $PathName -ErrorAction SilentlyContinue | Select-Object -First 1
+
+                        # 4. Build Composite ID
+                        $CompositeId = if ( $SetId -and $PathId ) { "$SetId-$PathId" } else { "N/A" }
+
+                        # Gather Metadata
+                        $SetType = $CounterSet.CounterSetType.ToString()
+                        $counterInstancesValues = @("-")
+
+                        if ( $SetType -eq 'MultiInstance' ) {
+                            $counterInstances = $CounterSet.PathsWithInstances
+                            # Regex: Matches content inside parenthesis before a backslash
+                            $searchPattern = '\(([^)]+)\)\\'
+
+                            $counterInstancesValues = $counterInstances | ForEach-Object {
+                                if ( $_ -match $searchPattern ) { $matches[1] }
+                            } | Select-Object -Unique
+                        }
+                        elseif ( $SetType -ne 'SingleInstance' ) {
+                            $SetType = "Unknown ($SetType)"
+                        }
+
+                        $Result += [PSCustomObject]@{
+                            ID          = $CompositeId
+                            CounterSet  = $CounterSet.CounterSetName
+                            Path        = $CounterPath
+                            SetType     = $SetType
+                            Instances   = $($counterInstancesValues -join ', ')
+                        }
+
+                    } catch {
+                        # Warning instead of Error to avoid stopping the entire loop for one bad counter
+                        Write-Warning "Skipping path '$CounterPath': $($_.Exception.Message)"
+                    }
+                }
+            }
+        }
+
+        if ( $Result.Count -gt 0)  {
+            $Result | Sort-Object -Property CounterSet, Path | Format-Table -AutoSize -Wrap
+        } else {
+            Write-Host "No matching performance counters found for search term: $SearchTerm" -ForegroundColor Yellow
+        }
+
+    } catch {
+        Write-Error "Critical error in Get-tpcPerformanceCounterInfo: $($_.Exception.Message)"
+    }
 }

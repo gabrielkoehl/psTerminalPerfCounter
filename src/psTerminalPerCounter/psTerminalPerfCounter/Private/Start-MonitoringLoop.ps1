@@ -6,9 +6,7 @@ function Start-MonitoringLoop {
         [Parameter(Mandatory=$true)]
         [psobject]  $Config,
         [Parameter(Mandatory=$true)]
-        [int]       $UpdateInterval,
-        [Parameter(Mandatory=$true)]
-        [int]       $MaxDataPoints
+        [int]       $UpdateInterval
     )
 
     begin {
@@ -24,115 +22,92 @@ function Start-MonitoringLoop {
 
             while ( $true ) {
 
-            $SampleCount++
+                $SampleCount++
 
-            # Collect data from all counters
-            foreach ( $Counter in $Config.Counters ) {
+                # Collect data from all counters
+                [psTPCCLASSES.CounterConfiguration]::GetValuesBatched($Config.Counters)
 
-                try {
-                    if ( $Counter.IsAvailable ) {
-                        $return                     = $Counter.GetCurrentValue()
-                        $value                      = $return[0]
-                        $Counter.ExecutionDuration  = $return[1]
-                        $Counter.AddDataPoint($Value, $MaxDataPoints)
-                    } else {
-                        Write-Warning "Counter '$($Counter.Title)' is not available: $($Counter.LastError)"
-                        Start-Sleep -Milliseconds 500 # Clear-Host is to fast to read anything
-                    }
-                } catch {
-                    Write-Warning "Error reading counter '$($Counter.Title)': $($_.Exception.Message)"
-                    Pause # Clear-Host is to fast to read anything
-                }
 
-            }
+                Show-SessionHeader -ConfigName $Config.Name -StartTime $StartTime -SampleCount $SampleCount
 
-            Show-SessionHeader -ConfigName $Config.Name -StartTime $StartTime -SampleCount $SampleCount
+                # Separate counters by format
+                $graphCounters = @()
+                $tableCounters = @()
 
-            # Separate counters by format
-            $graphCounters = @()
-            $tableCounters = @()
-
-            foreach ( $Counter in $Config.Counters ) {
-                if ( $Counter.HistoricalData.Count -gt 3 ) {  # Need some data points
-                    switch ($Counter.Format) {
-                        "graph" { $graphCounters += $Counter }
-                        "table" { $tableCounters += $Counter }
-                        "both"  {
-                                $graphCounters += $Counter
-                                $tableCounters += $Counter
+                foreach ( $Counter in $Config.Counters ) {
+                    if ( $Counter.HistoricalData.Count -gt 3 ) {  # Need some data points
+                        switch ($Counter.Format) {
+                            "graph" { $graphCounters += $Counter }
+                            "table" { $tableCounters += $Counter }
+                            "both"  {
+                                    $graphCounters += $Counter
+                                    $tableCounters += $Counter
+                            }
+                            default { $graphCounters += $Counter }  # Default to graph
                         }
-                        default { $graphCounters += $Counter }  # Default to graph
+                    } else {
+                        Write-Host "$($Counter.GetFormattedTitle()): Collecting data... ($($Counter.HistoricalData.Count)/3 samples)" -ForegroundColor Yellow
+                        Write-Host ""
                     }
-                } else {
-                    Write-Host "$($Counter.GetFormattedTitle()): Collecting data... ($($Counter.HistoricalData.Count)/3 samples)" -ForegroundColor Yellow
-                    Write-Host ""
                 }
-            }
 
-            # Show graphs first
-            foreach ( $Counter in $graphCounters ) {
-                try {
-                    Show-CounterGraph -Counter $Counter
-                } catch {
-                    Write-Host "$($Counter.Title) Graph error: $($_.Exception.Message)" -ForegroundColor Red
-                    Write-Host ""
+                # Show graphs first
+                foreach ( $Counter in $graphCounters ) {
+                    try {
+                        Show-CounterGraph -Counter $Counter
+                    } catch {
+                        Write-Host "$($Counter.Title) Graph error: $($_.Exception.Message)" -ForegroundColor Red
+                        Write-Host ""
+                    }
                 }
-            }
 
-            # Show table if there are any table counters
-            if ( $tableCounters.Count -gt 0 ) {
-                try {
-                    Show-CounterTable -Counters $tableCounters -MonitorType $monitorType
-                } catch {
-                    Write-Host "Table display error: $($_.Exception.Message)" -ForegroundColor Red
-                    Write-Host ""
+                # Show table if there are any table counters
+                if ( $tableCounters.Count -gt 0 ) {
+                    try {
+                        Show-CounterTable -Counters $tableCounters -MonitorType $monitorType
+                    } catch {
+                        Write-Host "Table display error: $($_.Exception.Message)" -ForegroundColor Red
+                        Write-Host ""
+                    }
                 }
+
+                Start-Sleep -Seconds $UpdateInterval
+
             }
 
-            Start-Sleep -Seconds $UpdateInterval
-
-            }
-
-        } elseif ( $monitorType -eq 'remoteMulti' ) {
+        } elseif ( $monitorType -eq 'environment' ) {
 
             while ( $true ) {
 
                 $SampleCount++
 
-                # Collect all counters from all servers
+                $Config.GetAllValuesBatched()
+
+                # Clear screen
+                Clear-Host
+
+                # Show header with environment info
+                Write-Host "=== $($Config.Name) ===" -ForegroundColor Cyan
+                Write-Host "Sample: $SampleCount | Started: $($StartTime.ToString('HH:mm:ss')) | Query Time: $($Config.QueryTimestamp.ToString('HH:mm:ss.fff')) | Duration: $($Config.QueryDuration)ms" -ForegroundColor Gray
+                Write-Host ""
+
+                # Collect all counters from all servers for display
                 $allCounters = @()
 
                 foreach ( $server in $Config.Servers ) {
-                    foreach ( $counterConfig in $server.PerformanceCounters ) {
-                        foreach ( $counter in $counterConfig.Counters ) {
-
-                            try {
-                                if ( $counter.IsAvailable ) {
-                                    $return                     = $counter.GetCurrentValue()
-                                    $value                      = $return[0]
-                                    $counter.ExecutionDuration  = $return[1]
-                                    $counter.AddDataPoint($Value, $MaxDataPoints)
-
-                                    $allCounters += $counter
-                                } else {
-                                    Write-Warning "Counter '$($counter.Title)' on $($counter.ComputerName) is not available: $($counter.LastError)"
-                                    Start-Sleep -Milliseconds 500
-                                }
-                            } catch {
-                                Write-Warning "Error reading counter '$($counter.Title)' on $($counter.ComputerName): $($_.Exception.Message)"
+                    if ( $server.IsAvailable ) {
+                        foreach ( $counter in $server.Counters ) {
+                            if ( $counter.IsAvailable -and $counter.HistoricalData.Count -gt 0 ) {
+                                $allCounters += $counter
                             }
                         }
                     }
                 }
 
-                # Clear screen and show data
-                Clear-Host
-                Show-SessionHeader -ConfigName $Config.Name -StartTime $StartTime -SampleCount $SampleCount
-
                 # Display table with all counters from all servers
                 if ( $allCounters.Count -gt 0 ) {
                     try {
-                        Show-CounterTable -Counters $allCounters -MonitorType $monitorType
+                        Show-CounterTable -Counters $allCounters -MonitorType 'environment'
                     } catch {
                         Write-Host "Table display error: $($_.Exception.Message)" -ForegroundColor Red
                         Write-Host ""
@@ -140,6 +115,14 @@ function Start-MonitoringLoop {
                 } else {
                     Write-Host "No data available from any server." -ForegroundColor Yellow
                 }
+
+                # Show environment statistics
+                Write-Host ""
+                Write-Host "Environment Statistics:" -ForegroundColor Cyan
+                $stats = $Config.GetEnvironmentStatistics()
+                Write-Host "  Total Servers: $($stats['TotalServers']) | Available: $($stats['AvailableServers'])" -ForegroundColor White
+                Write-Host "  Total Counters: $($stats['TotalCounters']) | Available: $($stats['AvailableCounters'])" -ForegroundColor White
+                Write-Host "  Last Query: $($stats['LastQueryTimestamp']) | Duration: $($stats['LastQueryDuration']) | Interval: $($stats['Interval'])" -ForegroundColor White
 
                 Start-Sleep -Seconds $UpdateInterval
             }

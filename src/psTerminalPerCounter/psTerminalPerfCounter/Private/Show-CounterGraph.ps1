@@ -2,7 +2,7 @@ function Show-CounterGraph {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
-        [CounterConfiguration]    $Counter
+        [psTPCCLASSES.CounterConfiguration] $Counter
     )
 
     $Config     = $Counter.GraphConfiguration
@@ -20,9 +20,9 @@ function Show-CounterGraph {
     $GraphParams = @{
         Datapoints      = $GraphData
         GraphTitle      = $Counter.GetFormattedTitle()
-        Type            = $Config.GraphType
+        Type            = $Config.graphType
         YAxisStep       = $YAxisStep
-        yAxisMaxRows   = $Config.yAxisMaxRows
+        yAxisMaxRows    = $Config.yAxisMaxRows
     }
 
     if ( $Counter.ColorMap.Count -gt 0 ) {

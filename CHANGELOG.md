@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased]
 
+### Added
+
+### Changed
+
+* **Counter Translation ID <> NAME**
+  * Removed DLL-based lookups to drastically improve remote startup speed and fixed ID resolution for multi-instance SQL counters.
+
+* **General Remote Call Performance**
+  * **Batched Remote Queries**
+    * Switched from sequential, single-counter queries to efficient batched approach. All counters for a specific server are now retrieved in a single remote call. Get-Counter can process lists, not only on path :P
+  * **Stabilized Update Interval**
+    * faster and more reliable. Execution time for environment monitoring dropped from >15s to ~2s.
+  * **Refactored Core Logic**
+    * Moved the data collection into a C# static method (GetValuesBatched) to leverage parallel processing and reduce PowerShell overhead.
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+### Code Quality
+
+### Known Issued
+
+* **Bitdefender False-Positive**
+  * PowerShell tried to load a malicious resource detected as CMD:Heur.BZC.ZFV.Boxter.602.098EEC9F and was blocked.
+
 ## [0.2.0] - 2025-10-11
 
 ### Added

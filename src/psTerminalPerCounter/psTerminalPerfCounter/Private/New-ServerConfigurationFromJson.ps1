@@ -1,6 +1,6 @@
 ﻿function New-ServerConfigurationFromJson {
     [CmdletBinding()]
-    [OutputType([ServerConfiguration[]])]
+    [OutputType([psTPCCLASSES.ServerConfiguration[]])]
     param(
         [Parameter(Mandatory=$true)]
         [PSCustomObject] $JsonConfig
@@ -21,21 +21,35 @@
 
             try {
 
-                $performanceCounters = @()
+                $performanceCounters    = @()
+                $skipServer             = $false
 
-                #Counters
                 if ( $ServerConfig.CounterConfig ) {
                     foreach ( $CounterConfig in $ServerConfig.CounterConfig ) {
-                        $performanceCounters += Get-CounterConfiguration -ConfigName $CounterConfig -isRemote -computername $ServerConfig.computername -credential $setCredential
+
+                        $param = @{}
+
+                        if ( $null -eq $setCredential ) { $param['Credential'] = $setCredential }
+
+                        $serverCounterMap = Get-CounterMap @param
+
+                        $config = Get-CounterConfiguration -ConfigName $CounterConfig -isRemote -computername $ServerConfig.computername -credential $setCredential -counterMap $serverCounterMap
+
+                        if ( $config.SkipServer ) {
+                            $skipServer = $true
+                            break
+                        }
+
+                        $performanceCounters += $config.Counters
                     }
                 }
 
-# in development, the selection of 1st one is in start-tpcMonitor, server count validation
-if ( $performanceCounters.count -gt 1 ) {
-    Write-Warning "Currently only one performance counter is supported for each server. You can add more counter to config itself. Monitoring only $($performanceCounters.title)"
-}
+                if ( $skipServer ) {
+                    Write-Warning "Skipping server '$($ServerConfig.computername)' - marked as unreachable during counter configuration."
+                    continue
+                }
 
-                $serverConfiguration = [ServerConfiguration]::new(
+                $serverConfiguration = [psTPCCLASSES.ServerConfiguration]::new(
                     $ServerConfig.computername,
                     $ServerConfig.comment,
                     $performanceCounters

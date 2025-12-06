@@ -1,9 +1,11 @@
 ﻿function New-CounterConfigurationFromJson {
     [CmdletBinding()]
-    [OutputType([CounterConfiguration[]])]
+    [OutputType([System.Collections.Generic.List[psTPCCLASSES.CounterConfiguration]])]
     param(
         [Parameter(Mandatory=$true)]
         [PSCustomObject]    $JsonConfig,
+        [Parameter(Mandatory=$true)]
+        [System.Collections.Generic.Dictionary[int, string]] $counterMap,
 
         # Remote params
         [Parameter()]
@@ -14,12 +16,12 @@
         [pscredential]      $credential
     )
 
-    $PerformanceCounters = @()
+    $PerformanceCounters = [System.Collections.Generic.List[psTPCCLASSES.CounterConfiguration]]::new()
 
     foreach ( $CounterConfig in $JsonConfig.counters ) {
 
         # Create CounterConfiguration Instance
-        $CounterConfiguration = [CounterConfiguration]::new(
+        $CounterConfiguration = [psTPCCLASSES.CounterConfiguration]::new(
             $CounterConfig.counterID,
             $CounterConfig.counterSetType,
             $CounterConfig.counterInstance,
@@ -33,10 +35,11 @@
             $CounterConfig.graphConfiguration,
             $isRemote,
             $computername,
-            $credential
+            $credential,
+            $counterMap
         )
 
-        $PerformanceCounters += $CounterConfiguration
+        $PerformanceCounters.Add($CounterConfiguration)
     }
 
     return $PerformanceCounters

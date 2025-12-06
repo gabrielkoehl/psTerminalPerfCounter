@@ -2,6 +2,9 @@ function Get-CounterConfiguration {
     [CmdletBinding()]
     [OutputType([hashtable])]
     param(
+        [Parameter(Mandatory)]
+        [System.Collections.Generic.Dictionary[int, string]] $counterMap,
+
         [Parameter(ParameterSetName = 'ConfigName',   Mandatory)]
         [Parameter(ParameterSetName = 'RemoteServer', Mandatory)]
         [string]        $ConfigName,
@@ -23,6 +26,7 @@ function Get-CounterConfiguration {
             isRemote        = $isRemote.IsPresent
             computername    = $computername
             credential      = $credential
+            counterMap      = $counterMap
         }
 
     }
@@ -30,6 +34,35 @@ function Get-CounterConfiguration {
     process {
 
         try {
+
+            if ( $isRemote.IsPresent -and $computername -ne $env:COMPUTERNAME ) {
+                try {
+                    $testResult = Test-Connection -ComputerName $computername -Count 1 -Quiet -TimeoutSeconds 2 -ErrorAction Stop
+                    if ( -not $testResult ) {
+                        Write-Warning "Server '$computername' is not reachable. Skipping counter configuration."
+                        return @{
+                            Name        = if ( $ConfigName ) { $ConfigName } else { "Unknown" }
+                            Description = "Server unreachable"
+                            Counters    = @()
+                            ConfigPath  = ""
+                            SkipServer  = $true
+                        }
+
+                    }
+
+                } catch {
+
+                    Write-Warning "Cannot reach server '$computername': $_. Skipping counter configuration."
+                    return @{
+                        Name        = if ( $ConfigName ) { $ConfigName } else { "Unknown" }
+                        Description = "Server unreachable"
+                        Counters    = @()
+                        ConfigPath  = ""
+                        SkipServer  = $true
+                    }
+                }
+            }
+
 
             if ( $PSCmdlet.ParameterSetName -eq 'ConfigPath' ) {
                 if ( [string]::IsNullOrWhiteSpace($ConfigPath) ) {
@@ -59,6 +92,7 @@ function Get-CounterConfiguration {
                     Description = $jsonContent.description
                     Counters    = $counters
                     ConfigPath  = Split-Path $ConfigPath -Parent
+                    SkipServer  = $false
                 }
             }
 
@@ -118,6 +152,7 @@ function Get-CounterConfiguration {
                 Description = $jsonContent.description
                 Counters    = $counters
                 ConfigPath  = $selectedConfig.ConfigPath
+                SkipServer  = $false
             }
 
         } catch {

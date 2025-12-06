@@ -69,13 +69,6 @@ Start-tpcMonitor -ConfigName "Memory" -UpdateInterval 2
 
 Starts memory monitoring with 2-second update intervals using the 'tpc_Memory.json' configuration.
 
-### EXAMPLE 4
-```
-Start-tpcMonitor -ConfigName "Disk" -UpdateInterval 1 -MaxHistoryPoints 200
-```
-
-Starts disk monitoring with 1-second updates and extended data retention of 200 points.
-
 ### EXAMPLE 5
 ```
 Start-tpcMonitor -ConfigName "CPU" -ComputerName "Server01"
@@ -181,7 +174,7 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -MaxHistoryPoints
+### -MaxHistoryPoints [DEPRECATED -- TO JSON 2DO]
 Maximum number of historical data points to retain in memory for each counter.
 This is the complete historical data used for statistics and future export.
 Independent of graph display width.

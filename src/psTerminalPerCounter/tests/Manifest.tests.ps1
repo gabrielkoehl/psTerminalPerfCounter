@@ -12,7 +12,7 @@ BeforeAll {
     $outputManifestPath = Join-Path -Path $outputModVerDir -Child "$($moduleName).psd1"
     $manifestData       = Test-ModuleManifest -Path $outputManifestPath -Verbose:$false -ErrorAction Stop -WarningAction SilentlyContinue
 
-    $changelogPath    = Join-Path -Path $env:BHProjectPath -Child 'CHANGELOG.md'
+    $changelogPath    = Join-Path (Split-Path (Split-Path $env:BHProjectPath -Parent) -Parent) 'CHANGELOG.md'
     $changelogVersion = Get-Content $changelogPath | ForEach-Object {
         if ($_ -match $changelogTagMatchRegEx) {
             $changelogVersion = $matches.Version

@@ -2,7 +2,7 @@ function Show-CounterStatistic {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
-        [CounterConfiguration]$Counter
+        [psTPCCLASSES.CounterConfiguration]$Counter
     )
 
     $Config             = $Counter.GraphConfiguration
