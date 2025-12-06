@@ -11,64 +11,79 @@ function Get-PerformanceCounterLookup {
         [string] $ComputerName = $env:COMPUTERNAME
     )
 
-    $remoteScript = {
-        try {
-            $path   = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Perflib\CurrentLanguage"
-            $values = Get-ItemProperty -Path $path -Name "Counter" -ErrorAction Stop
-            return $values.Counter
+    # Global cache to prevent repeated registry reads
+    if (-not $script:tpcPerfCounterCache) { $script:tpcPerfCounterCache = @{} }
+
+    $cacheKey = $ComputerName.ToLower()
+
+    # Populate cache if empty
+    if (-not $script:tpcPerfCounterCache.ContainsKey($cacheKey)) {
+
+        $remoteScript = {
+            try {
+                $path   = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Perflib\CurrentLanguage"
+                $values = Get-ItemProperty -Path $path -Name "Counter" -ErrorAction Stop
+                return $values.Counter
+            }
+            catch {
+                Write-Error "Error accessing registry: $_"
+            }
         }
-        catch {
-            Write-Error "Error accessing registry: $_"
+
+        try {
+            $conParam = @{
+                ScriptBlock = $remoteScript
+                ErrorAction = 'Stop'
+            }
+
+            if (-not [string]::IsNullOrWhiteSpace($ComputerName) -and $ComputerName -ne $env:COMPUTERNAME) {
+                $conParam['ComputerName'] = $ComputerName
+            }
+
+            $rawCounterData = Invoke-Command @conParam
+
+            if (-not $rawCounterData) { Throw "No data returned from registry." }
+
+            $tempMap = @{}
+
+            for ($i = 0; $i -lt ($rawCounterData.Count - 1); $i += 2) {
+                if ([string]$rawCounterData[$i] -match '^\d+$') {
+                    $cId   = [int]$rawCounterData[$i]
+                    $cName = $rawCounterData[$i+1]
+
+                    if ($cName) {
+                        # Use lowercase key for case-insensitive lookup later if needed,
+                        # but keeping ID mapping clean.
+                        # Storing Trimmed name to be safe.
+                        $tempMap[$cId] = $cName.Trim()
+                    }
+                }
+            }
+
+            $script:tpcPerfCounterCache[$cacheKey] = $tempMap
+
+        } catch {
+            Write-Error "Error building cache on $ComputerName : $_"
+            return $null
         }
     }
 
-    try {
-        $conParam = @{
-            ScriptBlock = $remoteScript
-            ErrorAction = 'Stop'
+    $counterMap = $script:tpcPerfCounterCache[$cacheKey]
+
+    if ($PSCmdlet.ParameterSetName -eq 'ByName') {
+        $result = $counterMap.GetEnumerator() | Where-Object { $_.Value -eq $Name } | Select-Object -First 1 # not shure if this breaks things later, needed for sql for example with multiple instances
+
+        if ($result) {
+            return $result.Key
+        } else {
+            return $null
         }
-
-        if (-not [string]::IsNullOrWhiteSpace($ComputerName) -and $ComputerName -ne $env:COMPUTERNAME) {
-            $conParam['ComputerName'] = $ComputerName
+    }
+    else {
+        if ($counterMap.ContainsKey($Id)) {
+            return $counterMap[$Id]
+        } else {
+            return $null
         }
-
-        $rawCounterData = Invoke-Command @conParam
-
-        if (-not $rawCounterData) { Throw "No data returned from registry." }
-
-        $counterMap = @{}
-
-        for ($i = 0; $i -lt ($rawCounterData.Count - 1); $i += 2) {
-            if ([string]$rawCounterData[$i] -match '^\d+$') {
-                $cId   = [int]$rawCounterData[$i]
-                $cName = $rawCounterData[$i+1]
-                $counterMap[$cId] = $cName
-            }
-        }
-
-        if ($PSCmdlet.ParameterSetName -eq 'ByName') {
-            $result = $counterMap.GetEnumerator() | Where-Object { $_.Value -eq $Name }
-
-            if ($result) {
-                return $result.Key
-            } else {
-                throw "Counter name '$Name' not found on '$ComputerName'."
-            }
-        }
-        else {
-            if ($counterMap.ContainsKey($Id)) {
-                return $counterMap[$Id]
-            } else {
-                throw "Counter ID '$Id' not found on '$ComputerName'."
-            }
-        }
-
-    } catch {
-        Write-Error "Error retrieving performance counter data on $ComputerName : $_"
     }
 }
-
-
-# Get-PerformanceCounterLookup -Name "Processor"
-# Get-PerformanceCounterLookup -Id 238
-# Get-PerformanceCounterLookup -ComputerName 'lab-node2' -Name "Processor"
