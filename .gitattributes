@@ -1,27 +1,17 @@
-# Language detection for GitHub stats
-*.ps1 text eol=crlf linguist-language=PowerShell
-*.psm1 text eol=crlf linguist-language=PowerShell
-*.cs text eol=lf linguist-language=C#
-*.csproj text eol=lf linguist-language=C#
-*.sln text eol=lf linguist-language=C#
-
-# GitHub linguist overrides
-**/docs/** linguist-vendored
-*.html linguist-generated
-*.md text eol=crlf linguist-documentation
-
-# Default behavior
+# Set default behavior to automatically normalize line endings
 * text=auto eol=crlf
 
-# Text files
+# Explicitly declare text files you want to always be normalized and converted to CRLF on checkout
 *.sql text eol=crlf
+*.ps1 text eol=crlf
+*.md text eol=crlf
 *.txt text eol=crlf
 *.json text eol=crlf
 *.xml text eol=crlf
 *.yml text eol=crlf
 *.yaml text eol=crlf
 
-# Binary files
+# Denote all files that are truly binary and should not be modified
 *.png binary
 *.jpg binary
 *.jpeg binary
