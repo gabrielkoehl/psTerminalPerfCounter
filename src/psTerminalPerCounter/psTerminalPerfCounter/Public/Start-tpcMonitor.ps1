@@ -146,32 +146,14 @@
                 }
 
                 Write-Host "Loading configuration from '$ConfigPath'..." -ForegroundColor Yellow
-                $Config = Get-CounterConfiguration -ConfigPath $ConfigPath
+                $Config = Get-CounterConfiguration -ConfigPath $ConfigPath -counterMap $(Get-CounterMap)
 
             } elseif ( $PSCmdlet.ParameterSetName -eq 'ConfigName' ) {
 
                 $monitorType = 'local'
 
                 Write-Host "Loading configuration '$ConfigName'..." -ForegroundColor Yellow
-                $Config = Get-CounterConfiguration -ConfigName $ConfigName
-
-            <# }  elseif ( $PSCmdlet.ParameterSetName -eq 'RemoteServerConfig' ) {
-
-                $monitorType = 'remoteMulti'
-
-                Write-Host "Loading remote server configuration from '$RemoteServerConfig'..." -ForegroundColor Yellow
-
-                if ( -not (Test-Path $RemoteServerConfig) ) {
-                    Write-Warning "Server Configuration file not found: $RemoteServerConfig"
-                    Return
-                }
-
-                $Config = Get-ServerConfiguration -pathServerConfiguration $RemoteServerConfig
-
-                if ( $Config.Servers.Count -eq 0 ) {
-                    Write-Warning "No valid servers found in remote server configuration '$RemoteServerConfig'"
-                    Return
-                } #>
+                $Config = Get-CounterConfiguration -ConfigName $ConfigName  -counterMap $(Get-CounterMap)
 
             } elseif ( $PSCmdlet.ParameterSetName -eq 'SingleRemoteServer' ) {
 
@@ -187,7 +169,7 @@
 
                 if ( Test-Connection -ComputerName $ComputerName -Count 1 -Quiet ) {
 
-                    $Config = Get-CounterConfiguration -ConfigName $ConfigName -isRemote -computername $ComputerName -credential $credential
+                    $Config = Get-CounterConfiguration -ConfigName $ConfigName -isRemote -computername $ComputerName -credential $credential -counterMap $(Get-CounterMap)
 
                     $config.name = "$($Config.Name) @ REMOTE $($ComputerName)"
 
