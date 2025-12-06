@@ -30,3 +30,5 @@ function Get-PerformanceCounterId
       throw "Cannot find '$Name' on '$ComputerName'."
     }
 }
+
+Get-PerformanceCounterId -Name "Processor"

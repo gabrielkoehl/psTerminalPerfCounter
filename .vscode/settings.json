@@ -5,7 +5,7 @@
     "debug.allowBreakpointsEverywhere": true,
     "debug.showInlineBreakpointCandidates": true,
     "powershell.debugging.createTemporaryIntegratedConsole": true,
-    "debug.inlineValues": true,
+    "debug.inlineValues": "on",
     "debug.showInStatusBar": "always",
     "workbench.colorCustomizations": {
         "tab.activeBorder": "#39739d",
@@ -46,7 +46,8 @@
     "editor.fontSize": 16,
     "editor.lineHeight": 26,
     "editor.letterSpacing": 0.5,
-    "editor.tabSize": 5,
+    "editor.tabSize": 4,
+    "editor.detectIndentation": false,
     "editor.wordWrap": "off",
     "editor.minimap.enabled": true,
     "editor.minimap.showSlider":"always",

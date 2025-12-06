@@ -80,8 +80,8 @@ function Get-tpcPerformanceCounterInfo {
                $PathId   = [uint32]$IdParts[1]
 
                try {
-                    $SetName  = Get-PerformanceCounterLocalName -ID $SetId      -ErrorAction SilentlyContinue
-                    $PathName = Get-PerformanceCounterLocalName -ID $PathId     -ErrorAction SilentlyContinue
+                    $SetName  = Get-PerformanceCounterLookup -ID $SetId      -ErrorAction SilentlyContinue
+                    $PathName = Get-PerformanceCounterLookup -ID $PathId     -ErrorAction SilentlyContinue
 
                     if ( $SetName -and $PathName ) {
 
@@ -143,9 +143,9 @@ function Get-tpcPerformanceCounterInfo {
                                    # Create composite ID
                                    try {
 
-                                        $SetId         = Get-PerformanceCounterId -Name $CounterSet.CounterSetName -ErrorAction SilentlyContinue
+                                        $SetId         = Get-PerformanceCounterLookup -Name $CounterSet.CounterSetName -ErrorAction SilentlyContinue
                                         $PathName      = ($CounterPath -split '\\')[-1] -replace '\(\*\)', '' -replace '[(){}]', ''
-                                        $PathId        = Get-PerformanceCounterId -Name $PathName -ErrorAction SilentlyContinue
+                                        $PathId        = Get-PerformanceCounterLookup -Name $PathName -ErrorAction SilentlyContinue
                                         $CompositeId   = if ( $SetId -and $PathId ) { "$SetId-$PathId" } else { "N/A" }
 
                                         $SetType       = $CounterSet.CounterSetType.ToString()

@@ -1,3 +1,6 @@
+# abhängig zu remoteregistry
+
+
 function Get-PerfCounterMapFromRegistry {
     param (
         [string]$ComputerName = $env:COMPUTERNAME
@@ -60,8 +63,7 @@ function Get-PerfCounterMapFromRegistry {
     } finally {
         # Aufräumen
         if ($subKey) { $subKey.Close() }
-        # Bei lokalem Zugriff dürfen wir LocalMachine nicht schließen (es ist statisch),
-        # aber OpenRemoteBaseKey Objekte müssen geschlossen werden.
+
         if ($regKey -and $regKey.Name -ne "HKEY_LOCAL_MACHINE") { $regKey.Close() }
     }
 }
