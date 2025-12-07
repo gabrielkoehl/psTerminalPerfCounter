@@ -61,15 +61,15 @@ You can configure any combination of performance counters that your system provi
 
 ## Documentation
 
-- **[Start-tpcMonitor](docs/en-US/Start-tpcMonitor.md)** - Main monitoring function for single servers
-- **[Start-tpcEnvironmentMonitor](docs/en-US/Start-tpcEnvironmentMonitor.md)** - Main monitoring function for whoe environments
-- **[Get-tpcConfigPaths](docs/en-US/Get-tpcConfigPaths.md)** - List configured pathes containing configurations
-- **[Add-tpcConfigPath](docs/en-US/Add-tpcConfigPath.md)** - Adds custom path contianing configurations
-- **[Remove-tpcConfigPath](docs/en-US/Remove-tpcConfigPath.md)** - Removes custom pathes
-- **[Get-tpcAvailableCounterConfig](docs/en-US/Get-tpcAvailableCounterConfig.md)** - shows all available confiogurations from all pathes
-- **[Get-tpcPerformanceCounterInfo](docs/en-US/Get-tpcPerformanceCounterInfo.md)** - shows detailed information about performance counters
+- **[Start-tpcMonitor](src\psTerminalPerCounter\docs/en-US/Start-tpcMonitor.md)** - Main monitoring function for single servers
+- **[Start-tpcEnvironmentMonitor](src\psTerminalPerCounter\docs/en-US/Start-tpcEnvironmentMonitor.md)** - Main monitoring function for whoe environments
+- **[Get-tpcConfigPaths](src\psTerminalPerCounter\docs/en-US/Get-tpcConfigPaths.md)** - List configured pathes containing configurations
+- **[Add-tpcConfigPath](src\psTerminalPerCounter\docs/en-US/Add-tpcConfigPath.md)** - Adds custom path contianing configurations
+- **[Remove-tpcConfigPath](src\psTerminalPerCounter\docs/en-US/Remove-tpcConfigPath.md)** - Removes custom pathes
+- **[Get-tpcAvailableCounterConfig](src\psTerminalPerCounter\docs/en-US/Get-tpcAvailableCounterConfig.md)** - shows all available confiogurations from all pathes
+- **[Get-tpcPerformanceCounterInfo](src\psTerminalPerCounter\docs/en-US/Get-tpcPerformanceCounterInfo.md)** - shows detailed information about performance counters
 
-- **[Building Custom Configuration Sets](docs/en-US/Building_Custom_ConfigurationSets.md)** - How to create custom configurations including Environments
+- **[Building Custom Configuration Sets](src\psTerminalPerCounter\docs/en-US/Building_Custom_ConfigurationSets.md)** - How to create custom configurations including Environments
 - **[DevelopmentStatus](DevelopmentStatus.md)** - Whats next?
 
 ## Installation
@@ -126,7 +126,7 @@ Start-tpcEnvironmentMonitor -ConfigPath "src\psTerminalPerCounter\psTerminalPerf
 Start-tpcEnvironmentMonitor -ConfigPath "C:\Configs\MyEnvironment.json" -UpdateInterval 5
 ```
 
-**Credential Management:** Environment configurations support integration with PowerShell SecretStore for secure credential management. Use the `secretvaultname` and `credentialname` fields in your environment JSON to specify stored credentials for remote server access. See the [Building Custom Configuration Sets Guide](docs/en-US/Building_Custom_ConfigurationSets.md) for details.
+**Credential Management:** Environment configurations support integration with PowerShell SecretStore for secure credential management. Use the `secretvaultname` and `credentialname` fields in your environment JSON to specify stored credentials for remote server access. See the [Building Custom Configuration Sets Guide](src\psTerminalPerCounter\docs/en-US/Building_Custom_ConfigurationSets.md) for details.
 
 ## Available Commands
 
@@ -154,7 +154,7 @@ Each template includes:
 
 ## Creating Custom Configurations
 
-For detailed information on creating custom JSON configuration files, see the [Building Custom Configuration Sets Guide](docs/en-US/Building_Custom_ConfigurationSets.md). The guide covers:
+For detailed information on creating custom JSON configuration files, see the [Building Custom Configuration Sets Guide](src\psTerminalPerCounter\docs/en-US/Building_Custom_ConfigurationSets.md). The guide covers:
 
 - Configuration file structure and naming conventions
 - Finding counter IDs with `Get-tpcPerformanceCounterInfo`
