@@ -15,20 +15,19 @@ Starts real-time performance counter monitoring for local or remote systems usin
 ### SingleRemoteServer
 ```
 Start-tpcMonitor -ConfigName <String> -ComputerName <String> [-Credential <PSCredential>]
- [-UpdateInterval <Int32>] [-MaxHistoryPoints <Int32>] [-ProgressAction <ActionPreference>]
- [<CommonParameters>]
+ [-UpdateInterval <Int32>] [-ProgressAction <ActionPreference>] [<CommonParameters>]
 ```
 
 ### ConfigName
 ```
-Start-tpcMonitor -ConfigName <String> [-UpdateInterval <Int32>] [-MaxHistoryPoints <Int32>]
- [-ProgressAction <ActionPreference>] [<CommonParameters>]
+Start-tpcMonitor -ConfigName <String> [-UpdateInterval <Int32>] [-ProgressAction <ActionPreference>]
+ [<CommonParameters>]
 ```
 
 ### ConfigPath
 ```
-Start-tpcMonitor -ConfigPath <String> [-UpdateInterval <Int32>] [-MaxHistoryPoints <Int32>]
- [-ProgressAction <ActionPreference>] [<CommonParameters>]
+Start-tpcMonitor -ConfigPath <String> [-UpdateInterval <Int32>] [-ProgressAction <ActionPreference>]
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -170,25 +169,6 @@ Aliases:
 Required: False
 Position: Named
 Default value: 1
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -MaxHistoryPoints [DEPRECATED -- TO JSON 2DO]
-Maximum number of historical data points to retain in memory for each counter.
-This is the complete historical data used for statistics and future export.
-Independent of graph display width.
-Time span covered by graph display = Samples × UpdateInterval seconds.
-Default: 100 historical data points
-
-```yaml
-Type: Int32
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: 100
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
