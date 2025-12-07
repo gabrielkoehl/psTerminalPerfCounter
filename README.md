@@ -24,7 +24,7 @@ With version 0.3.0, the module now supports full remote monitoring for multiple 
 
 ### Simultaneous monitoring of performance counter sets across multiple servers with a single config
 
--- PICTURE --
+The Environment Monitor feature allows you to monitor multiple servers simultaneously using a single JSON configuration file. Each server can have different counter configurations, and all data is collected in parallel for maximum performance.
 
 ### Language-Independent Counter IDs
 
@@ -104,6 +104,18 @@ Start-tpcMonitor -ConfigName "Memory" -UpdateInterval 2
 # Monitor disk I/O with extended data retention
 Start-tpcMonitor -ConfigName "Disk" -UpdateInterval 1 -MaxDataPoints 150
 ```
+
+### Environment Monitoring (Multiple Servers)
+
+```powershell
+# Monitor multiple servers simultaneously using an environment configuration
+Start-tpcEnvironmentMonitor -ConfigPath "src\psTerminalPerCounter\psTerminalPerfCounter\Config\ENV_SERVER_EXAMPLE.json"
+
+# Monitor with custom update interval
+Start-tpcEnvironmentMonitor -ConfigPath "C:\Configs\MyEnvironment.json" -UpdateInterval 5
+```
+
+**Credential Management:** Environment configurations support integration with PowerShell SecretStore for secure credential management. Use the `secretvaultname` and `credentialname` fields in your environment JSON to specify stored credentials for remote server access. See the [Building Custom Configuration Sets Guide](docs/en-US/Building_Custom_ConfigurationSets.md) for details.
 
 ## Available Commands
 

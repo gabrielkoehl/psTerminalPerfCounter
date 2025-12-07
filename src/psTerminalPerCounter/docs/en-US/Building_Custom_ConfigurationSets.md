@@ -353,6 +353,8 @@ Environment files are JSON files that define a collection of servers and the cou
     "name": "Production SQL Environment",
     "description": "Crucial SQL Server Instances",
     "interval": 2,
+    "secretvaultname": "SecretStore",
+    "credentialname": "integrated",
     "servers": [
         {
             "computername": "SQL-PROD-01",
@@ -373,14 +375,18 @@ Environment files are JSON files that define a collection of servers and the cou
 }
 ```
 
+**Note:** The `secretvaultname` and `credentialname` fields are optional and enable integration with PowerShell SecretStore for secure credential management. If omitted, the module will use the current user's credentials for remote connections.
+
 ### Environment Properties
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `name` | string | Name of the environment environment settings |
-| `description` | string | Brief description of the environment |
-| `interval` | integer | Default update interval in seconds (can be overridden at runtime) |
-| `servers` | array | List of server objects to monitor |
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `name` | string | Yes | Name of the environment environment settings |
+| `description` | string | Yes | Brief description of the environment |
+| `interval` | integer | Yes | Default update interval in seconds (can be overridden at runtime) |
+| `secretvaultname` | string | No | Name of the PowerShell SecretStore vault to use for credential retrieval (optional) |
+| `credentialname` | string | No | Name of the credential stored in the SecretStore vault (optional, e.g., "integrated" for integrated Windows authentication) |
+| `servers` | array | Yes | List of server objects to monitor |
 
 ### Server Object Properties
 
@@ -395,8 +401,72 @@ Environment files are JSON files that define a collection of servers and the cou
 Once you have created your environment JSON file (e.g., `MyEnv.json`), start the monitor:
 
 ```powershell
+# Using the included example configuration
+Start-tpcEnvironmentMonitor -ConfigPath "src\psTerminalPerCounter\psTerminalPerfCounter\Config\ENV_SERVER_EXAMPLE.json"
+
+# Using a custom environment configuration
 Start-tpcEnvironmentMonitor -ConfigPath "C:\Configs\MyEnv.json"
+
+# Override the interval from the JSON config
+Start-tpcEnvironmentMonitor -ConfigPath "C:\Configs\MyEnv.json" -UpdateInterval 5
 ```
+
+### Example Environment Configuration (ENV_SERVER_EXAMPLE.json)
+
+The module includes a complete example environment configuration at `src\psTerminalPerCounter\psTerminalPerfCounter\Config\ENV_SERVER_EXAMPLE.json`:
+
+```json
+[
+     {
+          "name": "SQL_ENVIRONMENT_001",
+          "description": "SQL Server Environment Production",
+          "interval": 2,
+          "secretvaultname": "SecretStore",
+          "credentialname": "integrated",
+          "servers": [
+               {
+                    "computername": "LAB-NODE2",
+                    "comment": "Sql Server Node B Production",
+                    "counterConfig": [
+                         "CPU",
+                         "DISK"
+                    ]
+               },
+               {
+                    "computername": "LAB-NODE1",
+                    "comment": "Sql Server Node A Production",
+                    "counterConfig": [
+                         "CPU",
+                         "DISK"
+                    ]
+               },
+               {
+                    "computername": "LAB-DC01",
+                    "comment": "Domain Controller",
+                    "counterConfig": [
+                         "CPU",
+                         "Memory"
+                    ]
+               },
+               {
+                    "computername": "LAB-NODE3",
+                    "comment": "Sql Server Single Node Dev",
+                    "counterConfig": [
+                         "CPU",
+                         "DISK",
+                         "Memory"
+                    ]
+               }
+          ]
+     }
+]
+```
+
+This example demonstrates:
+- Multiple servers with different counter configurations
+- SecretStore integration for credential management
+- Mixed counter configurations per server (CPU, DISK, Memory)
+- Descriptive comments for each server
 
 ## JSON Schema Validation
 

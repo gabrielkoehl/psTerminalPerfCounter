@@ -1,55 +1,58 @@
 function Test-tpcServerConfiguration {
     <#
     .SYNOPSIS
-        Testet die ServerConfiguration-Klasse mit paralleler Counter-Abfrage
+        Tests the ServerConfiguration class with parallel counter queries
 
     .DESCRIPTION
-        Diese Funktion ist zum Testen der neuen async ServerConfiguration-Funktionalität gedacht.
-        Sie erstellt eine ServerConfiguration-Instanz mit mehreren Countern und testet die
-        parallele Abfrage über GetValuesParallelAsync().
+        This function is designed to test the new async ServerConfiguration functionality.
+        It creates a ServerConfiguration instance with multiple counters and tests the
+        parallel query via GetValuesParallelAsync().
 
-        Zeigt:
-        - Server-Verfügbarkeit
-        - Parallele Counter-Abfrage
-        - Timestamp und Dauer
-        - Counter-Werte und Statistiken
+        Displays:
+        - Server availability
+        - Parallel counter queries
+        - Timestamp and duration
+        - Counter values and statistics
 
     .PARAMETER ComputerName
-        Name des zu testenden Servers
+        Name of the server to test
         Default: Localhost
 
     .PARAMETER ConfigName
-        Name der Counter-Konfiguration (ohne 'tpc_' und '.json')
+        Name of the counter configuration (without 'tpc_' and '.json')
         Default: 'CPU'
 
     .PARAMETER Credential
-        Credentials für Remote-Zugriff
+        Credentials for remote access
         Optional
 
     .PARAMETER Iterations
-        Anzahl der Test-Durchläufe
+        Number of test iterations
         Default: 3
+
+    .PARAMETER ProgressAction
+        Common parameter to control the display of progress bars. (PowerShell 7.4+)
 
     .EXAMPLE
         Test-tpcServerConfiguration
 
-        Testet den lokalen Server mit CPU-Countern
+        Tests the local server with CPU counters
 
     .EXAMPLE
         Test-tpcServerConfiguration -ComputerName "DEV-DC" -ConfigName "CPU" -Iterations 5
 
-        Testet den Remote-Server DEV-DC mit 5 Durchläufen
+        Tests the remote server DEV-DC with 5 iterations
 
     .EXAMPLE
         Test-tpcServerConfiguration -ComputerName "DEV-NODE3" -Credential $cred
 
-        Testet Remote-Server mit expliziten Credentials
+        Tests remote server with explicit credentials
 
     .OUTPUTS
-        Zeigt detaillierte Test-Ausgabe in der Konsole
+        Displays detailed test output in the console
 
     .NOTES
-        Entwicklungs-/Test-Funktion für die ServerConfiguration-Klasse
+        Development/test function for the ServerConfiguration class
     #>
 
     [CmdletBinding()]

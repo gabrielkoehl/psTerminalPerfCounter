@@ -18,6 +18,9 @@ function Add-tpcConfigPath {
     .PARAMETER Force
         If specified, creates the path without prompting if it doesn't exist.
 
+    .PARAMETER ProgressAction
+        Common parameter to control the display of progress bars. (PowerShell 7.4+)
+
     .EXAMPLE
         Add-tpcConfigPath -Path "C:\MyConfigs"
 

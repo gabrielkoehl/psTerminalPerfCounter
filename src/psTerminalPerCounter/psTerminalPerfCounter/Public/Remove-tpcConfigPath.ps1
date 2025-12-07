@@ -18,6 +18,9 @@ function Remove-tpcConfigPath {
         If specified, removes all custom paths from the TPC_CONFIGPATH environment variable without prompting.
         The module's default config directory is not affected.
 
+    .PARAMETER ProgressAction
+        Common parameter to control the display of progress bars. (PowerShell 7.4+)
+
     .EXAMPLE
         Remove-tpcConfigPath
 

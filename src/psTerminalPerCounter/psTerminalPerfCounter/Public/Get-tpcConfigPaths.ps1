@@ -17,6 +17,9 @@ function Get-tpcConfigPaths {
         If specified, excludes the module's default config directory from the returned paths.
         Only custom paths from the TPC_CONFIGPATH environment variable will be returned.
 
+    .PARAMETER ProgressAction
+        Common parameter to control the display of progress bars. (PowerShell 7.4+)
+
     .EXAMPLE
         Get-tpcConfigPaths
 

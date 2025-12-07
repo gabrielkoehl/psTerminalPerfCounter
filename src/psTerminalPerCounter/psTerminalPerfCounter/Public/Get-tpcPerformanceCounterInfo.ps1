@@ -21,6 +21,9 @@ function Get-tpcPerformanceCounterInfo {
           - Composite ID in format "SetID-PathID" (e.g., "238-6") for validation and resolution
           - Localized counter name or path pattern for ID discovery (supports wildcards)
 
+     .PARAMETER ProgressAction
+          Common parameter to control the display of progress bars. (PowerShell 7.4+)
+
      .EXAMPLE
           Get-tpcPerformanceCounterInfo -SearchTerm "238-6"
 

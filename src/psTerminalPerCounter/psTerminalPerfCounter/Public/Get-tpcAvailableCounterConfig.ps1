@@ -22,6 +22,9 @@
           If specified, tests each counter for availability on the current system.
           This validates that counters can actually be queried but may be slow with many counters.
 
+     .PARAMETER ProgressAction
+          Common parameter to control the display of progress bars. (PowerShell 7.4+)
+
      .EXAMPLE
           Get-tpcAvailableCounterConfig
 
