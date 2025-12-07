@@ -61,7 +61,7 @@ You can configure any combination of performance counters that your system provi
 
 ## Documentation
 
-- **[Start-tpcMonitor](src/psTerminalPerCounterdocs/en-US/Start-tpcMonitor.md)** - Main monitoring function for single servers
+- **[Start-tpcMonitor](src/psTerminalPerCounter/docs/en-US/Start-tpcMonitor.md)** - Main monitoring function for single servers
 - **[Start-tpcEnvironmentMonitor](src/psTerminalPerCounter/docs/en-US/Start-tpcEnvironmentMonitor.md)** - Main monitoring function for whoe environments
 - **[Get-tpcConfigPaths](src/psTerminalPerCounter/docs/en-US/Get-tpcConfigPaths.md)** - List configured pathes containing configurations
 - **[Add-tpcConfigPath](src/psTerminalPerCounter/docs/en-US/Add-tpcConfigPath.md)** - Adds custom path contianing configurations
