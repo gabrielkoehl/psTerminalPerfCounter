@@ -29,6 +29,15 @@
                          "CPU",
                          "Memory"
                     ]
+               },
+               {
+                    "computername": "LAB-NODE3",
+                    "comment": "Sql Server Single Node Dev",
+                    "counterConfig": [
+                         "CPU",
+                         "DISK",
+                         "Memory"
+                    ]
                }
           ]
      }

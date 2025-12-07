@@ -38,6 +38,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Known Issues
 
+* First pipe char in last 5 value table has ColorMap color instead of default
+
 * **Wrong datat point movement in table**
   * Datapoints moving in table from right to lefft ( last 5 )
 
