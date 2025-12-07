@@ -1,30 +1,41 @@
 # psTerminalPerfCounter
 
+<br>
+<div align="center">
+<a href="https://dbavonnebenan.de">
+<img src="src\psTerminalPerCounter\docs/en-US/src/logo.png" alt="Alt Text" style="width: 15%;">
+</a>
+</div>
 
 <br>
 <div align="center">
 
-<img src="docs/en-US/src/example_memory.png" alt="Alt Text" style="width: 50%;">
+<img src="src\psTerminalPerCounter\docs/en-US/src/example_memory.png" alt="Alt Text" style="width: 50%;">
 
 </div>
 <br>
+
+
+
 A PowerShell module for creating and using predefined performance counter configurations with real-time terminal-based visualization. This module addresses the challenge of efficiently monitoring system performance by providing ready-to-use presets tailored to specific requirements. It also currently supports remote server checks.
 
 With version 0.3.0, the module now supports full remote monitoring for multiple servers simultaneously using "Environment" configurations! It also introduces a new batched query engine for high performance.
 
 **Requirement:** PowerShell 7.4 or newer is required.
 
-<div align="center">
-<img src="docs/en-US/src/logo.png" alt="Alt Text" style="width: 20%;">
-<br>
-<a href="https://dbavonnebenan.de" style="font-size:1.2em;">-- dbavonnebenan.de --</a>
-</div>
-
 ## Key Features
 
 ### Simultaneous monitoring of performance counter sets across multiple servers with a single config
 
 The Environment Monitor feature allows you to monitor multiple servers simultaneously using a single JSON configuration file. Each server can have different counter configurations, and all data is collected in parallel for maximum performance.
+
+<br>
+<div align="center">
+
+<img src="src\psTerminalPerCounter\docs/en-US/src/example_environment.png" alt="Alt Text" style="width: 100%;">
+
+</div>
+<br>
 
 ### Language-Independent Counter IDs
 
@@ -140,15 +151,6 @@ Each template includes:
 - Display configuration (graphs, tables, colors)
 - Threshold-based color mapping
 - Statistical analysis settings
-
-## Example Output
-
-<br>
-<div align="center">
-<img src="docs/en-US/src/example_cpu.png" alt="Alt Text" style="width: 50%;">
-
-*Example of real-time CPU monitoring with graphical display*
-</div>
 
 ## Creating Custom Configurations
 
