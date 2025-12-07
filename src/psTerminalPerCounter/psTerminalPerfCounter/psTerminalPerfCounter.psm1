@@ -7,9 +7,6 @@ $script:DEFAULT_CONFIG_PATH             = Join-Path $PSScriptRoot -ChildPath "Co
 $script:JSON_SCHEMA_CONFIG_FILE         = Join-Path $script:DEFAULT_CONFIG_PATH -ChildPath "schema_config.json"
 $script:JSON_SCHEMA_ENVIRONMENT_FILE    = Join-Path $script:DEFAULT_CONFIG_PATH -ChildPath "schema_environment.json"
 
-# Load Libraries
-Add-Type -Path "$PSScriptRoot\Lib\psTPCCLASSES.dll"
-
 # Loading Logger (Singleton)
 $script:logger = [psTPCCLASSES.PowerShellLogger]::Instance
 

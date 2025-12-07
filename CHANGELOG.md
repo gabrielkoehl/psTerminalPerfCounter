@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 * **Ported all classes to C#**
   * I discovered significant limitations in PowerShell classes that were showstoppers. Consequently, I decided to take the difficult path and rewrote half of the codebase.
+  * Requires PowerShell 7.4 or newer
 
 * **Counter Translation ID <> NAME**
   * Removed DLL-based lookups to drastically improve remote startup speed and fixed ID resolution for multi-instance SQL counters.
@@ -35,7 +36,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Code Quality
 
-### Known Issued
+### Known Issues
+
+* **Wrong datat point movement in table**
+  * Datapoints moving in table from right to lefft ( last 5 )
 
 * **Bitdefender False-Positive**
   * PowerShell tried to load a malicious resource detected as CMD:Heur.BZC.ZFV.Boxter.602.098EEC9F and was blocked.

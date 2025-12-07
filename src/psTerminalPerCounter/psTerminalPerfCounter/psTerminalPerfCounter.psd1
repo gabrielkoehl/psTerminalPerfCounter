@@ -4,10 +4,10 @@
 RootModule = 'psTerminalPerfCounter.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.2.0'
+ModuleVersion = '0.3.0'
 
 # Supported PSEditions
-# CompatiblePSEditions = @()
+CompatiblePSEditions = @('Core')
 
 # ID used to uniquely identify this module
 GUID = '25ce61b2-11d0-420c-bc9f-7a95ae56a316'
@@ -25,7 +25,7 @@ Copyright = '(c) Gabriel Köhl. All rights reserved.'
 Description = 'A PowerShell module for displaying real-time graphs of Windows Performance Counters directly in the terminal console. This module provides an easy way to visualize system performance metrics without requiring external graphing tools or GUI applications by using templates and multilanguage support.'
 
 # Minimum version of the PowerShell engine required by this module
-PowerShellVersion = '5.1'
+PowerShellVersion = '7.4'
 
 # Name of the PowerShell host required by this module
 # PowerShellHostName = ''
@@ -46,7 +46,7 @@ PowerShellVersion = '5.1'
 RequiredModules = @('GripDevJsonSchemaValidator')
 
 # Assemblies that must be loaded prior to importing this module
-# RequiredAssemblies = @()
+RequiredAssemblies = @('Lib\psTPCCLASSES.dll')
 
 # Script files (.ps1) that are run in the caller's environment prior to importing this module.
 # ScriptsToProcess = @()
