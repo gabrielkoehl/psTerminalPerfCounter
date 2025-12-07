@@ -1,6 +1,6 @@
 # psTerminalPerfCounter
 
-Initiated from my role as SQL Server consultant since I always want to use what's available, namely PowerShell
+
 <br>
 <div align="center">
 
@@ -10,9 +10,9 @@ Initiated from my role as SQL Server consultant since I always want to use what'
 <br>
 A PowerShell module for creating and using predefined performance counter configurations with real-time terminal-based visualization. This module addresses the challenge of efficiently monitoring system performance by providing ready-to-use presets tailored to specific requirements. It also currently supports remote server checks.
 
-From version 0.2.0 onward, there is already a lot of (commented out) code for monitoring multiple remote servers, but I introduced some hard‑to‑work‑around constraints due to my preference for classes, since classes cannot be streamed across sessions. Therefore, the 0.2.0 release focuses on completing bug fixes and QoL improvements.
+With version 0.3.0, the module now supports full remote monitoring for multiple servers simultaneously using "Environment" configurations! It also introduces a new batched query engine for high performance.
 
-
+**Requirement:** PowerShell 7.4 or newer is required.
 
 <div align="center">
 <img src="docs/en-US/src/logo.png" alt="Alt Text" style="width: 20%;">
@@ -22,13 +22,19 @@ From version 0.2.0 onward, there is already a lot of (commented out) code for mo
 
 ## Key Features
 
+### Simultaneous monitoring of performance counter sets across multiple servers with a single config
+
+-- PICTURE --
+
 ### Language-Independent Counter IDs
 
-This module uses performance counter IDs, which is very helpful if you administer various systems. This approach was inspired from [PowerShell.One](https://powershell.one/tricks/performance/performance-counters) and ensures configurations work consistently across different Windows locales.
+This module utilizes numerical Performance Counter IDs instead of localized names. By dynamically retrieving the counter mapping directly from the local Windows Registry, this approach ensures that configurations remain valid and consistent across different Windows locales and language versions.
 
 ### Integrated Graphical Engine ( As far as one can call it that )
 
-The module includes an updated graphical engine based on [PSConsoleGraph](https://github.com/PrateekKumarSingh/PSConsoleGraph). Some pull requests have been integrated and refined to provide stable terminal-based visualization capabilities.
+Initially, the graphical capabilities (powered by [PSConsoleGraph](https://github.com/PrateekKumarSingh/PSConsoleGraph)) were the driving force behind this module. While still beautiful and effective for individual servers, visualizing complex environments pushed the engine to its limits.
+
+As a result, I have shifted the focus towards robust Console Table outputs for daily administration of multiple systems. Looking ahead, I plan to leverage PSWriteHTML for generating visual reports.
 
 ### Configuration-Driven Monitoring
 
@@ -44,14 +50,15 @@ You can configure any combination of performance counters that your system provi
 
 ## Documentation
 
-- **[Start-tpcMonitor](docs/en-US/Start-tpcMonitor.md)** - Main monitoring function
+- **[Start-tpcMonitor](docs/en-US/Start-tpcMonitor.md)** - Main monitoring function for single servers
+- **[Start-tpcEnvironmentMonitor](docs/en-US/Start-tpcEnvironmentMonitor.md)** - Main monitoring function for whoe environments
 - **[Get-tpcConfigPaths](docs/en-US/Get-tpcConfigPaths.md)** - List configured pathes containing configurations
 - **[Add-tpcConfigPath](docs/en-US/Add-tpcConfigPath.md)** - Adds custom path contianing configurations
 - **[Remove-tpcConfigPath](docs/en-US/Remove-tpcConfigPath.md)** - Removes custom pathes
 - **[Get-tpcAvailableCounterConfig](docs/en-US/Get-tpcAvailableCounterConfig.md)** - shows all available confiogurations from all pathes
 - **[Get-tpcPerformanceCounterInfo](docs/en-US/Get-tpcPerformanceCounterInfo.md)** - shows detailed information about performance counters
 
-- **[Building Custom Configs](docs/en-US/Building_Custom_Configs.md)** - How to create custom configurations
+- **[Building Custom Configuration Sets](docs/en-US/Building_Custom_ConfigurationSets.md)** - How to create custom configurations including Environments
 - **[DevelopmentStatus](DevelopmentStatus.md)** - Whats next?
 
 ## Installation
@@ -85,10 +92,10 @@ Start-tpcMonitor -ConfigName "Cpu" -UpdateInterval 2
 
 ```powershell
 # Monitor memory performance
-Start-tpcMonitor -ConfigName "Memory" -MaxDataPoints 200
+Start-tpcMonitor -ConfigName "Memory"
 
 # Extended memory monitoring for leak investigation
-Start-tpcMonitor -ConfigName "Memory" -UpdateInterval 2 -MaxDataPoints 300
+Start-tpcMonitor -ConfigName "Memory" -UpdateInterval 2
 ```
 
 ### Disk Performance
@@ -96,17 +103,14 @@ Start-tpcMonitor -ConfigName "Memory" -UpdateInterval 2 -MaxDataPoints 300
 ```powershell
 # Monitor disk I/O with extended data retention
 Start-tpcMonitor -ConfigName "Disk" -UpdateInterval 1 -MaxDataPoints 150
-
-# Detailed disk monitoring for I/O bottlenecks
-Start-tpcMonitor -ConfigName "Disk" -UpdateInterval 1 -MaxDataPoints 200
 ```
-
 
 ## Available Commands
 
 | Command | Description |
 |---------|-------------|
 | `Start-tpcMonitor` | Main monitoring function with real-time display |
+| `Start-tpcEnvironmentMonitor` | Monitor multiple servers simultaneously (Environment) |
 | `Get-tpcAvailableCounterConfig` | List available configuration templates |
 | `Get-tpcPerformanceCounterInfo` | Get detailed information about performance counters |
 
@@ -136,7 +140,7 @@ Each template includes:
 
 ## Creating Custom Configurations
 
-For detailed information on creating custom JSON configuration files, see the [Building Custom Configs Guide](docs/en-US/Building_Custom_Configs.md). The guide covers:
+For detailed information on creating custom JSON configuration files, see the [Building Custom Configuration Sets Guide](docs/en-US/Building_Custom_ConfigurationSets.md). The guide covers:
 
 - Configuration file structure and naming conventions
 - Finding counter IDs with `Get-tpcPerformanceCounterInfo`

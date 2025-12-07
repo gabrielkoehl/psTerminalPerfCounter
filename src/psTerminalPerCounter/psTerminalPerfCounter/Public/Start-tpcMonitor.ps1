@@ -44,6 +44,9 @@
         Graph time span = Samples (from JSON config) × UpdateInterval seconds.
         Default: 1 second
 
+    .PARAMETER ProgressAction
+        Common parameter to control the display of progress bars. (PowerShell 7.4+)
+
     .EXAMPLE
         Start-tpcMonitor
 

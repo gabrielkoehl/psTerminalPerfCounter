@@ -39,6 +39,9 @@ function Start-tpcEnvironmentMonitor {
         Lower values provide more responsive monitoring but increase system load.
         Default: Uses interval from JSON configuration (or 2 seconds if not specified)
 
+    .PARAMETER ProgressAction
+        Common parameter to control the display of progress bars. (PowerShell 7.4+)
+
     .EXAMPLE
         Start-tpcEnvironmentMonitor -ConfigPath "_remoteconfigs\AD_SERVER_001.json"
 

@@ -1,10 +1,10 @@
-# Building Custom Configurations
+# Building Custom Configuration Sets
 
-This guide explains how to create custom JSON configuration files for monitoring performance counters with the psTerminalPerfCounter module.
+This guide explains how to create custom JSON configuration files for monitoring performance counters with the psTerminalPerfCounter module, including single-server counter configurations and multi-server environment sets.
 
 ## Overview
 
-Configuration files define which performance counters to monitor and how to display them. They use language-independent counter IDs to ensure compatibility across different Windows locales.
+Configuration files define which performance counters to monitor and how to display them. They use language-independent counter IDs to ensure compatibility across different Windows locales. With version 0.3.0, you can also define "Environment" configurations to monitor multiple servers simultaneously.
 
 ## Prerequisites
 
@@ -12,9 +12,10 @@ Configuration files define which performance counters to monitor and how to disp
 - Understanding of Windows Performance Counters
 - Access to `Get-tpcPerformanceCounterInfo` for discovering counter IDs
 
-## Configuration File Structure
+## Counter Configuration Files (Single Server)
 
-Configuration files must:
+Counter configuration files must:
+
 - Be named with the prefix `tpc_` (e.g., `tpc_CustomMonitor.json`)
 - Follow the JSON schema defined in `psTerminalPerfCounter\Config\schema_config.json`
 - Be placed in a configured configuration path (see `Get-tpcConfigPaths` and `Add-tpcConfigPath`)
@@ -90,6 +91,7 @@ The `colorMap` defines threshold-based coloring. Keys are numeric threshold valu
 **Important:** Thresholds are evaluated in descending order. The color is applied when the value is **greater than or equal** to the threshold.
 
 **Example for high-is-bad metrics (CPU usage):**
+
 ```json
 "colorMap": {
     "30": "Green",    // Values >= 30% are Green
@@ -99,6 +101,7 @@ The `colorMap` defines threshold-based coloring. Keys are numeric threshold valu
 ```
 
 **Example for low-is-bad metrics (Available Memory):**
+
 ```json
 "colorMap": {
     "500": "Red",      // Values >= 500 MB are Red (critical low)
@@ -125,6 +128,7 @@ The `colorMap` defines threshold-based coloring. Keys are numeric threshold valu
 Use the `Get-tpcPerformanceCounterInfo` function to discover counter IDs:
 
 ### Search by Counter Name
+
 ```powershell
 # Find processor-related counters
 Get-tpcPerformanceCounterInfo -SearchTerm "Processor"
@@ -137,12 +141,14 @@ Get-tpcPerformanceCounterInfo -SearchTerm "Memory"
 ```
 
 ### Validate a Counter ID
+
 ```powershell
 # Verify a specific counter ID
 Get-tpcPerformanceCounterInfo -SearchTerm "238-6"
 ```
 
 The output includes:
+
 - **ID**: Composite counter ID in format `"SetID-PathID"` (use this in `counterID`)
 - **SetType**: `SingleInstance` or `MultiInstance` (use this in `counterSetType`)
 - **Instances**: Available instances for MultiInstance counters (use in `counterInstance`)
@@ -156,6 +162,7 @@ Get-tpcPerformanceCounterInfo -SearchTerm "Processor Time"
 ```
 
 **Output:**
+
 ```
 ID      CounterSet   Path                    SetType        Instances
 --      ----------   ----                    -------        ---------
@@ -326,25 +333,93 @@ Start-tpcMonitor -ConfigName "MyCustomCPU"
 }
 ```
 
+## Environment Configuration (Multi-Server)
+
+The Environment Monitor (`Start-tpcEnvironmentMonitor`) allows you to monitor multiple servers and their specific counters simultaneously.
+
+### Environment File Structure
+
+Environment files are JSON files that define a collection of servers and the counter configurations to run on each.
+
+**Key Requirements:**
+
+- Can be placed anywhere, but it's good practice to keep them in a dedicated folder (e.g., `_remoteconfigs`).
+- Must adhere to the expected JSON structure.
+
+### Environment Template
+
+```json
+{
+    "name": "Production SQL Environment",
+    "description": "Crucial SQL Server Instances",
+    "interval": 2,
+    "servers": [
+        {
+            "computername": "SQL-PROD-01",
+            "comment": "Primary Node",
+            "counterConfig": ["CPU", "Memory"]
+        },
+        {
+            "computername": "SQL-PROD-02",
+            "comment": "Secondary Node",
+            "counterConfig": ["CPU"]
+        },
+        {
+            "computername": "APP-SRV-01",
+            "comment": "Application Server",
+            "counterConfig": ["Disk"]
+        }
+    ]
+}
+```
+
+### Environment Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `name` | string | Name of the environment environment settings |
+| `description` | string | Brief description of the environment |
+| `interval` | integer | Default update interval in seconds (can be overridden at runtime) |
+| `servers` | array | List of server objects to monitor |
+
+### Server Object Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `computername` | string | DNS name or IP of the target server |
+| `comment` | string | Friendly description (e.g., role of the server) |
+| `counterConfig` | array | List of **Counter Configuration Names** (e.g., "CPU", "Memory") to monitor on this server. These must match existing `tpc_*.json` configuration names. |
+
+### Running the Environment Monitor
+
+Once you have created your environment JSON file (e.g., `MyEnv.json`), start the monitor:
+
+```powershell
+Start-tpcEnvironmentMonitor -ConfigPath "C:\Configs\MyEnv.json"
+```
+
 ## JSON Schema Validation
 
 All configurations are validated against the schema located at:
+
 ```
 psTerminalPerfCounter\Config\schema_config.json
 ```
 
 **Important:** The schema file should not be modified as it ensures configuration compatibility with the module. The schema enforces:
+
 - Required properties
 - Data types
 - Minimum values
 - Allowed enumerations
 
 If validation fails, `Get-tpcAvailableCounterConfig` will show detailed error messages including:
+
 - Error description
 - JSON path to the problematic field
 - Line number in the configuration file
 
-## Configuration Paths
+## Configuration Paths - Management
 
 Configurations can be stored in multiple locations:
 
@@ -375,7 +450,7 @@ The module searches all configured paths for files matching the pattern `tpc_*.j
 4. **Conversion Factors**:
    - Use `1` for no conversion
    - Use `1024` for bytes to KB
-   - Use `1048576` (1024�) for bytes to MB
+   - Use `1048576` (1024) for bytes to MB
    - Adjust `conversionExponent` if needed (usually `1`)
 
 5. **Graph Configuration**:
@@ -396,22 +471,26 @@ The module searches all configured paths for files matching the pattern `tpc_*.j
 ## Troubleshooting
 
 ### Configuration Not Found
+
 - Ensure filename starts with `tpc_`
 - Verify file is in a configured path (`Get-tpcConfigPaths`)
 - Check that filename doesn't contain "template"
 
 ### JSON Validation Errors
+
 - Install `GripDevJsonSchemaValidator` module
 - Review error messages from `Get-tpcAvailableCounterConfig`
 - Compare with example configurations in `psTerminalPerfCounter\Config\`
 
 ### Counter Not Available
+
 - Verify counter ID with `Get-tpcPerformanceCounterInfo`
 - Check that counter exists on target system
 - Ensure correct `counterSetType` and `counterInstance`
 - Review `LastError` property from `Get-tpcAvailableCounterConfig -TestCounters`
 
 ### Display Issues
+
 - Increase `yAxisMaxRows` for better vertical resolution
 - Adjust `yAxisStep` to match value range
 - Increase `Samples` for longer history (may impact performance)
@@ -419,14 +498,16 @@ The module searches all configured paths for files matching the pattern `tpc_*.j
 ## Reference Configurations
 
 See the following configurations in `psTerminalPerfCounter\Config\` for complete examples:
+
 - `tpc_CPU.json` - CPU monitoring with MultiInstance counters
 - `tpc_Memory.json` - Memory monitoring with SingleInstance counters
 - `tpc_Disk.json` - Disk I/O with conversion factors and Line graphs
 
 ## Related Commands
 
+- **[Start-tpcEnvironmentMonitor](Start-tpcEnvironmentMonitor.md)** - Run multi-server environment monitors
+- **[Start-tpcMonitor](Start-tpcMonitor.md)** - Use configurations
 - **[Get-tpcPerformanceCounterInfo](Get-tpcPerformanceCounterInfo.md)** - Find counter IDs
 - **[Get-tpcAvailableCounterConfig](Get-tpcAvailableCounterConfig.md)** - Validate configurations
 - **[Get-tpcConfigPaths](Get-tpcConfigPaths.md)** - Manage configuration paths
 - **[Add-tpcConfigPath](Add-tpcConfigPath.md)** - Add custom paths
-- **[Start-tpcMonitor](Start-tpcMonitor.md)** - Use configurations
