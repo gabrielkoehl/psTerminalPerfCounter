@@ -4,6 +4,8 @@ This module is actively developed with the following features planned
 
 ### Planned Features
 
+- Get-tpcPerformanceCounterInfo --> Remote Option
+
 - 🔄 Continuous data export to file
   - 🔄 Excel export with ImportExcel module integration
   - 🔄 PSWriteHtml ( It has automatically refreshing pages, possibly for visualization or complex reports )
