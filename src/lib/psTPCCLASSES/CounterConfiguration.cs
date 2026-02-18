@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using System;
 using System.Threading;
+using Microsoft.PowerShell.MarkdownRender;
 
 namespace psTPCCLASSES;
 
@@ -22,6 +23,7 @@ public class CounterConfiguration
     public int MaxHistoryPoints { get; set; }
     public int ConversionFactor { get; set; }
     public int ConversionExponent { get; set; }
+    public char ConversionType { get; set; }
     public string Unit { get; set; }
     public Dictionary<string, object> GraphConfiguration { get; set; }
 
@@ -49,6 +51,7 @@ public class CounterConfiguration
         string unit,
         int conversionFactor,
         int conversionExponent,
+        char conversionType,
         PSObject colorMap,
         PSObject graphConfiguration,
         bool isRemote,
@@ -67,6 +70,7 @@ public class CounterConfiguration
         MaxHistoryPoints    = 100;
         ConversionFactor    = conversionFactor;
         ConversionExponent  = conversionExponent;
+        ConversionType      = conversionType;
         HistoricalData      = new List<DataPoint>();
         Statistics          = new Dictionary<string, object>();
         IsAvailable         = false;
@@ -164,9 +168,20 @@ public class CounterConfiguration
                             try
                             {
                                 var rawValue = Convert.ToDouble(cookedValueObj);
+                                double calculatedValue = 0;
 
                                 // factorize
-                                var calculatedValue = Math.Round(rawValue / Math.Pow(matchedCounter.ConversionFactor, matchedCounter.ConversionExponent), 2);
+
+                                if (matchedCounter.ConversionType == 'M')
+                                {
+                                    calculatedValue = Math.Round(rawValue * Math.Pow(matchedCounter.ConversionFactor, matchedCounter.ConversionExponent), 2);
+                                }
+                                else if (matchedCounter.ConversionType == 'D')
+                                {
+                                    calculatedValue = Math.Round(rawValue / Math.Pow(matchedCounter.ConversionFactor, matchedCounter.ConversionExponent), 2);
+                                }
+
+
 
                                 matchedCounter.AddDataPoint(calculatedValue);
                                 matchedCounter.ExecutionDuration = duration;

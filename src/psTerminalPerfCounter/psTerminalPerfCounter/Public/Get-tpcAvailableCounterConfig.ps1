@@ -179,11 +179,13 @@
                                    $CounterConfig.unit,
                                    $CounterConfig.conversionFactor,
                                    $CounterConfig.conversionExponent,
+                                   $CounterConfig.conversionType,
                                    $CounterConfig.colorMap,
                                    $CounterConfig.graphConfiguration,
                                    $false,
                                    "",
-                                   $NULL
+                                   $NULL,
+                                   $(get-CounterMap)
                               )
 
                               $IsAvailable = if ($TestCounters) { $Counter.TestAvailability() } else { $null }
