@@ -98,20 +98,23 @@
 
     [CmdletBinding()]
     param(
-        [Parameter(ParameterSetName = 'ConfigName',         Mandatory)]
-        [Parameter(ParameterSetName = 'SingleRemoteServer')]
+        [Parameter(ParameterSetName = 'ConfigName',    Mandatory)]
+        [Parameter(ParameterSetName = 'RemoteByName',  Mandatory)]
         [string]        $ConfigName,
 
-        [Parameter(ParameterSetName = 'ConfigPath',         Mandatory)]
-        [Parameter(ParameterSetName = 'SingleRemoteServer')]
+        [Parameter(ParameterSetName = 'ConfigPath',    Mandatory)]
+        [Parameter(ParameterSetName = 'RemoteByPath',  Mandatory)]
         [string]        $ConfigPath,
 
-        [Parameter(ParameterSetName = 'SingleRemoteServer', Mandatory)]
+        [Parameter(ParameterSetName = 'RemoteByName',  Mandatory)]
+        [Parameter(ParameterSetName = 'RemoteByPath',  Mandatory)]
         [string]        $ComputerName,
-        [Parameter(ParameterSetName = 'SingleRemoteServer')]
+
+        [Parameter(ParameterSetName = 'RemoteByName')]
+        [Parameter(ParameterSetName = 'RemoteByPath')]
         [pscredential]  $Credential = $null,
 
-        [int]           $UpdateInterval     = 1
+        [int]           $UpdateInterval = 1
     )
 
     BEGIN {
@@ -148,7 +151,7 @@
 
             }
 
-            if ( $PSCmdlet.ParameterSetName -eq 'SingleRemoteServer' ) {
+            if ( $PSCmdlet.ParameterSetName -in @('RemoteByName', 'RemoteByPath') ) {
 
                 $monitorType = 'remoteSingle'
 
@@ -162,14 +165,23 @@
 
                 if ( Test-Connection -ComputerName $ComputerName -Count 1 -Quiet ) {
 
-                    $Config = Get-CounterConfiguration -ConfigName $ConfigName -isRemote -computername $ComputerName -credential $credential -counterMap $(Get-CounterMap)
+                    if ( $PSCmdlet.ParameterSetName -eq 'RemoteByName' ) {
+
+                        $Config = Get-CounterConfiguration -ConfigName $ConfigName -isRemote -computername $ComputerName -credential $credential -counterMap $(Get-CounterMap)
+
+                    } elseif ( $PSCmdlet.ParameterSetName -eq 'RemoteByPath' ){
+
+                        $Config = Get-CounterConfiguration -ConfigPath $ConfigPath -isRemote -ComputerName $ComputerName -Credential $Credential -counterMap $(Get-CounterMap)
+
+                    }
 
                     $config.name = "$($Config.Name) @ REMOTE $($ComputerName)"
 
-
                 } else {
+
                     Write-Warning "Remote computer $computername not reachable. Aborting"
                     Return
+
                 }
             }
 
@@ -195,13 +207,9 @@
 
         } finally {
 
-            if ( $PSCmdlet.ParameterSetName -in @('ConfigName', 'ConfigPath') ) {
-
                 if ( $availabilityResult.Success -eq $true ) {
                     Show-SessionSummary -Counters $config.Counters
                 }
-
-            }
 
         }
 

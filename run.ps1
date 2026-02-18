@@ -5,7 +5,7 @@
 import-module -fullyqualifiedname ".\src\psTerminalPerfCounter\psTerminalPerfCounter\psTerminalPerfCounter.psd1" -force
 
 
-start-tpcmonitor -ComputerName lab-node2 -ConfigName CPU
+start-tpcmonitor -ComputerName lab-node1 -ConfigName CPU
 
 #start-tpcMonitor -ConfigName CPU
 

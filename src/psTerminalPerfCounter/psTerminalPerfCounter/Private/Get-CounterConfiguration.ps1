@@ -5,18 +5,24 @@ function Get-CounterConfiguration {
         [Parameter(Mandatory)]
         [System.Collections.Generic.Dictionary[int, string]] $counterMap,
 
-        [Parameter(ParameterSetName = 'ConfigName',   Mandatory)]
-        [Parameter(ParameterSetName = 'RemoteServer', Mandatory)]
+        [Parameter(ParameterSetName = 'ConfigName',    Mandatory)]
+        [Parameter(ParameterSetName = 'RemoteByName',  Mandatory)]
         [string]        $ConfigName,
 
-        [Parameter(ParameterSetName = 'ConfigPath',   Mandatory)]
+        [Parameter(ParameterSetName = 'ConfigPath',    Mandatory)]
+        [Parameter(ParameterSetName = 'RemoteByPath',  Mandatory)]
         [string]        $ConfigPath,
 
-        [Parameter(ParameterSetName = 'RemoteServer', Mandatory)]
+        [Parameter(ParameterSetName = 'RemoteByName',  Mandatory)]
+        [Parameter(ParameterSetName = 'RemoteByPath',  Mandatory)]
         [switch]        $isRemote,
-        [Parameter(ParameterSetName = 'RemoteServer')]
+
+        [Parameter(ParameterSetName = 'RemoteByName')]
+        [Parameter(ParameterSetName = 'RemoteByPath')]
         [string]        $computername = $env:COMPUTERNAME,
-        [Parameter(ParameterSetName = 'RemoteServer')]
+
+        [Parameter(ParameterSetName = 'RemoteByName')]
+        [Parameter(ParameterSetName = 'RemoteByPath')]
         [pscredential]  $credential = $null
     )
 
@@ -64,7 +70,7 @@ function Get-CounterConfiguration {
             }
 
 
-            if ( $PSCmdlet.ParameterSetName -eq 'ConfigPath' ) {
+            if ( $PSCmdlet.ParameterSetName -in @('ConfigPath', 'RemoteByPath') ) {
                 if ( [string]::IsNullOrWhiteSpace($ConfigPath) ) {
                     throw "ConfigPath parameter cannot be null or empty"
                 }
