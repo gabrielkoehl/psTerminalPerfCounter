@@ -2,7 +2,7 @@ dotnet build "src\lib\psTPCLIB.sln"
 
 Add-Type -Path "src\lib\psTPCCLASSES\bin\Debug\net9.0\psTPCCLASSES.dll"
 
-$json = Get-Content "src\psTerminalPerCounter\psTerminalPerfCounter\Config\tpc_CPU.json" -Raw | ConvertFrom-Json
+$json = Get-Content "src\psTerminalPerfCounter\psTerminalPerfCounter\Config\tpc_CPU.json" -Raw | ConvertFrom-Json
 
 # Erstelle ALLE Counter-Instanzen VORHER
 $instances = [System.Collections.Generic.List[psTPCCLASSES.CounterConfiguration]]::new()

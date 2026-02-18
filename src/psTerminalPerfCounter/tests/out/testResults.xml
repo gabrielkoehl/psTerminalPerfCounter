@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <test-results xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nunit_schema_2.5.xsd" name="Pester" total="124" errors="0" failures="25" not-run="0" inconclusive="0" ignored="0" skipped="2" invalid="0" date="2025-12-07" time="16:02:04">
-  <environment platform="Microsoft Windows 11 Pro|C:\WINDOWS|\Device\Harddisk0\Partition3" os-version="10.0.26200" clr-version="9.0.10" machine-name="DEV-MAIN" nunit-version="2.5.8.0" cwd="C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests" user="devadmin" user-domain="DEV" />
+  <environment platform="Microsoft Windows 11 Pro|C:\WINDOWS|\Device\Harddisk0\Partition3" os-version="10.0.26200" clr-version="9.0.10" machine-name="DEV-MAIN" nunit-version="2.5.8.0" cwd="C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests" user="devadmin" user-domain="DEV" />
   <culture-info current-culture="en-DE" current-uiculture="en-US" />
   <test-suite type="TestFixture" name="Pester" executed="True" result="Failure" success="False" time="3.1859" asserts="0" description="Pester">
     <results>
-      <test-suite type="TestFixture" name="C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1" executed="True" result="Failure" success="False" time="2.5497" asserts="0" description="C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1">
+      <test-suite type="TestFixture" name="C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1" executed="True" result="Failure" success="False" time="2.5497" asserts="0" description="C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1">
         <results>
           <test-suite type="TestFixture" name="Test help for Add-tpcConfigPath" executed="True" result="Failure" success="False" time="0.4434" asserts="0" description="Test help for Add-tpcConfigPath">
             <results>
@@ -27,22 +27,22 @@
                   <test-case description="Has description" name="Test help for Add-tpcConfigPath.Parameter ProgressAction.Has description" time="0.1208" asserts="0" success="False" result="Failure" executed="True">
                     <failure>
                       <message>Expected a value, but got $null or empty.</message>
-                      <stack-trace>at $parameterHelp.Description.Text | Should -Not -BeNullOrEmpty, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:95
-at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:95</stack-trace>
+                      <stack-trace>at $parameterHelp.Description.Text | Should -Not -BeNullOrEmpty, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:95
+at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:95</stack-trace>
                     </failure>
                   </test-case>
                   <test-case description="Has correct [mandatory] value" name="Test help for Add-tpcConfigPath.Parameter ProgressAction.Has correct [mandatory] value" time="0.0222" asserts="0" success="False" result="Failure" executed="True">
                     <failure>
                       <message>Expected 'False', but got $null.</message>
-                      <stack-trace>at $parameterHelp.Required | Should -Be $codeMandatory, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:101
-at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:101</stack-trace>
+                      <stack-trace>at $parameterHelp.Required | Should -Be $codeMandatory, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:101
+at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:101</stack-trace>
                     </failure>
                   </test-case>
                   <test-case description="Has correct parameter type" name="Test help for Add-tpcConfigPath.Parameter ProgressAction.Has correct parameter type" time="0.0136" asserts="0" success="False" result="Failure" executed="True">
                     <failure>
                       <message>Expected 'ActionPreference', but got $null.</message>
-                      <stack-trace>at $parameterHelpType | Should -Be $parameter.ParameterType.Name, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:106
-at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:106</stack-trace>
+                      <stack-trace>at $parameterHelpType | Should -Be $parameter.ParameterType.Name, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:106
+at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:106</stack-trace>
                     </failure>
                   </test-case>
                 </results>
@@ -60,22 +60,22 @@ at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPer
                   <test-case description="Has description" name="Test help for Get-tpcAvailableCounterConfig.Parameter ProgressAction.Has description" time="0.0229" asserts="0" success="False" result="Failure" executed="True">
                     <failure>
                       <message>Expected a value, but got $null or empty.</message>
-                      <stack-trace>at $parameterHelp.Description.Text | Should -Not -BeNullOrEmpty, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:95
-at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:95</stack-trace>
+                      <stack-trace>at $parameterHelp.Description.Text | Should -Not -BeNullOrEmpty, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:95
+at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:95</stack-trace>
                     </failure>
                   </test-case>
                   <test-case description="Has correct [mandatory] value" name="Test help for Get-tpcAvailableCounterConfig.Parameter ProgressAction.Has correct [mandatory] value" time="0.0213" asserts="0" success="False" result="Failure" executed="True">
                     <failure>
                       <message>Expected 'False', but got $null.</message>
-                      <stack-trace>at $parameterHelp.Required | Should -Be $codeMandatory, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:101
-at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:101</stack-trace>
+                      <stack-trace>at $parameterHelp.Required | Should -Be $codeMandatory, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:101
+at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:101</stack-trace>
                     </failure>
                   </test-case>
                   <test-case description="Has correct parameter type" name="Test help for Get-tpcAvailableCounterConfig.Parameter ProgressAction.Has correct parameter type" time="0.0287" asserts="0" success="False" result="Failure" executed="True">
                     <failure>
                       <message>Expected 'ActionPreference', but got $null.</message>
-                      <stack-trace>at $parameterHelpType | Should -Be $parameter.ParameterType.Name, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:106
-at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:106</stack-trace>
+                      <stack-trace>at $parameterHelpType | Should -Be $parameter.ParameterType.Name, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:106
+at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:106</stack-trace>
                     </failure>
                   </test-case>
                 </results>
@@ -114,22 +114,22 @@ at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPer
                   <test-case description="Has description" name="Test help for Get-tpcConfigPaths.Parameter ProgressAction.Has description" time="0.0358" asserts="0" success="False" result="Failure" executed="True">
                     <failure>
                       <message>Expected a value, but got $null or empty.</message>
-                      <stack-trace>at $parameterHelp.Description.Text | Should -Not -BeNullOrEmpty, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:95
-at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:95</stack-trace>
+                      <stack-trace>at $parameterHelp.Description.Text | Should -Not -BeNullOrEmpty, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:95
+at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:95</stack-trace>
                     </failure>
                   </test-case>
                   <test-case description="Has correct [mandatory] value" name="Test help for Get-tpcConfigPaths.Parameter ProgressAction.Has correct [mandatory] value" time="0.0144" asserts="0" success="False" result="Failure" executed="True">
                     <failure>
                       <message>Expected 'False', but got $null.</message>
-                      <stack-trace>at $parameterHelp.Required | Should -Be $codeMandatory, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:101
-at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:101</stack-trace>
+                      <stack-trace>at $parameterHelp.Required | Should -Be $codeMandatory, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:101
+at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:101</stack-trace>
                     </failure>
                   </test-case>
                   <test-case description="Has correct parameter type" name="Test help for Get-tpcConfigPaths.Parameter ProgressAction.Has correct parameter type" time="0.0357" asserts="0" success="False" result="Failure" executed="True">
                     <failure>
                       <message>Expected 'ActionPreference', but got $null.</message>
-                      <stack-trace>at $parameterHelpType | Should -Be $parameter.ParameterType.Name, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:106
-at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:106</stack-trace>
+                      <stack-trace>at $parameterHelpType | Should -Be $parameter.ParameterType.Name, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:106
+at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:106</stack-trace>
                     </failure>
                   </test-case>
                 </results>
@@ -147,22 +147,22 @@ at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPer
                   <test-case description="Has description" name="Test help for Get-tpcPerformanceCounterInfo.Parameter ProgressAction.Has description" time="0.0232" asserts="0" success="False" result="Failure" executed="True">
                     <failure>
                       <message>Expected a value, but got $null or empty.</message>
-                      <stack-trace>at $parameterHelp.Description.Text | Should -Not -BeNullOrEmpty, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:95
-at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:95</stack-trace>
+                      <stack-trace>at $parameterHelp.Description.Text | Should -Not -BeNullOrEmpty, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:95
+at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:95</stack-trace>
                     </failure>
                   </test-case>
                   <test-case description="Has correct [mandatory] value" name="Test help for Get-tpcPerformanceCounterInfo.Parameter ProgressAction.Has correct [mandatory] value" time="0.0159" asserts="0" success="False" result="Failure" executed="True">
                     <failure>
                       <message>Expected 'False', but got $null.</message>
-                      <stack-trace>at $parameterHelp.Required | Should -Be $codeMandatory, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:101
-at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:101</stack-trace>
+                      <stack-trace>at $parameterHelp.Required | Should -Be $codeMandatory, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:101
+at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:101</stack-trace>
                     </failure>
                   </test-case>
                   <test-case description="Has correct parameter type" name="Test help for Get-tpcPerformanceCounterInfo.Parameter ProgressAction.Has correct parameter type" time="0.0193" asserts="0" success="False" result="Failure" executed="True">
                     <failure>
                       <message>Expected 'ActionPreference', but got $null.</message>
-                      <stack-trace>at $parameterHelpType | Should -Be $parameter.ParameterType.Name, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:106
-at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:106</stack-trace>
+                      <stack-trace>at $parameterHelpType | Should -Be $parameter.ParameterType.Name, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:106
+at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:106</stack-trace>
                     </failure>
                   </test-case>
                 </results>
@@ -194,22 +194,22 @@ at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPer
                   <test-case description="Has description" name="Test help for Remove-tpcConfigPath.Parameter ProgressAction.Has description" time="0.0121" asserts="0" success="False" result="Failure" executed="True">
                     <failure>
                       <message>Expected a value, but got $null or empty.</message>
-                      <stack-trace>at $parameterHelp.Description.Text | Should -Not -BeNullOrEmpty, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:95
-at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:95</stack-trace>
+                      <stack-trace>at $parameterHelp.Description.Text | Should -Not -BeNullOrEmpty, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:95
+at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:95</stack-trace>
                     </failure>
                   </test-case>
                   <test-case description="Has correct [mandatory] value" name="Test help for Remove-tpcConfigPath.Parameter ProgressAction.Has correct [mandatory] value" time="0.0191" asserts="0" success="False" result="Failure" executed="True">
                     <failure>
                       <message>Expected 'False', but got $null.</message>
-                      <stack-trace>at $parameterHelp.Required | Should -Be $codeMandatory, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:101
-at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:101</stack-trace>
+                      <stack-trace>at $parameterHelp.Required | Should -Be $codeMandatory, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:101
+at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:101</stack-trace>
                     </failure>
                   </test-case>
                   <test-case description="Has correct parameter type" name="Test help for Remove-tpcConfigPath.Parameter ProgressAction.Has correct parameter type" time="0.0123" asserts="0" success="False" result="Failure" executed="True">
                     <failure>
                       <message>Expected 'ActionPreference', but got $null.</message>
-                      <stack-trace>at $parameterHelpType | Should -Be $parameter.ParameterType.Name, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:106
-at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:106</stack-trace>
+                      <stack-trace>at $parameterHelpType | Should -Be $parameter.ParameterType.Name, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:106
+at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:106</stack-trace>
                     </failure>
                   </test-case>
                 </results>
@@ -234,22 +234,22 @@ at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPer
                   <test-case description="Has description" name="Test help for Start-tpcEnvironmentMonitor.Parameter ProgressAction.Has description" time="0.028" asserts="0" success="False" result="Failure" executed="True">
                     <failure>
                       <message>Expected a value, but got $null or empty.</message>
-                      <stack-trace>at $parameterHelp.Description.Text | Should -Not -BeNullOrEmpty, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:95
-at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:95</stack-trace>
+                      <stack-trace>at $parameterHelp.Description.Text | Should -Not -BeNullOrEmpty, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:95
+at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:95</stack-trace>
                     </failure>
                   </test-case>
                   <test-case description="Has correct [mandatory] value" name="Test help for Start-tpcEnvironmentMonitor.Parameter ProgressAction.Has correct [mandatory] value" time="0.0215" asserts="0" success="False" result="Failure" executed="True">
                     <failure>
                       <message>Expected 'False', but got $null.</message>
-                      <stack-trace>at $parameterHelp.Required | Should -Be $codeMandatory, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:101
-at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:101</stack-trace>
+                      <stack-trace>at $parameterHelp.Required | Should -Be $codeMandatory, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:101
+at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:101</stack-trace>
                     </failure>
                   </test-case>
                   <test-case description="Has correct parameter type" name="Test help for Start-tpcEnvironmentMonitor.Parameter ProgressAction.Has correct parameter type" time="0.0195" asserts="0" success="False" result="Failure" executed="True">
                     <failure>
                       <message>Expected 'ActionPreference', but got $null.</message>
-                      <stack-trace>at $parameterHelpType | Should -Be $parameter.ParameterType.Name, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:106
-at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:106</stack-trace>
+                      <stack-trace>at $parameterHelpType | Should -Be $parameter.ParameterType.Name, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:106
+at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:106</stack-trace>
                     </failure>
                   </test-case>
                 </results>
@@ -302,22 +302,22 @@ at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPer
                   <test-case description="Has description" name="Test help for Start-tpcMonitor.Parameter ProgressAction.Has description" time="0.0182" asserts="0" success="False" result="Failure" executed="True">
                     <failure>
                       <message>Expected a value, but got $null or empty.</message>
-                      <stack-trace>at $parameterHelp.Description.Text | Should -Not -BeNullOrEmpty, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:95
-at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:95</stack-trace>
+                      <stack-trace>at $parameterHelp.Description.Text | Should -Not -BeNullOrEmpty, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:95
+at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:95</stack-trace>
                     </failure>
                   </test-case>
                   <test-case description="Has correct [mandatory] value" name="Test help for Start-tpcMonitor.Parameter ProgressAction.Has correct [mandatory] value" time="0.012" asserts="0" success="False" result="Failure" executed="True">
                     <failure>
                       <message>Expected 'False', but got $null.</message>
-                      <stack-trace>at $parameterHelp.Required | Should -Be $codeMandatory, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:101
-at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:101</stack-trace>
+                      <stack-trace>at $parameterHelp.Required | Should -Be $codeMandatory, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:101
+at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:101</stack-trace>
                     </failure>
                   </test-case>
                   <test-case description="Has correct parameter type" name="Test help for Start-tpcMonitor.Parameter ProgressAction.Has correct parameter type" time="0.017" asserts="0" success="False" result="Failure" executed="True">
                     <failure>
                       <message>Expected 'ActionPreference', but got $null.</message>
-                      <stack-trace>at $parameterHelpType | Should -Be $parameter.ParameterType.Name, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:106
-at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:106</stack-trace>
+                      <stack-trace>at $parameterHelpType | Should -Be $parameter.ParameterType.Name, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:106
+at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:106</stack-trace>
                     </failure>
                   </test-case>
                 </results>
@@ -370,22 +370,22 @@ at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPer
                   <test-case description="Has description" name="Test help for Test-tpcServerConfiguration.Parameter ProgressAction.Has description" time="0.031" asserts="0" success="False" result="Failure" executed="True">
                     <failure>
                       <message>Expected a value, but got $null or empty.</message>
-                      <stack-trace>at $parameterHelp.Description.Text | Should -Not -BeNullOrEmpty, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:95
-at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:95</stack-trace>
+                      <stack-trace>at $parameterHelp.Description.Text | Should -Not -BeNullOrEmpty, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:95
+at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:95</stack-trace>
                     </failure>
                   </test-case>
                   <test-case description="Has correct [mandatory] value" name="Test help for Test-tpcServerConfiguration.Parameter ProgressAction.Has correct [mandatory] value" time="0.0102" asserts="0" success="False" result="Failure" executed="True">
                     <failure>
                       <message>Expected 'False', but got $null.</message>
-                      <stack-trace>at $parameterHelp.Required | Should -Be $codeMandatory, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:101
-at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:101</stack-trace>
+                      <stack-trace>at $parameterHelp.Required | Should -Be $codeMandatory, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:101
+at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:101</stack-trace>
                     </failure>
                   </test-case>
                   <test-case description="Has correct parameter type" name="Test help for Test-tpcServerConfiguration.Parameter ProgressAction.Has correct parameter type" time="0.0192" asserts="0" success="False" result="Failure" executed="True">
                     <failure>
                       <message>Expected 'ActionPreference', but got $null.</message>
-                      <stack-trace>at $parameterHelpType | Should -Be $parameter.ParameterType.Name, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:106
-at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\help.tests.ps1:106</stack-trace>
+                      <stack-trace>at $parameterHelpType | Should -Be $parameter.ParameterType.Name, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:106
+at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:106</stack-trace>
                     </failure>
                   </test-case>
                 </results>
@@ -398,7 +398,7 @@ at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPer
           </test-suite>
         </results>
       </test-suite>
-      <test-suite type="TestFixture" name="C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\Manifest.tests.ps1" executed="True" result="Failure" success="False" time="0.3043" asserts="0" description="C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\Manifest.tests.ps1">
+      <test-suite type="TestFixture" name="C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\Manifest.tests.ps1" executed="True" result="Failure" success="False" time="0.3043" asserts="0" description="C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\Manifest.tests.ps1">
         <results>
           <test-suite type="TestFixture" name="Module manifest" executed="True" result="Failure" success="False" time="0.1133" asserts="0" description="Module manifest">
             <results>
@@ -416,8 +416,8 @@ at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPer
                   <test-case description="Changelog and manifest versions are the same" name="Module manifest.Validation.Changelog and manifest versions are the same" time="0.0217" asserts="0" success="False" result="Failure" executed="True">
                     <failure>
                       <message>Expected 0.3.0, but got 0.2.0.</message>
-                      <stack-trace>at $changelogVersion -as [Version] | Should -Be ( $manifestData.Version -as [Version] ), C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\Manifest.tests.ps1:67
-at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\Manifest.tests.ps1:67</stack-trace>
+                      <stack-trace>at $changelogVersion -as [Version] | Should -Be ( $manifestData.Version -as [Version] ), C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\Manifest.tests.ps1:67
+at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\Manifest.tests.ps1:67</stack-trace>
                     </failure>
                   </test-case>
                 </results>
@@ -432,7 +432,7 @@ at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPer
           </test-suite>
         </results>
       </test-suite>
-      <test-suite type="TestFixture" name="C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\Meta.tests.ps1" executed="True" result="Success" success="True" time="0.3319" asserts="0" description="C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerCounter\tests\Meta.tests.ps1">
+      <test-suite type="TestFixture" name="C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\Meta.tests.ps1" executed="True" result="Success" success="True" time="0.3319" asserts="0" description="C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\Meta.tests.ps1">
         <results>
           <test-suite type="TestFixture" name="Text files formatting" executed="True" result="Success" success="True" time="0.0457" asserts="0" description="Text files formatting">
             <results>

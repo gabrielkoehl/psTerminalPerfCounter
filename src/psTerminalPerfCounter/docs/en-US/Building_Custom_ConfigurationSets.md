@@ -402,7 +402,7 @@ Once you have created your environment JSON file (e.g., `MyEnv.json`), start the
 
 ```powershell
 # Using the included example configuration
-Start-tpcEnvironmentMonitor -ConfigPath "src\psTerminalPerCounter\psTerminalPerfCounter\Config\ENV_SERVER_EXAMPLE.json"
+Start-tpcEnvironmentMonitor -ConfigPath "src\psTerminalPerfCounter\psTerminalPerfCounter\Config\ENV_SERVER_EXAMPLE.json"
 
 # Using a custom environment configuration
 Start-tpcEnvironmentMonitor -ConfigPath "C:\Configs\MyEnv.json"
@@ -413,7 +413,7 @@ Start-tpcEnvironmentMonitor -ConfigPath "C:\Configs\MyEnv.json" -UpdateInterval 
 
 ### Example Environment Configuration (ENV_SERVER_EXAMPLE.json)
 
-The module includes a complete example environment configuration at `src\psTerminalPerCounter\psTerminalPerfCounter\Config\ENV_SERVER_EXAMPLE.json`:
+The module includes a complete example environment configuration at `src\psTerminalPerfCounter\psTerminalPerfCounter\Config\ENV_SERVER_EXAMPLE.json`:
 
 ```json
 [
