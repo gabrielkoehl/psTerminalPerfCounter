@@ -18,11 +18,13 @@ foreach ($cfg in $json.counters) {
         $cfg.unit,
         $cfg.conversionFactor,
         $cfg.conversionExponent,
+        $cfg.conversionType,
         $cfg.colorMap,
         $cfg.graphConfiguration,
         $false,
         $env:COMPUTERNAME,
-        $null
+        $null,
+        $(Get-CounterMap)
     )
 
     $instances.Add($counter)

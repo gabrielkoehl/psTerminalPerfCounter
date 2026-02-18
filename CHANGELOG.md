@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+* CounterConfiguration (JSON)
+  * unit conversion now supports configurable scaling operations (multiply "M" / divide "D")
+
 ### Changed
 
 ### Deprecated
@@ -17,7 +20,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
-* start-tpcMonitor accepts -ConfigPath paramter now
+* start-tpcMonitor
+  * accepts -ConfigPath paramter now
+* Get-tpcAvailableCounterConfig
+  * missed changes for CounterClass Rebuild
 
 ### Security
 

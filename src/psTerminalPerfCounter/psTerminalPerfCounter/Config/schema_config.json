@@ -16,7 +16,7 @@
             "minItems": 1,
             "items": {
                 "type": "object",
-                "required": ["title", "unit", "conversionFactor", "conversionExponent", "type", "format", "counterID", "counterSetType", "counterInstance", "colorMap", "graphConfiguration"],
+                "required": ["title", "unit", "conversionFactor", "conversionExponent", "conversionType", "type", "format", "counterID", "counterSetType", "counterInstance", "colorMap", "graphConfiguration"],
                 "properties": {
                     "title": {
                         "type": "string"
@@ -31,6 +31,10 @@
                     "conversionExponent": {
                         "type": "integer",
                         "minimum": 1
+                    },
+                    "conversionType": {
+                        "type": "string",
+                        "enum": ["D", "M"]
                     },
                     "type": {
                         "type": "string",
