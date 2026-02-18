@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [-]
+
+### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+### Code Quality
+
+### Known Issues
+
+* First pipe char in last 5 value table has ColorMap color instead of default
+
+
 ## [0.3.0] 2025-12-07
 
 ### Added

@@ -99,10 +99,11 @@
     [CmdletBinding()]
     param(
         [Parameter(ParameterSetName = 'ConfigName',         Mandatory)]
-        [Parameter(ParameterSetName = 'SingleRemoteServer', Mandatory)]
+        [Parameter(ParameterSetName = 'SingleRemoteServer')]
         [string]        $ConfigName,
 
         [Parameter(ParameterSetName = 'ConfigPath',         Mandatory)]
+        [Parameter(ParameterSetName = 'SingleRemoteServer')]
         [string]        $ConfigPath,
 
         [Parameter(ParameterSetName = 'SingleRemoteServer', Mandatory)]
@@ -124,10 +125,7 @@
 
         try {
 
-
             if ( $PSCmdlet.ParameterSetName -eq 'ConfigPath' ) {
-
-                $monitorType = 'local'
 
                 if ( -not (Test-Path $ConfigPath) ) {
                     Write-Warning "Configuration file not found: $ConfigPath"
@@ -145,12 +143,12 @@
 
             } elseif ( $PSCmdlet.ParameterSetName -eq 'ConfigName' ) {
 
-                $monitorType = 'local'
-
                 Write-Host "Loading configuration '$ConfigName'..." -ForegroundColor Yellow
                 $Config = Get-CounterConfiguration -ConfigName $ConfigName  -counterMap $(Get-CounterMap)
 
-            } elseif ( $PSCmdlet.ParameterSetName -eq 'SingleRemoteServer' ) {
+            }
+
+            if ( $PSCmdlet.ParameterSetName -eq 'SingleRemoteServer' ) {
 
                 $monitorType = 'remoteSingle'
 
@@ -173,10 +171,8 @@
                     Write-Warning "Remote computer $computername not reachable. Aborting"
                     Return
                 }
-
-            } else {
-                throw "Invalid parameter set. Use ConfigName, ConfigPath, or RemoteServerConfig."
             }
+
 
             # Start monitoring
             $MonitoringParams = @{
