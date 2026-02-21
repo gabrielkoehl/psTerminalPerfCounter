@@ -3,7 +3,7 @@ import-module -fullyqualifiedname ".\src\psTerminalPerfCounter\psTerminalPerfCou
 
 #start-tpcmonitor -ComputerName lab-node1 -ConfigName CPU
 
-Start-tpcMonitor -ConfigName disk
+Start-tpcMonitor -ConfigName disk -ComputerName 'lab-node1'
 
 #start-tpcMonitor -ConfigName CPU
 

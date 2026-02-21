@@ -87,11 +87,9 @@ function Test-tpcServerConfiguration {
             # 1. Counter-Konfiguration laden
             Write-Host "[1/4] Loading counter configuration..." -ForegroundColor Yellow
 
-            $isRemote = $ComputerName -ne $env:COMPUTERNAME
-
             if ($isRemote) {
                 Write-Host "  Remote mode for $ComputerName" -ForegroundColor Gray
-                $counters = Get-CounterConfiguration -ConfigName $ConfigName -isRemote -computername $ComputerName -credential $Credential
+                $counters = Get-CounterConfiguration -ConfigName $ConfigName -computername $ComputerName -credential $Credential
             } else {
                 Write-Host "  Local mode" -ForegroundColor Gray
                 $counters = Get-CounterConfiguration -ConfigName $ConfigName

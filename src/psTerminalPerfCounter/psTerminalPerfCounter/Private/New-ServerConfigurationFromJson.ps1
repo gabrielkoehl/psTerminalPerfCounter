@@ -33,7 +33,7 @@
 
                         $serverCounterMap = Get-CounterMap @param
 
-                        $config = Get-CounterConfiguration -ConfigName $CounterConfig -isRemote -computername $ServerConfig.computername -credential $setCredential -counterMap $serverCounterMap
+                        $config = Get-CounterConfiguration -ConfigName $CounterConfig -computername $ServerConfig.computername -credential $setCredential -counterMap $serverCounterMap
 
                         if ( $config.SkipServer ) {
                             $skipServer = $true
