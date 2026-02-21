@@ -20,8 +20,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+*
 * start-tpcMonitor
-  * accepts -ConfigPath paramter now
+  * accepts -ConfigPath paramter now when remoting
 * Get-tpcAvailableCounterConfig
   * missed changes for CounterClass Rebuild
 
