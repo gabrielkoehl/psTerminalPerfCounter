@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 * CounterConfiguration (JSON)
   * unit conversion now supports configurable scaling operations (multiply "M" / divide "D")
+* Get-tpcPerformanceCounterInfo
+  * added remoting capability
 
 ### Changed
 
@@ -20,15 +22,23 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
-*
+* Get-PerformanceCounterLookup
+  * improved / fixed remoting (some functions were local, some remote,
+    would crash with different system languages)
+  * credential passing improved
 * start-tpcMonitor
   * accepts -ConfigPath paramter now when remoting
+  * improved / fixed remoting (some functions were local, some remote,
+    would crash with different system languages)
 * Get-tpcAvailableCounterConfig
   * missed changes for CounterClass Rebuild
+* several internal function calls, parameters, logic
 
 ### Security
 
 ### Code Quality
+
+* Refactoring, removing old code base
 
 ### Known Issues
 
