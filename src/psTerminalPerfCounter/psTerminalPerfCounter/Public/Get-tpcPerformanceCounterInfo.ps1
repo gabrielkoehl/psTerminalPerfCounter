@@ -1,229 +1,209 @@
 
-    function Get-tpcPerformanceCounterInfo {
-        <#
-        .SYNOPSIS
-            Evaluates and resolves language-independent performance counter IDs for creating custom configuration templates.
+function Get-tpcPerformanceCounterInfo {
+<#
+    .SYNOPSIS
+        Resolves performance counter IDs (SetID-PathID) from names or validates existing composite IDs.
 
-        .DESCRIPTION
-            This function serves as the primary tool for discovering and validating correct counter IDs used in JSON configuration templates.
-            It operates with a language-independent approach by using numeric IDs instead of localized counter names, ensuring
-            configurations work across different Windows language settings.
+    .DESCRIPTION
+        Discovers and validates language-independent composite counter IDs for JSON configuration templates.
+        Supports local and remote execution via Invoke-Command.
 
-            Two evaluation methods are supported:
-            - ID-based resolution: Validates and resolves composite ID format (SetID-PathID) to counter information
-            - Name-based discovery: Searches counter sets and paths to identify correct IDs for template configuration
+        Input modes:
+        - Composite ID ("238-6"): Resolves to localized counter names and metadata
+        - Name/pattern ("Processor"): Searches all counter sets and returns matching composite IDs
 
-            The function translates between localized counter names and universal numeric IDs. Results include the composite IDs
-            (format: "SetID-PathID") needed for the counterID field in JSON configuration files.
+    .PARAMETER SearchTerm
+        Composite ID (format "SetID-PathID") or localized counter name/pattern (wildcards supported).
 
-        .PARAMETER SearchTerm
-            The search term for counter ID evaluation. Can be either:
-            - Composite ID in format "SetID-PathID" (e.g., "238-6") for validation and resolution
-            - Localized counter name or path pattern for ID discovery (supports wildcards)
+    .PARAMETER ComputerName
+        Target remote machine. Triggers connectivity check and remote execution.
 
-        .PARAMETER Computername
-            Providie parameter for searching on remote machine
+    .PARAMETER Credential
+        Alternate credentials for remote execution.
 
-        .PARAMETER Credential
-            Using different credential from current login
+    .EXAMPLE
+        Get-tpcPerformanceCounterInfo -SearchTerm "238-6"
 
-        .PARAMETER ProgressAction
-            Common parameter to control the display of progress bars. (PowerShell 7.4+)
+    .EXAMPLE
+        Get-tpcPerformanceCounterInfo -SearchTerm "Processor"
 
-        .EXAMPLE
-            Get-tpcPerformanceCounterInfo -SearchTerm "238-6"
+    .EXAMPLE
+        Get-tpcPerformanceCounterInfo -SearchTerm "Processor" -ComputerName 'lab-node1'
 
-            Validates and resolves the composite ID "238-6" to verify counter availability and display localized names.
-            Shows the counter set, path, type, and available instances.
+    .OUTPUTS
+        PSCustomObject: ID, CounterSet, Path, SetType, Instances
+    #>
 
-        .EXAMPLE
-            Get-tpcPerformanceCounterInfo -SearchTerm "Processor"
 
-            Discovers all processor-related counters and their corresponding composite IDs.
-            Use these IDs in the counterID field of JSON configuration files.
+[CmdletBinding()]
+param(
+    [Parameter(ParameterSetName = 'Remote',  Mandatory)]
+    [string]        $ComputerName,
 
-        .EXAMPLE
-            Get-tpcPerformanceCounterInfo -SearchTerm "Processor" -Computername 'lab-node1'
+    [Parameter(ParameterSetName = 'Remote')]
+    [pscredential]  $Credential = $null,
 
-            Finds the specific counter path and returns its composite ID for use in configuration templates from remote machine
+    [Parameter(Mandatory)]
+    [string] $SearchTerm
+)
 
-        .OUTPUTS
-            Formatted table displaying counter information for template configuration:
-            - ID: Composite counter ID (SetID-PathID) for use in JSON config counterID field, or "N/A" if not resolvable
-            - CounterSet: Localized performance counter set name
-            - Path: Full localized counter path
-            - SetType: SingleInstance or MultiInstance (determines counterSetType in JSON config)
-            - Instances: Available counter instances for multi-instance counters (use in counterInstance field)
+BEGIN {
 
-        .NOTES
-            Primary function for creating custom JSON configuration templates in the psTerminalPerfCounter module.
-            Language-independent approach ensures templates work across different Windows system locales.
-            Composite IDs returned by this function are used directly in the counterID field of JSON configuration files.
-        #>
+    $Result = @()
+    $param  = @{}
 
-    [CmdletBinding()]
-    param(
-        [Parameter(ParameterSetName = 'Remote',  Mandatory)]
-        [string]        $ComputerName,
+    if ( $PSCmdlet.ParameterSetName -eq 'Remote' ) {
 
-        [Parameter(ParameterSetName = 'Remote')]
-        [pscredential]  $Credential = $null,
+        $param.Computername = $computername
 
-        [Parameter(Mandatory)]
-        [string] $SearchTerm
-    )
-
-    BEGIN {
-
-        $Result = @()
-        $param  = @{}
-
-        if ( $PSCmdlet.ParameterSetName -eq 'Remote' ) {
-
-            $param.Computername = $computername
-
-            if ( $null -ne $Credential ) {
-
-                $param.Credential = $Credential
-
-            }
+        if ( $null -ne $Credential ) {
+            $param.Credential = $Credential
         }
-
     }
 
-    PROCESS {
+}
 
-        try {
+PROCESS {
 
-            # is ID
-            if ( $SearchTerm -match '^\d+-\d+$' ) {
+    try {
 
-                $IdParts  = $SearchTerm -split '-'
-                $SetId    = [int]$IdParts[0]
-                $PathId   = [int]$IdParts[1]
+        if ( $PSCmdlet.ParameterSetName -eq 'Remote' -and -not $(Test-Connection -ComputerName $ComputerName -Count 1 -Quiet) ) {
+            THROW "Remote computer $computername not reachable. Aborting"
+        }
 
-                try {
-                    # Lookup IDs -> Names
-                    $SetName  = Get-PerformanceCounterLookup -ID $SetId  @param -ErrorAction SilentlyContinue
-                    $PathName = Get-PerformanceCounterLookup -ID $PathId @param -ErrorAction SilentlyContinue
+        # is ID
+        if ( $SearchTerm -match '^\d+-\d+$' ) {
 
-                    if ( $SetName -and $PathName ) {
+            $IdParts  = $SearchTerm -split '-'
+            $SetId    = [int]$IdParts[0]
+            $PathId   = [int]$IdParts[1]
 
-                        $ListSetObj = Get-Counter -ListSet $SetName -ErrorAction SilentlyContinue
-                        if (-not $ListSetObj) { throw "CounterSet '$SetName' found by ID but not accessible via Get-Counter." }
+            try {
 
-                        $SetType = $ListSetObj.CounterSetType.ToString()
+                # Lookup IDs -> Names
+                $SetName  = Get-PerformanceCounterLookup -ID $SetId  @param -ErrorAction SilentlyContinue
+                $PathName = Get-PerformanceCounterLookup -ID $PathId @param -ErrorAction SilentlyContinue
+
+                if ( $SetName -and $PathName ) {
+
+                    $scriptblock = { param([string]$arg1) Get-Counter -ListSet $arg1 -ErrorAction SilentlyContinue }
+                    $ListSetObj  = invoke-command -ScriptBlock $scriptblock @param -ArgumentList $setname
+
+                    if (-not $ListSetObj) { throw "CounterSet '$SetName' found by ID but not accessible via Get-Counter." }
+
+                    $SetType = $ListSetObj.CounterSetType.ToString()
+                    $counterInstancesValues = @("-")
+
+                    # Handle MultiInstance counters
+                    if ( $SetType -eq 'MultiInstance' ) {
+                        $counterInstances = $ListSetObj.PathsWithInstances
+                        # Regex to extract instance name between parenthesis
+                        $searchPattern = '\(([^)]+)\)\\'
+
+                        $counterInstancesValues = $counterInstances | ForEach-Object {
+                                if ( $_ -match $searchPattern ) { $matches[1] }
+                        } | Select-Object -Unique
+                    }
+
+                    $Result = [PSCustomObject]@{
+                        ID          = $SearchTerm
+                        CounterSet  = $SetName
+                        Path        = $PathName
+                        SetType     = $SetType
+                        Instances   = $($counterInstancesValues -join ', ')
+                    }
+
+                } else {
+                    Write-Host "Could not resolve ID '$SearchTerm' to counter names." -ForegroundColor Red
+                    if (-not $SetName)  { Write-Host "  Set ID $SetId not found" -ForegroundColor Yellow }
+                    if (-not $PathName) { Write-Host "  Path ID $PathId not found" -ForegroundColor Yellow }
+                }
+
+            } catch {
+                Write-Error "Error resolving ID '$SearchTerm': $($_.Exception.Message)"
+            }
+
+        # Input is a Name (Search Term)
+        } else {
+
+            # Retrieve ALL sets... takes time
+            $scriptblock    = { Get-Counter -ListSet * -ErrorAction SilentlyContinue }
+            $AllSets        = invoke-command -ScriptBlock $scriptblock @param
+
+            foreach ( $CounterSet in $AllSets ) {
+
+                $MatchingPaths = $CounterSet.Paths | Where-Object {
+                    ($_ -like "*$SearchTerm*") -or ($CounterSet.CounterSetName -like "*$SearchTerm*")
+                }
+
+                foreach ( $CounterPath in $MatchingPaths ) {
+
+                    try {
+                        # 1. Get SET ID
+                        $SetId = Get-PerformanceCounterLookup -Name $CounterSet.CounterSetName @param -ErrorAction SilentlyContinue
+
+                        # 2. Clean PATH NAME
+                        $RawName = ($CounterPath -split '\\')[-1]
+
+                        # Only remove '(*)' if strictly necessary (wildcard placeholder)
+                        $PathName = $RawName -replace '\(\*\)', ''
+
+                        # 3. Get PATH ID
+                        $PathId = Get-PerformanceCounterLookup -Name $PathName @param -ErrorAction SilentlyContinue | Select-Object -First 1
+
+                        # 4. Build Composite ID
+                        $CompositeId = if ( $SetId -and $PathId ) { "$SetId-$PathId" } else { "N/A" }
+
+                        # Gather Metadata
+                        $SetType = $CounterSet.CounterSetType.ToString()
                         $counterInstancesValues = @("-")
 
-                        # Handle MultiInstance counters
                         if ( $SetType -eq 'MultiInstance' ) {
-                            $counterInstances = $ListSetObj.PathsWithInstances
-                            # Regex to extract instance name between parenthesis
+
+                            $counterInstances = $CounterSet.PathsWithInstances
+                            # Regex: Matches content inside parenthesis before a backslash
                             $searchPattern = '\(([^)]+)\)\\'
 
                             $counterInstancesValues = $counterInstances | ForEach-Object {
-                                    if ( $_ -match $searchPattern ) { $matches[1] }
+                                if ( $_ -match $searchPattern ) { $matches[1] }
                             } | Select-Object -Unique
+
+                        } elseif ( $SetType -ne 'SingleInstance' ) {
+
+                            $SetType = "Unknown ($SetType)"
+
                         }
 
-                        $Result = [PSCustomObject]@{
-                            ID          = $SearchTerm
-                            CounterSet  = $SetName
-                            Path        = $PathName
+                        $Result += [PSCustomObject]@{
+                            ID          = $CompositeId
+                            CounterSet  = $CounterSet.CounterSetName
+                            Path        = $CounterPath
                             SetType     = $SetType
                             Instances   = $($counterInstancesValues -join ', ')
                         }
 
-                    } else {
-                        Write-Host "Could not resolve ID '$SearchTerm' to counter names." -ForegroundColor Red
-                        if (-not $SetName)  { Write-Host "  Set ID $SetId not found" -ForegroundColor Yellow }
-                        if (-not $PathName) { Write-Host "  Path ID $PathId not found" -ForegroundColor Yellow }
-                    }
-
-                } catch {
-                    Write-Error "Error resolving ID '$SearchTerm': $($_.Exception.Message)"
-                }
-
-            # Input is a Name (Search Term)
-            } else {
-
-                # Retrieve ALL sets... takes time
-                $AllSets = Get-Counter -ListSet *
-
-                foreach ( $CounterSet in $AllSets ) {
-
-                    # Performance Optimization: Only process this set if the Set Name OR one of its paths matches the search term.
-                  ##  if ( -not $CounterSet.Paths ) { continue } 2Do - REMOVE
-
-                    $MatchingPaths = $CounterSet.Paths | Where-Object {
-                        ($_ -like "*$SearchTerm*") -or ($CounterSet.CounterSetName -like "*$SearchTerm*")
-                    }
-
-                    foreach ($CounterPath in $MatchingPaths) {
-
-                        try {
-                            # 1. Get SET ID
-                            $SetId = Get-PerformanceCounterLookup -Name $CounterSet.CounterSetName -ErrorAction SilentlyContinue
-
-                            # 2. Clean PATH NAME
-                            $RawName = ($CounterPath -split '\\')[-1]
-
-                            # Only remove '(*)' if strictly necessary (wildcard placeholder)
-                            $PathName = $RawName -replace '\(\*\)', ''
-
-                            # 3. Get PATH ID
-                            $PathId = Get-PerformanceCounterLookup -Name $PathName -ErrorAction SilentlyContinue | Select-Object -First 1
-
-                            # 4. Build Composite ID
-                            $CompositeId = if ( $SetId -and $PathId ) { "$SetId-$PathId" } else { "N/A" }
-
-                            # Gather Metadata
-                            $SetType = $CounterSet.CounterSetType.ToString()
-                            $counterInstancesValues = @("-")
-
-                            if ( $SetType -eq 'MultiInstance' ) {
-                                $counterInstances = $CounterSet.PathsWithInstances
-                                # Regex: Matches content inside parenthesis before a backslash
-                                $searchPattern = '\(([^)]+)\)\\'
-
-                                $counterInstancesValues = $counterInstances | ForEach-Object {
-                                    if ( $_ -match $searchPattern ) { $matches[1] }
-                                } | Select-Object -Unique
-                            }
-                            elseif ( $SetType -ne 'SingleInstance' ) {
-                                $SetType = "Unknown ($SetType)"
-                            }
-
-                            $Result += [PSCustomObject]@{
-                                ID          = $CompositeId
-                                CounterSet  = $CounterSet.CounterSetName
-                                Path        = $CounterPath
-                                SetType     = $SetType
-                                Instances   = $($counterInstancesValues -join ', ')
-                            }
-
-                        } catch {
-                            # Warning instead of Error to avoid stopping the entire loop for one bad counter
-                            Write-Warning "Skipping path '$CounterPath': $($_.Exception.Message)"
-                        }
+                    } catch {
+                        # Warning instead of Error to avoid stopping the entire loop for one bad counter
+                        Write-Warning "Skipping path '$CounterPath': $($_.Exception.Message)"
                     }
                 }
             }
-
-            if ( $Result.Count -gt 0)  {
-                $Result | Sort-Object -Property CounterSet, Path | Format-Table -AutoSize -Wrap
-            } else {
-                Write-Host "No matching performance counters found for search term: $SearchTerm" -ForegroundColor Yellow
-            }
-
-        } catch {
-            Write-Error "Critical error in Get-tpcPerformanceCounterInfo: $($_.Exception.Message)"
         }
 
+        if ( $Result.Count -gt 0)  {
+            $Result | Sort-Object -Property CounterSet, Path | Format-Table -AutoSize -Wrap
+        } else {
+            Write-Host "No matching performance counters found for search term: $SearchTerm" -ForegroundColor Yellow
+        }
+
+    } catch {
+        Write-Error "Critical error in Get-tpcPerformanceCounterInfo: $($_.Exception.Message)"
     }
 
-    END {
+}
 
-    }
+END {
 
-    }
+}
+
+}
