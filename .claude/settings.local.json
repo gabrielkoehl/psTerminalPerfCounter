@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(test:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(git ls-tree:*)"
     ],
     "deny": [],
     "ask": []

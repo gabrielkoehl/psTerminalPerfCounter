@@ -5,32 +5,26 @@ function Get-CounterConfiguration {
         [Parameter(Mandatory)]
         [System.Collections.Generic.Dictionary[int, string]] $counterMap,
 
-        [Parameter(ParameterSetName = 'ConfigName',    Mandatory)]
-        [Parameter(ParameterSetName = 'RemoteByName',  Mandatory)]
+        [Parameter(ParameterSetName = 'ConfigName', Mandatory)]
         [string]        $ConfigName,
 
-        [Parameter(ParameterSetName = 'ConfigPath',    Mandatory)]
-        [Parameter(ParameterSetName = 'RemoteByPath',  Mandatory)]
+        [Parameter(ParameterSetName = 'ConfigPath', Mandatory)]
         [string]        $ConfigPath,
 
-        [Parameter(ParameterSetName = 'RemoteByName',  Mandatory)]
-        [Parameter(ParameterSetName = 'RemoteByPath',  Mandatory)]
-        [switch]        $isRemote,
+        [Parameter()]
+        [string]        $computername,
 
-        [Parameter(ParameterSetName = 'RemoteByName')]
-        [Parameter(ParameterSetName = 'RemoteByPath')]
-        [string]        $computername = $env:COMPUTERNAME,
-
-        [Parameter(ParameterSetName = 'RemoteByName')]
-        [Parameter(ParameterSetName = 'RemoteByPath')]
+        [Parameter()]
         [pscredential]  $credential = $null
     )
 
     begin {
 
+        $isRemote = $PSBoundParameters.ContainsKey('computername') -and $computername -ne $env:COMPUTERNAME
+
         $counterParam = @{
-            isRemote        = $isRemote.IsPresent
-            computername    = $computername
+            isRemote        = $isRemote
+            computername    = if ( $PSBoundParameters.ContainsKey('computername') ) { $computername } else { $env:COMPUTERNAME }
             credential      = $credential
             counterMap      = $counterMap
         }
@@ -41,9 +35,12 @@ function Get-CounterConfiguration {
 
         try {
 
-            if ( $isRemote.IsPresent -and $computername -ne $env:COMPUTERNAME ) {
+            if ( $isRemote ) {
+
                 try {
+
                     $testResult = Test-Connection -ComputerName $computername -Count 1 -Quiet -TimeoutSeconds 2 -ErrorAction Stop
+
                     if ( -not $testResult ) {
                         Write-Warning "Server '$computername' is not reachable. Skipping counter configuration."
                         return @{
@@ -53,7 +50,6 @@ function Get-CounterConfiguration {
                             ConfigPath  = ""
                             SkipServer  = $true
                         }
-
                     }
 
                 } catch {
@@ -70,7 +66,7 @@ function Get-CounterConfiguration {
             }
 
 
-            if ( $PSCmdlet.ParameterSetName -in @('ConfigPath', 'RemoteByPath') ) {
+            if ( $PSCmdlet.ParameterSetName -eq 'ConfigPath' ) {
                 if ( [string]::IsNullOrWhiteSpace($ConfigPath) ) {
                     throw "ConfigPath parameter cannot be null or empty"
                 }

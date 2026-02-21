@@ -8,7 +8,12 @@ function Get-PerformanceCounterLookup {
         [int] $Id,
 
         [Parameter(Mandatory = $false)]
-        [string] $ComputerName = $env:COMPUTERNAME
+        [string] $ComputerName = $env:COMPUTERNAME,
+
+        [Parameter(Mandatory = $false)]
+        [pscredential] $Credential = $null
+
+
     )
 
     # Global cache to prevent repeated registry reads
@@ -38,6 +43,10 @@ function Get-PerformanceCounterLookup {
 
             if (-not [string]::IsNullOrWhiteSpace($ComputerName) -and $ComputerName -ne $env:COMPUTERNAME) {
                 $conParam['ComputerName'] = $ComputerName
+
+                if ($Credential) {
+                    $conParam['Credential'] = $Credential
+                }
             }
 
             $rawCounterData = Invoke-Command @conParam
@@ -52,9 +61,8 @@ function Get-PerformanceCounterLookup {
                     $cName = $rawCounterData[$i+1]
 
                     if ($cName) {
-                        # Use lowercase key for case-insensitive lookup later if needed,
-                        # but keeping ID mapping clean.
-                        # Storing Trimmed name to be safe.
+                        # Use lowercase key for case-insensitive lookup later if needed, trimmed... safe
+                        # but keeping ID mapping clean
                         $tempMap[$cId] = $cName.Trim()
                     }
                 }
@@ -63,8 +71,10 @@ function Get-PerformanceCounterLookup {
             $script:tpcPerfCounterCache[$cacheKey] = $tempMap
 
         } catch {
+
             Write-Error "Error building cache on $ComputerName : $_"
             return $null
+
         }
     }
 

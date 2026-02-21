@@ -31,11 +31,11 @@ function Get-CounterMap {
         $isLocal = [string]::IsNullOrWhiteSpace($ComputerName) -or ($ComputerName -eq $env:COMPUTERNAME)
 
         if ($isLocal) {
-            Write-Verbose "Retrieving CounterMap locally..."
+            Write-Host "Retrieving CounterMap locally..." -ForegroundColor Yellow
             $rawCounterData = & $counterMapScript
         }
         else {
-            Write-Verbose "Retrieving CounterMap from remote computer: $ComputerName..."
+            Write-Host "Retrieving CounterMap from remote computer: $ComputerName..." -ForegroundColor Yellow
             $invokeParams['ComputerName'] = $ComputerName
 
             if ($Credential) {
