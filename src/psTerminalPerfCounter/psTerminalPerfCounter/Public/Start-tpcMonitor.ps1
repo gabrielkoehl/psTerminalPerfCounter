@@ -76,6 +76,12 @@
             if ( ($PSCmdlet.ParameterSetName -in @('RemoteByName', 'RemoteByPath') -and $ComputerName -eq $env:COMPUTERNAME) -or # in case local computername to avoid self remoting
                  ($PSCmdlet.ParameterSetName -in @('ConfigPath', 'ConfigName') ) ) {
 
+
+                if ($PSCmdlet.ParameterSetName -in @('RemoteByName', 'RemoteByPath')) {
+                    Write-Host "ComputerName '$ComputerName' matches local host. Falling back to local monitoring." -ForegroundColor Yellow
+                    Start-Sleep 1000
+                }
+
                 $configParams['counterMap'] = $(Get-CounterMap)
 
                 if ( $PSCmdlet.ParameterSetName -eq 'ConfigPath' ) {
