@@ -79,12 +79,12 @@
 
                 if ($PSCmdlet.ParameterSetName -in @('RemoteByName', 'RemoteByPath')) {
                     Write-Host "ComputerName '$ComputerName' matches local host. Falling back to local monitoring." -ForegroundColor Yellow
-                    Start-Sleep 1000
+                    Start-Sleep -Seconds 1
                 }
 
                 $configParams['counterMap'] = $(Get-CounterMap)
 
-                if ( $PSCmdlet.ParameterSetName -eq 'ConfigPath' ) {
+                if ( $PSCmdlet.ParameterSetName -in @('ConfigPath', 'RemoteByPath') ) {
 
                     if ( -not (Test-Path $ConfigPath) ) {
                         Write-Warning "Configuration file not found: $ConfigPath"
@@ -100,10 +100,7 @@
 
                     $configParams['ConfigPath'] = $ConfigPath
 
-
-                    #$Config = Get-CounterConfiguration -ConfigPath $ConfigPath -counterMap $(Get-CounterMap)
-
-                } elseif ( $PSCmdlet.ParameterSetName -eq 'ConfigName' ) {
+                } elseif ( $PSCmdlet.ParameterSetName -in @('ConfigName', 'RemoteByName') ) {
 
                     Write-Host "Loading configuration '$ConfigName'..." -ForegroundColor Yellow
 
