@@ -21,8 +21,7 @@
                     return "White"
                }
 
-               $numericValue = 0
-               if (![int]::TryParse($value, [ref]$numericValue)) {
+               if (![int]::TryParse($value, [ref]$null)) {
                     return "White"
                }
 
