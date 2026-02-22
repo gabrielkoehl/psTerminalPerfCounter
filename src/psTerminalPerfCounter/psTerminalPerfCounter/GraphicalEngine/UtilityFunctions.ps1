@@ -22,19 +22,3 @@ Function Write-Graph {
     Write-Host -Object $([char]9474)
 
 }
-
-Function Get-AdaptiveYAxisStep {
-    [CmdletBinding()]
-    [OutputType([int])]
-    param(
-        [hashtable] $GraphConfiguration = @{}
-    )
-
-    # If YAxisStep is explicitly configured in GraphConfiguration, use it
-    if ( $GraphConfiguration.ContainsKey('YAxisStep') -and $GraphConfiguration.YAxisStep -gt 0 ) {
-        return $GraphConfiguration.YAxisStep
-    } else {
-        return 1
-    }
-
-}

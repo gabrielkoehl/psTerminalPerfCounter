@@ -13,15 +13,12 @@ function Show-CounterGraph {
         return
     }
 
-    # Determine Y-axis step
-    $YAxisStep  = Get-AdaptiveYAxisStep -GraphConfiguration $Config
-
     # Show graph
     $GraphParams = @{
         Datapoints      = $GraphData
         GraphTitle      = $Counter.GetFormattedTitle()
         Type            = $Config.graphType
-        YAxisStep       = $YAxisStep
+        YAxisStep       = $Config.yAxisStep
         yAxisMaxRows    = $Config.yAxisMaxRows
     }
 
