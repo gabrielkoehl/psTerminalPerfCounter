@@ -14,7 +14,7 @@ function Show-CounterGraph {
     }
 
     # Determine Y-axis step
-    $YAxisStep  = Get-AdaptiveYAxisStep -CounterType $Counter.Type -GraphConfiguration $Config
+    $YAxisStep  = Get-AdaptiveYAxisStep -GraphConfiguration $Config
 
     # Show graph
     $GraphParams = @{

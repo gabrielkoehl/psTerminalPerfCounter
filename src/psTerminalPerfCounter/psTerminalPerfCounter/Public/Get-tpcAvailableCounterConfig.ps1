@@ -174,7 +174,6 @@
                                    $CounterConfig.counterSetType,
                                    $CounterConfig.counterInstance,
                                    $CounterConfig.title,
-                                   $CounterConfig.type,
                                    $CounterConfig.format,
                                    $CounterConfig.unit,
                                    $CounterConfig.conversionFactor,

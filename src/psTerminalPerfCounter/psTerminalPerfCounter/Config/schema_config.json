@@ -36,10 +36,6 @@
                         "type": "string",
                         "enum": ["D", "M"]
                     },
-                    "type": {
-                        "type": "string",
-                        "enum": ["Number", "Percentage"]
-                    },
                     "format": {
                         "type": "string",
                         "enum": ["both", "table", "graph"]

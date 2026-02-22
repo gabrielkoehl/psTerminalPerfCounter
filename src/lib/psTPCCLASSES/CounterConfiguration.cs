@@ -18,7 +18,6 @@ public class CounterConfiguration
     public string CounterInstance { get; set; }
     public string CounterPath { get; set; }
     public string Title { get; set; }
-    public string Type { get; set; }
     public string Format { get; set; }
     public int MaxHistoryPoints { get; set; }
     public int ConversionFactor { get; set; }
@@ -46,7 +45,6 @@ public class CounterConfiguration
         string counterSetType,
         string counterInstance,
         string title,
-        string type,
         string format,
         string unit,
         int conversionFactor,
@@ -64,7 +62,6 @@ public class CounterConfiguration
         CounterSetType      = counterSetType;
         CounterInstance     = counterInstance;
         Title               = title;
-        Type                = type;
         Format              = format;
         Unit                = unit;
         MaxHistoryPoints    = 100;
