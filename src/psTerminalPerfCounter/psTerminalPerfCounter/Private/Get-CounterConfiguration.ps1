@@ -76,22 +76,26 @@ function Get-CounterConfiguration {
                 if ( -not [string]::IsNullOrWhiteSpace($configContent) ) {
 
                     try {
-                        $jsonContent = $configContent | ConvertFrom-Json
+                        $jsonContent        = $configContent | ConvertFrom-Json
+                        $mergedJsonContent  = Merge-JsonConfigDefaultValues -CounterConfig $jsonContent
+
                     } catch {
                         Write-Warning "Failed to parse JSON from configuration file: $ConfigPath"
                         Return
                     }
 
                 } else {
+
                     Write-Warning "Configuration file is empty: $ConfigPath"
                     Return
+
                 }
 
-                $counters = New-CounterConfigurationFromJson @counterParam -JsonConfig $jsonContent
+                $counters = New-CounterConfigurationFromJson @counterParam -JsonConfig $mergedJsonContent
 
                 return @{
-                    Name        = $jsonContent.name
-                    Description = $jsonContent.description
+                    Name        = $mergedJsonContent.name
+                    Description = $mergedJsonContent.description
                     Counters    = $counters
                     ConfigPath  = Split-Path $ConfigPath -Parent
                     SkipServer  = $false
@@ -136,10 +140,15 @@ function Get-CounterConfiguration {
             if ( -not [string]::IsNullOrWhiteSpace($configContent) ) {
 
                 try {
-                    $jsonContent = $configContent | ConvertFrom-Json
+
+                    $jsonContent        = $configContent | ConvertFrom-Json
+                    $mergedJsonContent  = Merge-JsonConfigDefaultValues -CounterConfig $jsonContent
+
                 } catch {
+
                     Write-Warning "Failed to parse JSON from configuration file: $($selectedConfig.Path)"
                     Return
+
                 }
 
             } else {
@@ -147,11 +156,11 @@ function Get-CounterConfiguration {
                 Return
             }
 
-            $counters       = New-CounterConfigurationFromJson @counterParam -JsonConfig $jsonContent
+            $counters       = New-CounterConfigurationFromJson @counterParam -JsonConfig $mergedJsonContent
 
             return @{
-                Name        = $jsonContent.name
-                Description = $jsonContent.description
+                Name        = $mergedJsonContent.name
+                Description = $mergedJsonContent.description
                 Counters    = $counters
                 ConfigPath  = $selectedConfig.ConfigPath
                 SkipServer  = $false
