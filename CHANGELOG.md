@@ -32,6 +32,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
     would crash with different system languages)
 * Get-tpcAvailableCounterConfig
   * missed changes for CounterClass Rebuild
+* Show-CounterTable
+  * fixed bug with conversion int -> double when counter returns doubles -> skipped colormap
 * several internal function calls, parameters, logic
 
 ### Security
