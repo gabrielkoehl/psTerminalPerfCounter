@@ -17,11 +17,7 @@
           function Get-ValueColor {
                param($value, $colorMap)
 
-               if ([string]::IsNullOrEmpty($value) -or $value -eq "-") {
-                    return "White"
-               }
-
-               if (![int]::TryParse($value, [ref]$null)) {
+               if ([string]::IsNullOrEmpty($value) -or $value -eq "-" -or ![int]::TryParse($value, [ref]$null) ) {
                     return "White"
                }
 
