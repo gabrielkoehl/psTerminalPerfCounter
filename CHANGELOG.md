@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   * missed changes for CounterClass Rebuild
 * Show-CounterTable
   * fixed bug with conversion int -> double when counter returns doubles -> skipped colormap
+  * seperator current value not colored anymore
 * several internal function calls, parameters, logic
 
 ### Security
