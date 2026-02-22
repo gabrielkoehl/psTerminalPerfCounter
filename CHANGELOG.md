@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+* JSON Configs simplified. Optional style and customization parameters are outsourced to `default_template_values.json` and merged at runtime when missing. Only include mandatory and optional parameters you want to customize.
+
 ### Deprecated
 
 ### Removed
