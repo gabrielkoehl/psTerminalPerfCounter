@@ -38,7 +38,7 @@ function Get-CounterConfiguration {
                 if ( -not $testResult ) {
                     Write-Warning "Server '$computername' is not reachable. Skipping counter configuration."
                     return @{
-                        Name        = if ( $ConfigName ) { $ConfigName } else { "Unknown" }
+                        Name        = if ( $ConfigName ) { "$ConfigName @ Remote $computername" } else { "Unknown" }
                         Description = "Server unreachable"
                         Counters    = @()
                         ConfigPath  = ""
@@ -50,7 +50,7 @@ function Get-CounterConfiguration {
 
                 Write-Warning "Cannot reach server '$computername': $_. Skipping counter configuration."
                 return @{
-                    Name        = if ( $ConfigName ) { $ConfigName } else { "Unknown" }
+                    Name        = if ( $ConfigName ) { "$ConfigName @ Remote $computername" } else { "Unknown" }
                     Description = "Server unreachable"
                     Counters    = @()
                     ConfigPath  = ""
@@ -88,7 +88,7 @@ function Get-CounterConfiguration {
             $counters = New-CounterConfigurationFromJson @counterParam -JsonConfig $mergedJsonContent
 
             return @{
-                Name        = $mergedJsonContent.name
+                Name        = $( if ( $isRemote ) { "$($mergedJsonContent.name) @ Remote $computername" } else { $mergedJsonContent.name } )
                 Description = $mergedJsonContent.description
                 Counters    = $counters
                 ConfigPath  = Split-Path $ConfigPath -Parent
@@ -153,7 +153,7 @@ function Get-CounterConfiguration {
         $counters       = New-CounterConfigurationFromJson @counterParam -JsonConfig $mergedJsonContent
 
         return @{
-            Name        = $mergedJsonContent.name
+            Name        = $( if ( $isRemote ) { "$($mergedJsonContent.name) @ Remote $computername" } else { $mergedJsonContent.name } )
             Description = $mergedJsonContent.description
             Counters    = $counters
             ConfigPath  = $selectedConfig.ConfigPath
