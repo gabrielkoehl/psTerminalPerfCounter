@@ -34,20 +34,17 @@ function Get-tpcPerformanceCounterInfo {
         PSCustomObject: ID, CounterSet, Path, SetType, Instances
     #>
 
+    [CmdletBinding()]
+    param(
+        [Parameter(ParameterSetName = 'Remote',  Mandatory)]
+        [string]        $ComputerName,
 
-[CmdletBinding()]
-param(
-    [Parameter(ParameterSetName = 'Remote',  Mandatory)]
-    [string]        $ComputerName,
+        [Parameter(ParameterSetName = 'Remote')]
+        [pscredential]  $Credential = $null,
 
-    [Parameter(ParameterSetName = 'Remote')]
-    [pscredential]  $Credential = $null,
-
-    [Parameter(Mandatory)]
-    [string] $SearchTerm
-)
-
-BEGIN {
+        [Parameter(Mandatory)]
+        [string] $SearchTerm
+    )
 
     $Result = @()
     $param  = @{}
@@ -60,10 +57,6 @@ BEGIN {
             $param.Credential = $Credential
         }
     }
-
-}
-
-PROCESS {
 
     try {
 
@@ -199,11 +192,5 @@ PROCESS {
     } catch {
         Write-Error "Critical error in Get-tpcPerformanceCounterInfo: $($_.Exception.Message)"
     }
-
-}
-
-END {
-
-}
 
 }
