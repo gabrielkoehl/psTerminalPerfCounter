@@ -212,7 +212,7 @@
                     Write-Host -NoNewline ("{0}" -f $part.Value.PadRight($part.Width - 2)) -ForegroundColor $part.Color
                 }
 
-                 Write-Host -NoNewline " | "
+                Write-Host -NoNewline " | "
             }
 
             # Handle Last5 with individual colors
