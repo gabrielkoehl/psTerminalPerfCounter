@@ -33,7 +33,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 * Get-tpcAvailableCounterConfig
   * missed changes for CounterClass Rebuild
 * Show-CounterTable
-  * fixed bug with conversion int -> double when counter returns doubles -> skipped colormap
+  * fixed bug with conversion int -> double, when counter returns doubles -> skipped colormap
   * seperator current value not colored anymore
 * several internal function calls, parameters, logic
 
@@ -45,7 +45,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Known Issues
 
-* First pipe char in last 5 value table has ColorMap color instead of default
 
 
 ## [0.3.0] 2025-12-07
