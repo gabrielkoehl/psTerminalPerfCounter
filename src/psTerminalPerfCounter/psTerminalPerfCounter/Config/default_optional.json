@@ -1,0 +1,25 @@
+{
+    "counters": [
+        {
+            "conversionFactor": 1,
+            "conversionExponent": 1,
+            "conversionType": "D",
+            "format": "table",
+            "colorMap": {
+                "0": "White"
+            },
+            "graphConfiguration": {
+                "Samples": 70,
+                "graphType": "Bar",
+                "showStatistics": true,
+                "yAxisStep": 10,
+                "yAxisMaxRows": 10,
+                "colors": {
+                    "title": "Cyan",
+                    "statistics": "Gray",
+                    "default": "White"
+                }
+            }
+        }
+    ]
+}
