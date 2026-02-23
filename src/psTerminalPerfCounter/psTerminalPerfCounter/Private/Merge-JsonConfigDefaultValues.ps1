@@ -46,6 +46,12 @@ function Merge-JsonConfigDefaultValues {
             # Hier auf MultiInstance prüfen und Instanzen auflösen und klonen
             # Indexmäßig dazwischen schieben
 
+            if ( $current_counter.counterSetType -eq 'MultiInstance' -and $current_counter.counterInstance -like "|" ) {
+
+                # BUG - get-tpcPerformanceCounterInfo needs Computername -- määhh really
+
+            }
+
         }
 
     } catch {
