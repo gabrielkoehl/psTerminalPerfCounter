@@ -2,7 +2,7 @@ function Merge-JsonConfigDefaultValues {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
-        [pscustomobject] $CounterConfig
+        [hashtable] $CounterConfig
     )
 
     function Merge-PropertiesRecursive {
@@ -35,15 +35,16 @@ function Merge-JsonConfigDefaultValues {
 
     }
 
-    # Hashtable comparison is much easier than objects
-    $counterConfigHashtable     = $CounterConfig | ConvertTo-Json -Depth 10 | ConvertFrom-Json -AsHashtable
     $counterConfigDefaultValues = (Get-Content $script:JSON_DEFAULT_TEMPLATE_FILE | ConvertFrom-Json -AsHashtable).counters[0]
 
     try {
 
-        foreach ( $current_counter in $counterConfigHashtable.counters ) {
+        foreach ( $current_counter in $CounterConfig.counters ) {
 
             Merge-PropertiesRecursive -Target $current_counter -Template $counterConfigDefaultValues
+
+            # Hier auf MultiInstance prüfen und Instanzen auflösen und klonen
+            # Indexmäßig dazwischen schieben
 
         }
 
@@ -53,7 +54,7 @@ function Merge-JsonConfigDefaultValues {
 
     }
 
-    $result = $counterConfigHashtable | ConvertTo-Json -Depth 10 | ConvertFrom-Json
+    $result = $CounterConfig | ConvertTo-Json -Depth 10 | ConvertFrom-Json
     return $result
 
 

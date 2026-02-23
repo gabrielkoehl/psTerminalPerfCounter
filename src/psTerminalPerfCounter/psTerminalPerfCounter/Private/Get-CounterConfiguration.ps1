@@ -70,8 +70,10 @@ function Get-CounterConfiguration {
             if ( -not [string]::IsNullOrWhiteSpace($configContent) ) {
 
                 try {
-                    $jsonContent        = $configContent | ConvertFrom-Json
+
+                    $jsonContent        = $configContent | ConvertFrom-Json -AsHashtable
                     $mergedJsonContent  = Merge-JsonConfigDefaultValues -CounterConfig $jsonContent
+
 
                 } catch {
                     Write-Warning "Failed to parse JSON from configuration file: $ConfigPath"
@@ -135,7 +137,7 @@ function Get-CounterConfiguration {
 
             try {
 
-                $jsonContent        = $configContent | ConvertFrom-Json
+                $jsonContent        = $configContent | ConvertFrom-Json -AsHashtable
                 $mergedJsonContent  = Merge-JsonConfigDefaultValues -CounterConfig $jsonContent
 
             } catch {
