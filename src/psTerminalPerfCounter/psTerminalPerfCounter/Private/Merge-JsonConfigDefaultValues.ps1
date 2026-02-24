@@ -66,14 +66,17 @@ function Merge-JsonConfigDefaultValues {
             if ( $current_counter.counterSetType -eq 'MultiInstance' -and $current_counter.counterInstance -like "*|*" ) {
 
                 $counterInstances   = $current_counter.counterInstance -split "\|"
-                $clonedCounter      = Get-DeepCopy -Source $current_counter
 
-                foreach ( $current_instance in $counterInstances) {
-                    $clonedCounter.counterInstance = $current_instance.trim()
+                foreach ( $current_instance in $counterInstances ) {
+
+                    $clonedCounter = Get-DeepCopy -Source $current_counter
+                    $clonedCounter.counterInstance = $current_instance.Trim()
+                    $newCounters.Add($clonedCounter)
+
                 }
 
-                $newCounters.Add($clonedCounter)
-
+            } else {
+                $newCounters.Add($current_counter)
             }
 
         } catch {
