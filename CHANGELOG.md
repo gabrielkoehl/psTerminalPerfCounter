@@ -10,11 +10,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 * CounterConfiguration (JSON)
-  * unit conversion now supports configurable scaling operations (multiply "M" / divide "D")
+  * unit conversion now supports configurable scaling operations by new parameter `conversionType` (multiply "M" / divide "D")
+  * `MultiInstanceCounter` now requires only a single configuration; instances are automatically cloned based on the specified instance names
+  * new configuration parameter `decimalPlaces` to specify the number of fractional digits for counter values
 * Get-tpcPerformanceCounterInfo
   * added remoting capability
 
 ### Changed
+
+* JSON Configs simplified. Optional style and customization parameters are outsourced to `default_template_values.json` and merged at runtime when missing. Only include mandatory and optional parameters you want to customize.
 
 ### Deprecated
 
@@ -27,11 +31,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
     would crash with different system languages)
   * credential passing improved
 * start-tpcMonitor
-  * accepts -ConfigPath paramter now when remoting
+  * accepts `-ConfigPath` paramter now when remoting
   * improved / fixed remoting (some functions were local, some remote,
     would crash with different system languages)
 * Get-tpcAvailableCounterConfig
   * missed changes for CounterClass Rebuild
+* Show-CounterTable
+  * fixed bug with conversion int -> double, when counter returns doubles -> skipped colormap
+  * seperator current value not colored anymore
 * several internal function calls, parameters, logic
 
 ### Security
@@ -42,7 +49,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Known Issues
 
-* First pipe char in last 5 value table has ColorMap color instead of default
 
 
 ## [0.3.0] 2025-12-07

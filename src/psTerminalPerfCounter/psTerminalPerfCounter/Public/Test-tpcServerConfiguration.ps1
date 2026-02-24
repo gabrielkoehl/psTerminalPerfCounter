@@ -70,150 +70,138 @@ function Test-tpcServerConfiguration {
         [int] $Iterations = 3
     )
 
-    BEGIN {
+    Write-Host "`n=== ServerConfiguration Test ===" -ForegroundColor Cyan
+    Write-Host "Computer: $ComputerName" -ForegroundColor White
+    Write-Host "Config  : $ConfigName" -ForegroundColor White
+    Write-Host "Iterations: $Iterations" -ForegroundColor White
+    Write-Host ""
 
-        Write-Host "`n=== ServerConfiguration Test ===" -ForegroundColor Cyan
-        Write-Host "Computer: $ComputerName" -ForegroundColor White
-        Write-Host "Config  : $ConfigName" -ForegroundColor White
-        Write-Host "Iterations: $Iterations" -ForegroundColor White
+    try {
+
+        # 1. Counter-Konfiguration laden
+        Write-Host "[1/4] Loading counter configuration..." -ForegroundColor Yellow
+
+        # 2DO this old RemoteChecking und building works but looks like shit and its not like newer code --> REFACTOR
+
+        $isRemote = $ComputerName -ne $env:COMPUTERNAME
+
+        if ($isRemote) {
+            Write-Host "  Remote mode for $ComputerName" -ForegroundColor Gray
+            $counters = Get-CounterConfiguration -ConfigName $ConfigName -computername $ComputerName -credential $Credential
+        } else {
+            Write-Host "  Local mode" -ForegroundColor Gray
+            $counters = Get-CounterConfiguration -ConfigName $ConfigName
+        }
+
+        if (-not $counters -or $counters.Counters.Count -eq 0) {
+            Write-Warning "No counters loaded"
+            return
+        }
+
+        Write-Host "  Loaded $($counters.Counters.Count) counter(s)" -ForegroundColor Green
         Write-Host ""
 
-    }
+        # 2. ServerConfiguration erstellen
+        Write-Host "[2/4] Creating ServerConfiguration object..." -ForegroundColor Yellow
 
-    PROCESS {
+        $server = [psTPCCLASSES.ServerConfiguration]::new(
+            $ComputerName,
+            "Test Server",
+            $counters.Counters
+        )
 
-        try {
+        Write-Host "  IsAvailable: $($server.IsAvailable)" -ForegroundColor $(if($server.IsAvailable){"Green"}else{"Red"})
 
-            # 1. Counter-Konfiguration laden
-            Write-Host "[1/4] Loading counter configuration..." -ForegroundColor Yellow
+        if (-not $server.IsAvailable) {
+            Write-Warning "Server not available: $($server.LastError)"
+            return
+        }
 
-            # 2DO this old RemoteChecking und building works but looks like shit and its not like newer code --> REFACTOR
+        Write-Host "  Total Counters: $($server.Counters.Count)" -ForegroundColor Green
+        Write-Host "  Available Counters: $($server.Counters | Where-Object IsAvailable | Measure-Object | Select-Object -ExpandProperty Count)" -ForegroundColor Green
+        Write-Host ""
 
-            $isRemote = $ComputerName -ne $env:COMPUTERNAME
+        # 3. Counter Details anzeigen
+        Write-Host "[3/4] Counter details:" -ForegroundColor Yellow
+        foreach ($counter in $server.Counters) {
+            $status = if ($counter.IsAvailable) { "✓" } else { "✗" }
+            $statusColor = if ($counter.IsAvailable) { "Green" } else { "Red" }
+            Write-Host "  [$status] $($counter.Title) - $($counter.CounterPath)" -ForegroundColor $statusColor
+        }
+        Write-Host ""
 
-            if ($isRemote) {
-                Write-Host "  Remote mode for $ComputerName" -ForegroundColor Gray
-                $counters = Get-CounterConfiguration -ConfigName $ConfigName -computername $ComputerName -credential $Credential
-            } else {
-                Write-Host "  Local mode" -ForegroundColor Gray
-                $counters = Get-CounterConfiguration -ConfigName $ConfigName
-            }
+        # 4. Parallele Abfragen testen
+        Write-Host "[4/4] Testing parallel queries ($Iterations iteration(s))..." -ForegroundColor Yellow
+        Write-Host ""
 
-            if (-not $counters -or $counters.Counters.Count -eq 0) {
-                Write-Warning "No counters loaded"
-                return
-            }
+        for ($i = 1; $i -le $Iterations; $i++) {
 
-            Write-Host "  Loaded $($counters.Counters.Count) counter(s)" -ForegroundColor Green
+            Write-Host "  Iteration $i of $Iterations" -ForegroundColor Cyan
+
+            # Zeitmessung starten
+            $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+
+            # ASYNC Parallele Abfrage
+            $server.GetValuesParallelAsync().GetAwaiter().GetResult()
+
+            $stopwatch.Stop()
+
+            # Ergebnisse anzeigen
+            Write-Host "    Last Update: $($server.LastUpdate.ToString('HH:mm:ss.fff'))" -ForegroundColor Gray
+            Write-Host "    Total Duration: $($stopwatch.ElapsedMilliseconds)ms" -ForegroundColor Gray
             Write-Host ""
 
-            # 2. ServerConfiguration erstellen
-            Write-Host "[2/4] Creating ServerConfiguration object..." -ForegroundColor Yellow
+            # Counter-Werte anzeigen
+            foreach ($counter in $server.Counters | Where-Object IsAvailable) {
 
-            $server = [psTPCCLASSES.ServerConfiguration]::new(
-                $ComputerName,
-                "Test Server",
-                $counters.Counters
-            )
+                if ($counter.HistoricalData.Count -gt 0) {
+                    $latestData = $counter.HistoricalData[-1]
+                    $value = $latestData.Value
+                    $timestamp = $latestData.Timestamp.ToString('HH:mm:ss.fff')
 
-            Write-Host "  IsAvailable: $($server.IsAvailable)" -ForegroundColor $(if($server.IsAvailable){"Green"}else{"Red"})
+                    Write-Host "    $($counter.Title): $value $($counter.Unit) (at $timestamp)" -ForegroundColor White
 
-            if (-not $server.IsAvailable) {
-                Write-Warning "Server not available: $($server.LastError)"
-                return
-            }
-
-            Write-Host "  Total Counters: $($server.Counters.Count)" -ForegroundColor Green
-            Write-Host "  Available Counters: $($server.Counters | Where-Object IsAvailable | Measure-Object | Select-Object -ExpandProperty Count)" -ForegroundColor Green
-            Write-Host ""
-
-            # 3. Counter Details anzeigen
-            Write-Host "[3/4] Counter details:" -ForegroundColor Yellow
-            foreach ($counter in $server.Counters) {
-                $status = if ($counter.IsAvailable) { "✓" } else { "✗" }
-                $statusColor = if ($counter.IsAvailable) { "Green" } else { "Red" }
-                Write-Host "  [$status] $($counter.Title) - $($counter.CounterPath)" -ForegroundColor $statusColor
-            }
-            Write-Host ""
-
-            # 4. Parallele Abfragen testen
-            Write-Host "[4/4] Testing parallel queries ($Iterations iteration(s))..." -ForegroundColor Yellow
-            Write-Host ""
-
-            for ($i = 1; $i -le $Iterations; $i++) {
-
-                Write-Host "  Iteration $i of $Iterations" -ForegroundColor Cyan
-
-                # Zeitmessung starten
-                $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
-
-                # ASYNC Parallele Abfrage
-                $server.GetValuesParallelAsync().GetAwaiter().GetResult()
-
-                $stopwatch.Stop()
-
-                # Ergebnisse anzeigen
-                Write-Host "    Last Update: $($server.LastUpdate.ToString('HH:mm:ss.fff'))" -ForegroundColor Gray
-                Write-Host "    Total Duration: $($stopwatch.ElapsedMilliseconds)ms" -ForegroundColor Gray
-                Write-Host ""
-
-                # Counter-Werte anzeigen
-                foreach ($counter in $server.Counters | Where-Object IsAvailable) {
-
-                    if ($counter.HistoricalData.Count -gt 0) {
-                        $latestData = $counter.HistoricalData[-1]
-                        $value = $latestData.Value
-                        $timestamp = $latestData.Timestamp.ToString('HH:mm:ss.fff')
-
-                        Write-Host "    $($counter.Title): $value $($counter.Unit) (at $timestamp)" -ForegroundColor White
-
-                        # Statistiken nach mehreren Iterationen
-                        if ($counter.Statistics.Count -gt 0) {
-                            $stats = $counter.Statistics
-                            Write-Host "      Stats: Min=$($stats['Minimum']), Max=$($stats['Maximum']), Avg=$($stats['Average'])" -ForegroundColor DarkGray
-                        }
+                    # Statistiken nach mehreren Iterationen
+                    if ($counter.Statistics.Count -gt 0) {
+                        $stats = $counter.Statistics
+                        Write-Host "      Stats: Min=$($stats['Minimum']), Max=$($stats['Maximum']), Avg=$($stats['Average'])" -ForegroundColor DarkGray
                     }
-
-                }
-
-                Write-Host ""
-
-                # Pause zwischen Iterationen (außer bei letzter)
-                if ($i -lt $Iterations) {
-                    Start-Sleep -Seconds 2
                 }
 
             }
 
-            # Server-Statistiken anzeigen
-            Write-Host "=== Final Server Statistics ===" -ForegroundColor Cyan
-            $server.UpdateStatistics()
-            $server.Statistics.GetEnumerator() | Sort-Object Name | ForEach-Object {
-                Write-Host "  $($_.Key): $($_.Value)" -ForegroundColor White
+            Write-Host ""
+
+            # Pause zwischen Iterationen (außer bei letzter)
+            if ($i -lt $Iterations) {
+                Start-Sleep -Seconds 2
             }
-            Write-Host ""
-
-            # Zusammenfassung
-            Write-Host "=== Test Summary ===" -ForegroundColor Green
-            Write-Host "Server: $($server.ComputerName) - Available: $($server.IsAvailable)" -ForegroundColor White
-            Write-Host "Counters tested: $($server.Counters.Count)" -ForegroundColor White
-            Write-Host "Iterations completed: $Iterations" -ForegroundColor White
-            Write-Host "Last update: $($server.LastUpdate)" -ForegroundColor White
-            Write-Host ""
-            Write-Host "Test completed successfully!" -ForegroundColor Green
-
-        } catch {
-
-            Write-Host "`n=== ERROR ===" -ForegroundColor Red
-            Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Yellow
-            Write-Host "StackTrace: $($_.ScriptStackTrace)" -ForegroundColor DarkGray
-            throw
 
         }
 
-    }
+        # Server-Statistiken anzeigen
+        Write-Host "=== Final Server Statistics ===" -ForegroundColor Cyan
+        $server.UpdateStatistics()
+        $server.Statistics.GetEnumerator() | Sort-Object Name | ForEach-Object {
+            Write-Host "  $($_.Key): $($_.Value)" -ForegroundColor White
+        }
+        Write-Host ""
 
-    END {
+        # Zusammenfassung
+        Write-Host "=== Test Summary ===" -ForegroundColor Green
+        Write-Host "Server: $($server.ComputerName) - Available: $($server.IsAvailable)" -ForegroundColor White
+        Write-Host "Counters tested: $($server.Counters.Count)" -ForegroundColor White
+        Write-Host "Iterations completed: $Iterations" -ForegroundColor White
+        Write-Host "Last update: $($server.LastUpdate)" -ForegroundColor White
+        Write-Host ""
+        Write-Host "Test completed successfully!" -ForegroundColor Green
+
+    } catch {
+
+        Write-Host "`n=== ERROR ===" -ForegroundColor Red
+        Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Yellow
+        Write-Host "StackTrace: $($_.ScriptStackTrace)" -ForegroundColor DarkGray
+        throw
 
     }
 

@@ -5,39 +5,19 @@
         {
             "title": "Processor Time",
             "unit": "%",
-            "conversionFactor": 1,
-            "conversionExponent": 1,
-            "conversionType": "D",
-            "type": "Percentage",
             "format": "both",
             "counterID": "238-6",
             "counterSetType": "MultiInstance",
-            "counterInstance": "_Total",
+            "counterInstance": "_Total|0|1",
             "colorMap": {
                 "30": "Green",
                 "70": "Yellow",
                 "80": "Red"
-            },
-            "graphConfiguration": {
-                "Samples": 70,
-                "graphType": "Bar",
-                "showStatistics": true,
-                "yAxisStep": 10,
-                "yAxisMaxRows": 10,
-                "colors": {
-                    "title": "Cyan",
-                    "statistics": "Gray",
-                    "default": "White"
-                }
             }
         },
         {
             "title": "Processor Queue Length",
             "unit": "Threads",
-            "conversionFactor": 1,
-            "conversionExponent": 1,
-            "conversionType": "D",
-            "type": "Number",
             "format": "both",
             "counterID": "2-44",
             "counterSetType": "SingleInstance",
@@ -46,18 +26,6 @@
                 "1": "Green",
                 "2": "Yellow",
                 "5": "Red"
-            },
-            "graphConfiguration": {
-                "Samples": 70,
-                "graphType": "Bar",
-                "showStatistics": true,
-                "yAxisStep": 1,
-                "yAxisMaxRows": 10,
-                "colors": {
-                    "title": "Yellow",
-                    "statistics": "Gray",
-                    "default": "White"
-                }
             }
         }
     ]

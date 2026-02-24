@@ -85,109 +85,97 @@ function Start-tpcEnvironmentMonitor {
         [int] $UpdateInterval = 0  # 0 = use from config
     )
 
-    BEGIN {
+    $environment = $null
 
-        $environment = $null
+    try {
 
-    }
+        # Load environment configuration
+        Write-Host "Loading environment configuration from '$ConfigPath'..." -ForegroundColor Yellow
 
-    PROCESS {
+        $environment = Get-EnvironmentConfiguration -ConfigPath $ConfigPath
+        if ( -not $environment ) {
+            Write-Warning "Failed to load environment configuration"
+            Return
+        }
 
-        try {
-
-            # Load environment configuration
-            Write-Host "Loading environment configuration from '$ConfigPath'..." -ForegroundColor Yellow
-
-            $environment = Get-EnvironmentConfiguration -ConfigPath $ConfigPath
-            if ( -not $environment ) {
-                Write-Warning "Failed to load environment configuration"
-                Return
-            }
-
-            # Determine update interval (parameter overrides config)
-            $effectiveInterval = if ( $UpdateInterval -gt 0 ) {
-                $UpdateInterval
+        # Determine update interval (parameter overrides config)
+        $effectiveInterval = if ( $UpdateInterval -gt 0 ) {
+            $UpdateInterval
+        } else {
+            if ( $environment.Interval -gt 0 ) {
+                $environment.Interval
             } else {
-                if ( $environment.Interval -gt 0 ) {
-                    $environment.Interval
-                } else {
-                    2  # Fallback default
-                }
+                2  # Fallback default
             }
+        }
+
+        Write-Host ""
+        Write-Host "=== Environment Monitoring ===" -ForegroundColor Cyan
+        Write-Host "Environment   : $($environment.Name)" -ForegroundColor White
+        Write-Host "Description   : $($environment.Description)" -ForegroundColor White
+        Write-Host "Servers       : $($environment.Servers.Count)" -ForegroundColor White
+        Write-Host "Update Interval: $effectiveInterval second(s)" -ForegroundColor White
+        Write-Host ""
+
+        # Display server overview
+        Write-Host "Servers in environment:" -ForegroundColor Cyan
+        foreach ( $server in $environment.Servers ) {
+            $status = if ($server.IsAvailable) { "Available" } else { "Unavailable - $($server.LastError)" }
+            $statusColor = if ($server.IsAvailable) { "Green" } else { "Red" }
+            Write-Host "  [$status] $($server.ComputerName) - $($server.Comment) ($($server.Counters.Count) counter(s))" -ForegroundColor $statusColor
+        }
+        Write-Host ""
+
+        # Start monitoring loop
+        $MonitoringParams = @{
+            MonitorType     = 'environment'
+            Config          = $environment
+            UpdateInterval  = $effectiveInterval
+        }
+
+        Start-MonitoringLoop @MonitoringParams
+
+    } catch [System.Management.Automation.HaltCommandException] {
+
+        Write-Host "`n=== Monitoring stopped by user ===" -ForegroundColor Green
+
+    } catch {
+
+        Write-Host "`n=== ERROR ===" -ForegroundColor Red
+        Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Yellow
+        throw
+
+    } finally {
+
+        # Display summary if environment was loaded
+        if ( $environment ) {
 
             Write-Host ""
-            Write-Host "=== Environment Monitoring ===" -ForegroundColor Cyan
-            Write-Host "Environment   : $($environment.Name)" -ForegroundColor White
-            Write-Host "Description   : $($environment.Description)" -ForegroundColor White
-            Write-Host "Servers       : $($environment.Servers.Count)" -ForegroundColor White
-            Write-Host "Update Interval: $effectiveInterval second(s)" -ForegroundColor White
+            Write-Host "=== Environment Monitoring Summary ===" -ForegroundColor Cyan
+            Write-Host "Environment     : $($environment.Name)" -ForegroundColor White
+            Write-Host "Last Query Time : $($environment.QueryTimestamp)" -ForegroundColor White
+            Write-Host "Last Query Duration: $($environment.QueryDuration)ms" -ForegroundColor White
             Write-Host ""
 
-            # Display server overview
-            Write-Host "Servers in environment:" -ForegroundColor Cyan
+            # Show statistics per server
+            Write-Host "Server Statistics:" -ForegroundColor Cyan
             foreach ( $server in $environment.Servers ) {
-                $status = if ($server.IsAvailable) { "Available" } else { "Unavailable - $($server.LastError)" }
-                $statusColor = if ($server.IsAvailable) { "Green" } else { "Red" }
-                Write-Host "  [$status] $($server.ComputerName) - $($server.Comment) ($($server.Counters.Count) counter(s))" -ForegroundColor $statusColor
+                if ( $server.IsAvailable ) {
+                    $availableCounters = $server.Counters | Where-Object { $_.IsAvailable }
+                    Write-Host "  $($server.ComputerName): $($availableCounters.Count)/$($server.Counters.Count) counters available, Last Update: $($server.LastUpdate)" -ForegroundColor Green
+                } else {
+                    Write-Host "  $($server.ComputerName): Unavailable - $($server.LastError)" -ForegroundColor Red
+                }
             }
+
             Write-Host ""
-
-            # Start monitoring loop
-            $MonitoringParams = @{
-                MonitorType     = 'environment'
-                Config          = $environment
-                UpdateInterval  = $effectiveInterval
-            }
-
-            Start-MonitoringLoop @MonitoringParams
-
-        } catch [System.Management.Automation.HaltCommandException] {
-
-            Write-Host "`n=== Monitoring stopped by user ===" -ForegroundColor Green
-
-        } catch {
-
-            Write-Host "`n=== ERROR ===" -ForegroundColor Red
-            Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Yellow
-            throw
-
-        } finally {
-
-            # Display summary if environment was loaded
-            if ( $environment ) {
-
-                Write-Host ""
-                Write-Host "=== Environment Monitoring Summary ===" -ForegroundColor Cyan
-                Write-Host "Environment     : $($environment.Name)" -ForegroundColor White
-                Write-Host "Last Query Time : $($environment.QueryTimestamp)" -ForegroundColor White
-                Write-Host "Last Query Duration: $($environment.QueryDuration)ms" -ForegroundColor White
-                Write-Host ""
-
-                # Show statistics per server
-                Write-Host "Server Statistics:" -ForegroundColor Cyan
-                foreach ( $server in $environment.Servers ) {
-                    if ( $server.IsAvailable ) {
-                        $availableCounters = $server.Counters | Where-Object { $_.IsAvailable }
-                        Write-Host "  $($server.ComputerName): $($availableCounters.Count)/$($server.Counters.Count) counters available, Last Update: $($server.LastUpdate)" -ForegroundColor Green
-                    } else {
-                        Write-Host "  $($server.ComputerName): Unavailable - $($server.LastError)" -ForegroundColor Red
-                    }
-                }
-
-                Write-Host ""
-                Write-Host "Environment statistics:" -ForegroundColor Cyan
-                $stats = $environment.GetEnvironmentStatistics()
-                $stats.GetEnumerator() | Sort-Object Name | ForEach-Object {
-                    Write-Host "  $($_.Key): $($_.Value)" -ForegroundColor White
-                }
-
+            Write-Host "Environment statistics:" -ForegroundColor Cyan
+            $stats = $environment.GetEnvironmentStatistics()
+            $stats.GetEnumerator() | Sort-Object Name | ForEach-Object {
+                Write-Host "  $($_.Key): $($_.Value)" -ForegroundColor White
             }
 
         }
-
-    }
-
-    END {
 
     }
 
