@@ -70,6 +70,7 @@ function Merge-JsonConfigDefaultValues {
                 foreach ( $current_instance in $counterInstances ) {
 
                     $clonedCounter = Get-DeepCopy -Source $current_counter
+                    $clonedCounter.title = "$($clonedCounter.title) ($($current_instance.Trim()))"
                     $clonedCounter.counterInstance = $current_instance.Trim()
                     $newCounters.Add($clonedCounter)
 

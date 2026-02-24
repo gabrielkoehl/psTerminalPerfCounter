@@ -8,7 +8,7 @@
             "format": "both",
             "counterID": "238-6",
             "counterSetType": "MultiInstance",
-            "counterInstance": "_Total",
+            "counterInstance": "_Total|0|1",
             "colorMap": {
                 "30": "Green",
                 "70": "Yellow",
