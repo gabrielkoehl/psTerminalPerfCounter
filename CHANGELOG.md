@@ -10,7 +10,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 * CounterConfiguration (JSON)
-  * unit conversion now supports configurable scaling operations (multiply "M" / divide "D")
+  * unit conversion now supports configurable scaling operations by new parameter `conversionType` (multiply "M" / divide "D")
+  * `MultiInstanceCounter` now requires only a single configuration; instances are automatically cloned based on the specified instance names
+  * new configuration parameter `decimalPlaces` to specify the number of fractional digits for counter values
 * Get-tpcPerformanceCounterInfo
   * added remoting capability
 
@@ -29,7 +31,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
     would crash with different system languages)
   * credential passing improved
 * start-tpcMonitor
-  * accepts -ConfigPath paramter now when remoting
+  * accepts `-ConfigPath` paramter now when remoting
   * improved / fixed remoting (some functions were local, some remote,
     would crash with different system languages)
 * Get-tpcAvailableCounterConfig

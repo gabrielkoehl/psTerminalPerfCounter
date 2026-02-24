@@ -31,6 +31,7 @@
             $CounterConfig.conversionFactor,
             $CounterConfig.conversionExponent,
             $CounterConfig.conversionType,
+            $CounterConfig.decimalPlaces,
             $CounterConfig.colorMap,
             $CounterConfig.graphConfiguration,
             $isRemote,

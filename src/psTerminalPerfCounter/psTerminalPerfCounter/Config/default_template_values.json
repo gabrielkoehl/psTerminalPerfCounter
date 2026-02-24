@@ -4,6 +4,7 @@
             "conversionFactor": 1,
             "conversionExponent": 1,
             "conversionType": "D",
+            "decimalPlaces": 1,
             "format": "table",
             "colorMap": {
                 "0": "White"

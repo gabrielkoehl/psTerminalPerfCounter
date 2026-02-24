@@ -23,9 +23,10 @@ public class CounterConfiguration
     public int ConversionFactor { get; set; }
     public int ConversionExponent { get; set; }
     public char ConversionType { get; set; }
+    public int DecimalPlaces { get; set; }
     public string Unit { get; set; }
-    public Dictionary<string, object> GraphConfiguration { get; set; }
 
+    public Dictionary<string, object> GraphConfiguration { get; set; }
     public record DataPoint(DateTime Timestamp, double Value);
     public List<DataPoint> HistoricalData { get; set; }
 
@@ -50,6 +51,7 @@ public class CounterConfiguration
         int conversionFactor,
         int conversionExponent,
         char conversionType,
+        int decimalPlaces,
         PSObject colorMap,
         PSObject graphConfiguration,
         bool isRemote,
@@ -68,6 +70,7 @@ public class CounterConfiguration
         ConversionFactor    = conversionFactor;
         ConversionExponent  = conversionExponent;
         ConversionType      = conversionType;
+        DecimalPlaces       = decimalPlaces;
         HistoricalData      = new List<DataPoint>();
         Statistics          = new Dictionary<string, object>();
         IsAvailable         = false;
@@ -169,11 +172,11 @@ public class CounterConfiguration
 
                                 if (matchedCounter.ConversionType == 'M')
                                 {
-                                    calculatedValue = Math.Round(rawValue * Math.Pow(matchedCounter.ConversionFactor, matchedCounter.ConversionExponent), 2);
+                                    calculatedValue = Math.Round(rawValue * Math.Pow(matchedCounter.ConversionFactor, matchedCounter.ConversionExponent), matchedCounter.DecimalPlaces);
                                 }
                                 else if (matchedCounter.ConversionType == 'D')
                                 {
-                                    calculatedValue = Math.Round(rawValue / Math.Pow(matchedCounter.ConversionFactor, matchedCounter.ConversionExponent), 2);
+                                    calculatedValue = Math.Round(rawValue / Math.Pow(matchedCounter.ConversionFactor, matchedCounter.ConversionExponent), matchedCounter.DecimalPlaces);
                                 }
 
 
