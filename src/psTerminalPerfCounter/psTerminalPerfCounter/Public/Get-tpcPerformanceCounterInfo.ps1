@@ -34,15 +34,16 @@ function Get-tpcPerformanceCounterInfo {
         PSCustomObject: ID, CounterSet, Path, SetType, Instances
     #>
 
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'Local')]
     param(
-        [Parameter(ParameterSetName = 'Remote',  Mandatory)]
-        [string]        $ComputerName,
+        [Parameter(ParameterSetName = 'Remote', Mandatory)]
+        [string] $ComputerName,
 
         [Parameter(ParameterSetName = 'Remote')]
-        [pscredential]  $Credential = $null,
+        [pscredential] $Credential,
 
-        [Parameter(Mandatory)]
+        [Parameter(ParameterSetName = 'Remote', Mandatory)]
+        [Parameter(ParameterSetName = 'Local',  Mandatory)]
         [string] $SearchTerm
     )
 
