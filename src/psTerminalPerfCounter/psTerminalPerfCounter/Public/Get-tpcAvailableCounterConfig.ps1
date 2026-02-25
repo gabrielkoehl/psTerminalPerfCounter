@@ -33,7 +33,7 @@ function Get-tpcAvailableCounterConfig {
 [CmdletBinding()]
 param (
     [Parameter()]
-    [string] $configPath,
+    [string] $configFilePath,
 
     [Parameter()]
     [switch] $TestCounters
@@ -41,7 +41,10 @@ param (
 
     try {
 
-        $skipSchemaValidation = $false
+        $skipSchemaValidation   = $false
+        $isSingleFile           = $false
+        $AllResults             = @()
+        $ConfigNamesFound       = @{}
 
         # Check if central schema file exists
         if ( -not (Test-Path $script:JSON_SCHEMA_CONFIG_FILE) ) {
@@ -51,38 +54,42 @@ param (
             $configSchema = Get-Content $script:JSON_SCHEMA_CONFIG_FILE -Raw
         }
 
-        # Get all configured paths using Get-tpcConfigPaths
-        $ConfigPaths = Get-tpcConfigPaths
-
         if ( $ConfigPaths.Count -eq 0 ) {
             Write-Warning "No configuration paths found. Use Add-tpcConfigPath to add configuration directories."
             return @()
         }
 
-        if ( $PSBoundParameters.ContainsKey('configPath') ) {
-
+        if ( $PSBoundParameters.ContainsKey('configFilePath') ) {
+            $ConfigPaths    = $configFilePath
+            $isSingleFile   = $true
         } else {
-
+            # Get all configured paths
+            $ConfigPaths    = Get-tpcConfigPaths
         }
-
-        $AllResults         = @()
-        $ConfigNamesFound   = @{}
 
         foreach ( $ConfigPath in $ConfigPaths ) {
 
             if ( -not (Test-Path $ConfigPath) ) {
-                Write-Warning "Configuration directory not found: $ConfigPath"
+                Write-Warning "Configuration directory / file not found: $ConfigPath"
                 continue
             }
 
-            $ConfigFiles = Get-ChildItem -Path $ConfigPath -Filter "tpc_*.json" -File | Where-Object { $_.BaseName -notlike "*template*" }
+            if ( -not $isSingleFile ) {
 
-            if ( $ConfigFiles.Count -eq 0 ) {
-                Write-Verbose "No configuration files found with 'tpc_' prefix in: $ConfigPath"
-                continue
+                $ConfigFiles = Get-ChildItem -Path $ConfigPath -Filter "tpc_*.json" -File | Where-Object { $_.BaseName -notlike "*template*" }
+
+                if ( $ConfigFiles.Count -eq 0 ) {
+                    Write-Verbose "No configuration files found with 'tpc_' prefix in: $ConfigPath"
+                    continue
+                }
+
+                $PathResults = @()
+
+            } else {
+
+                $ConfigFiles = Get-ItemProperty $ConfigPath
+
             }
-
-            $PathResults = @()
 
             foreach ( $ConfigFile in $ConfigFiles ) {
 
