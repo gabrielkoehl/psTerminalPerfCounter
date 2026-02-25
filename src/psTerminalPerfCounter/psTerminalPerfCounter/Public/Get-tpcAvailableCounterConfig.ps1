@@ -36,7 +36,10 @@ param (
     [string] $configFilePath,
 
     [Parameter()]
-    [switch] $TestCounters
+    [switch] $TestCounters,
+
+    [Parameter()]
+    [switch] $Raw
 )
 
     try {
@@ -54,20 +57,21 @@ param (
             $configSchema = Get-Content $script:JSON_SCHEMA_CONFIG_FILE -Raw
         }
 
-        if ( $ConfigPaths.Count -eq 0 ) {
+        if ( $PSBoundParameters.ContainsKey('configFilePath') ) {
+            $ConfigPaths    = @($configFilePath)
+            $isSingleFile   = $true
+        } else {
+            $ConfigPaths    = Get-tpcConfigPaths
+        }
+
+        if ( $ConfigPaths.Count -eq 0 -and -not $isSingleFile ) {
             Write-Warning "No configuration paths found. Use Add-tpcConfigPath to add configuration directories."
             return @()
         }
 
-        if ( $PSBoundParameters.ContainsKey('configFilePath') ) {
-            $ConfigPaths    = $configFilePath
-            $isSingleFile   = $true
-        } else {
-            # Get all configured paths
-            $ConfigPaths    = Get-tpcConfigPaths
-        }
-
         foreach ( $ConfigPath in $ConfigPaths ) {
+
+            $PathResults = @()
 
             if ( -not (Test-Path $ConfigPath) ) {
                 Write-Warning "Configuration directory / file not found: $ConfigPath"
@@ -82,8 +86,6 @@ param (
                     Write-Verbose "No configuration files found with 'tpc_' prefix in: $ConfigPath"
                     continue
                 }
-
-                $PathResults = @()
 
             } else {
 
