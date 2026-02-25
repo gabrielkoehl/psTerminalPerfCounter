@@ -1,33 +1,31 @@
 function Test-tpcAvailableCounterConfig {
 <#
 .SYNOPSIS
-    Lists available performance counter configurations from all configured paths.
+    Validates and displays available tpc counter configurations.
 
 .DESCRIPTION
-    Scans configured paths for 'tpc_*.json' files, validates them against the JSON schema,
-    and displays counter details grouped by path. Detects duplicates across paths.
+    Scans configured paths (or a single file) for 'tpc_*.json' files.
+    Validates against JSON schema using Test-Json (PowerShell 7.4+),
+    merges default values, resolves counter paths, and detects duplicates.
     Template files are excluded.
 
+.PARAMETER configFilePath
+    Path to a single configuration file. If omitted, all configured paths are scanned.
+
 .PARAMETER Raw
-    Returns raw PSCustomObject[] instead of formatted output.
-
-.PARAMETER TestCounters
-    Tests each counter for availability on the current system. May be slow.
+    Returns PSCustomObject[] instead of formatted console output.
 
 .EXAMPLE
-    Get-tpcAvailableCounterConfig
+    Test-tpcAvailableCounterConfig
 
 .EXAMPLE
-    Get-tpcAvailableCounterConfig -TestCounters
+    Test-tpcAvailableCounterConfig -configFilePath "C:\configs\tpc_CPU.json"
 
 .EXAMPLE
-    Get-tpcAvailableCounterConfig -Raw
+    Test-tpcAvailableCounterConfig -Raw | Where-Object { -not $_.JsonValid }
 
 .OUTPUTS
     Formatted console output (default) or PSCustomObject[] (-Raw).
-
-.NOTES
-    Requires GripDevJsonSchemaValidator module for schema validation.
 #>
 
 [CmdletBinding()]
@@ -43,7 +41,7 @@ param (
 
         $skipSchemaValidation   = $false
         $isSingleFile           = $false
-        $AllResults             = @()
+        $AllResults             = [System.Collections.Generic.List[PSCustomObject]]::new() # wenn irgendwann mal 100te Configs da sind, ist besser
         $ConfigNamesFound       = @{}
         $localCounterMap        = Get-CounterMap
 
@@ -70,7 +68,7 @@ param (
 
         foreach ( $ConfigPath in $ConfigPaths ) {
 
-            $PathResults = @()
+            $PathResults = [System.Collections.Generic.List[PSCustomObject]]::new()
 
             if ( -not (Test-Path $ConfigPath) ) {
                 Write-Warning "Configuration directory / file not found: $ConfigPath"
@@ -88,7 +86,7 @@ param (
 
             } else {
 
-                $ConfigFiles = Get-ItemProperty $ConfigPath
+                $ConfigFiles = Get-Item $ConfigPath
 
             }
 
@@ -140,7 +138,7 @@ param (
 
                     }
 
-                    $CounterDetails = @()
+                    $CounterDetails = [System.Collections.Generic.List[PSCustomObject]]::new()
 
                     if ( -not $isEmpty ) {
 
@@ -168,15 +166,17 @@ param (
                             )
 
                             $CounterDetail = [PSCustomObject]@{
-                                Title          = $Counter.Title
-                                CounterId      = $Counter.counterID
-                                CounterPath    = $Counter.CounterPath
-                                Unit           = $Counter.Unit
-                                Format         = $Counter.Format
-                                InstancePath   = $Counter.CounterPath
+                                Title           = $Counter.Title
+                                CounterId       = $Counter.counterID
+                                CounterPath     = $Counter.CounterPath
+                                Unit            = $Counter.Unit
+                                Format          = $Counter.Format
+                                InstancePath    = $Counter.CounterPath
+                                Valid           = $true
+                                ErrorMessage    = $null
                             }
 
-                            $CounterDetails += $CounterDetail
+                            $CounterDetails.Add($CounterDetail)
 
                         } catch {
 
@@ -191,25 +191,25 @@ param (
                                 InstancePath   = $($_.Exception.Message)
                             }
 
-                            $CounterDetails += $CounterDetail
+                            $CounterDetails.Add($CounterDetail)
                         }
 
                     }
                 }
 
                     $ConfigOverview = [PSCustomObject]@{
-                            ConfigName               = $ConfigName
-                            ConfigPath               = $ConfigPath
-                            Description              = if ($isEmpty) { "Error: Empty configuration file" } else { $mergedJsonContent.description }
-                            ConfigFile               = $ConfigFile.FullName
-                            JsonValid                = if ($isEmpty) { $false } else { $SchemaValidation.IsValid }
-                            JsonValidationErrors     = if ($isEmpty) { @("Configuration file is empty or contains only whitespace") } else { $SchemaValidation.Errors }
-                            CounterCount             = $CounterDetails.Count
-                            Counters                 = $CounterDetails
-                            IsDuplicate              = $IsDuplicate
+                        ConfigName               = $ConfigName
+                        ConfigPath               = $ConfigPath
+                        Description              = if ($isEmpty) { "Error: Empty configuration file" } else { $mergedJsonContent.description }
+                        ConfigFile               = $ConfigFile.FullName
+                        JsonValid                = if ($isEmpty) { $false } else { $SchemaValidation.IsValid }
+                        JsonValidationErrors     = if ($isEmpty) { @("Configuration file is empty or contains only whitespace") } else { $SchemaValidation.Errors }
+                        CounterCount             = $CounterDetails.Count
+                        Counters                 = $CounterDetails
+                        IsDuplicate              = $IsDuplicate
                     }
 
-                    $PathResults += $ConfigOverview
+                    $PathResults.Add($ConfigOverview)
 
                 } catch {
 
@@ -220,18 +220,18 @@ param (
                     $IsDuplicate = $ConfigNamesFound[$ConfigNameLower] -gt 1
 
                     $ErrorConfig = [PSCustomObject]@{
-                            ConfigName               = $ConfigFile.BaseName -replace '^tpc_', ''
-                            ConfigPath               = $ConfigPath
-                            Description              = "Error loading configuration"
-                            ConfigFile               = $ConfigFile.FullName
-                            JsonValid                = $false
-                            JsonValidationErrors     = @($_.Exception.Message)
-                            CounterCount             = 0
-                            Counters                 = @()
-                            IsDuplicate              = $IsDuplicate
+                        ConfigName               = $ConfigFile.BaseName -replace '^tpc_', ''
+                        ConfigPath               = $ConfigPath
+                        Description              = "Error loading configuration"
+                        ConfigFile               = $ConfigFile.FullName
+                        JsonValid                = $false
+                        JsonValidationErrors     = @($_.Exception.Message)
+                        CounterCount             = 0
+                        Counters                 = @()
+                        IsDuplicate              = $IsDuplicate
                     }
 
-                    $PathResults += $ErrorConfig
+                    $PathResults.Add($ErrorConfig)
 
                 }
 
@@ -239,7 +239,7 @@ param (
 
         # Add path results to overall results
         if ( $PathResults.Count -gt 0 ) {
-            $AllResults += $PathResults
+            $AllResults.AddRange($PathResults)
         }
     }
 
@@ -277,9 +277,9 @@ param (
                         $JsonStatus    = if ( $result.JsonValid )    { "Valid JSON Schema" } else { "Invalid JSON Schema" }
 
                         if ( $result.JsonValid ) {
-                            Write-Host "$JsonStatus, $CounterStatus" -ForegroundColor Green
+                            Write-Host "$JsonStatus" -ForegroundColor Green
                         } else {
-                            Write-Host "$JsonStatus, $CounterStatus" -ForegroundColor Red
+                            Write-Host "$JsonStatus" -ForegroundColor Red
                             Write-Host "Schema Validation Errors:" -ForegroundColor Yellow
                             ForEach ( $errorMessage in $result.JsonValidationErrors ) {
                                 Write-Host "  - $errorMessage" -ForegroundColor Red
@@ -305,11 +305,11 @@ param (
                 $separatorLine = "=" * 35
                 Write-Host $separatorLine -ForegroundColor Red
                 foreach ( $dupName in $duplicateNames ) {
-                        $dupConfigs = $AllResults | Where-Object { $_.ConfigName.ToLower() -eq $dupName }
-                        Write-Host "`n'$dupName' found in:" -ForegroundColor Yellow
-                        foreach ( $dupConfig in $dupConfigs ) {
-                            Write-Host "- $($dupConfig.ConfigPath) ($([System.IO.Path]::GetFileName($dupConfig.ConfigFile)))" -ForegroundColor Gray
-                        }
+                    $dupConfigs = $AllResults | Where-Object { $_.ConfigName.ToLower() -eq $dupName }
+                    Write-Host "`n'$dupName' found in:" -ForegroundColor Yellow
+                    foreach ( $dupConfig in $dupConfigs ) {
+                        Write-Host "- $($dupConfig.ConfigPath) ($([System.IO.Path]::GetFileName($dupConfig.ConfigFile)))" -ForegroundColor Gray
+                    }
                 }
                 Write-Host "`nConsider removing duplicate configurations to avoid conflicts." -ForegroundColor Yellow
             }
