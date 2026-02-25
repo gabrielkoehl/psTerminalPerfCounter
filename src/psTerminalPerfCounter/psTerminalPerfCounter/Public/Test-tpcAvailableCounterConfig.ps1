@@ -36,9 +36,6 @@ param (
     [string] $configFilePath,
 
     [Parameter()]
-    [switch] $TestCounters,
-
-    [Parameter()]
     [switch] $Raw
 )
 
@@ -147,7 +144,7 @@ param (
 
                     if ( -not $isEmpty ) {
 
-                        foreach ( $CounterConfig in $JsonConfig.counters ) {
+                        foreach ( $CounterConfig in $mergedJsonContent.counters ) {
 
                         try {
 
@@ -170,16 +167,12 @@ param (
                                 $localCounterMap
                             )
 
-                            $IsAvailable = if ($TestCounters) { $Counter.TestAvailability() } else { $null }
-
                             $CounterDetail = [PSCustomObject]@{
                                 Title          = $Counter.Title
                                 CounterId      = $Counter.counterID
                                 CounterPath    = $Counter.CounterPath
                                 Unit           = $Counter.Unit
                                 Format         = $Counter.Format
-                                Valid          = $IsAvailable
-                                ErrorMessage   = if ($TestCounters -and -not $IsAvailable) { $Counter.LastError } else { $null }
                                 InstancePath   = $Counter.CounterPath
                             }
 
@@ -207,13 +200,11 @@ param (
                     $ConfigOverview = [PSCustomObject]@{
                             ConfigName               = $ConfigName
                             ConfigPath               = $ConfigPath
-                            Description              = if ($isEmpty) { "Error: Empty configuration file" } else { $JsonConfig.description }
+                            Description              = if ($isEmpty) { "Error: Empty configuration file" } else { $mergedJsonContent.description }
                             ConfigFile               = $ConfigFile.FullName
                             JsonValid                = if ($isEmpty) { $false } else { $SchemaValidation.IsValid }
                             JsonValidationErrors     = if ($isEmpty) { @("Configuration file is empty or contains only whitespace") } else { $SchemaValidation.Errors }
                             CounterCount             = $CounterDetails.Count
-                            ValidCounters            = if ($TestCounters) { ($CounterDetails | Where-Object { $_.Valid -eq $true }).Count }  else { "Not tested" }
-                            InvalidCounters          = if ($TestCounters) { ($CounterDetails | Where-Object { $_.Valid -eq $false }).Count } else { "Not tested" }
                             Counters                 = $CounterDetails
                             IsDuplicate              = $IsDuplicate
                     }
@@ -236,8 +227,6 @@ param (
                             JsonValid                = $false
                             JsonValidationErrors     = @($_.Exception.Message)
                             CounterCount             = 0
-                            ValidCounters            = if ($TestCounters) { 0 } else { "Not tested" }
-                            InvalidCounters          = if ($TestCounters) { 0 } else { "Not tested" }
                             Counters                 = @()
                             IsDuplicate              = $IsDuplicate
                     }
@@ -286,7 +275,6 @@ param (
                         Write-Host "Description: $($result.Description)" -ForegroundColor Gray
 
                         $JsonStatus    = if ( $result.JsonValid )    { "Valid JSON Schema" } else { "Invalid JSON Schema" }
-                        $CounterStatus = if ( $TestCounters )        { "Counters: $($result.ValidCounters)/$($result.CounterCount)" } else { "Counters: $($result.CounterCount) (not tested)" }
 
                         if ( $result.JsonValid ) {
                             Write-Host "$JsonStatus, $CounterStatus" -ForegroundColor Green
@@ -304,16 +292,9 @@ param (
 
                         if ( $result.Counters.Count -gt 0)  {
                             Write-Host "Counters:" -ForegroundColor Gray
-                            if ( $TestCounters ) {
-                                $result.Counters | Format-Table Title, CounterId, Unit, Format, Valid, InstancePath -AutoSize -Wrap
-                            } else {
-                                $result.Counters | Format-Table Title, CounterId, Unit, Format, InstancePath -AutoSize -Wrap
-                            }
-
+                            $result.Counters | Format-Table Title, CounterId, Unit, Format, InstancePath -AutoSize -Wrap
                         } else {
-
                             Write-Host "No counters found" -ForegroundColor Yellow
-
                         }
                 }
             }

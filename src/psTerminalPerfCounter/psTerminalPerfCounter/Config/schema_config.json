@@ -16,7 +16,20 @@
             "minItems": 1,
             "items": {
                 "type": "object",
-                "required": ["title", "unit", "conversionFactor", "conversionExponent", "conversionType", "type", "format", "counterID", "counterSetType", "counterInstance", "colorMap", "graphConfiguration"],
+                "required": [
+                    "title",
+                    "unit",
+                    "conversionFactor",
+                    "conversionExponent",
+                    "conversionType",
+                    "decimalPlaces",
+                    "format",
+                    "counterID",
+                    "counterSetType",
+                    "counterInstance",
+                    "colorMap",
+                    "graphConfiguration"
+                ],
                 "properties": {
                     "title": {
                         "type": "string"
@@ -35,6 +48,10 @@
                     "conversionType": {
                         "type": "string",
                         "enum": ["D", "M"]
+                    },
+                    "decimalPlaces": {
+                        "type": "integer",
+                        "minimum": 0
                     },
                     "format": {
                         "type": "string",
@@ -55,11 +72,21 @@
                         "type": "object",
                         "additionalProperties": {
                             "type": "string"
+                        },
+                        "propertyNames": {
+                            "pattern": "^\\d+(\\.\\d+)?$"
                         }
                     },
                     "graphConfiguration": {
                         "type": "object",
-                        "required": ["Samples", "graphType", "showStatistics", "yAxisStep", "yAxisMaxRows", "colors"],
+                        "required": [
+                            "Samples",
+                            "graphType",
+                            "showStatistics",
+                            "yAxisStep",
+                            "yAxisMaxRows",
+                            "colors"
+                        ],
                         "properties": {
                             "Samples": {
                                 "type": "integer",
@@ -95,6 +122,25 @@
                                     }
                                 }
                             }
+                        }
+                    }
+                },
+                "if": {
+                    "properties": {
+                        "counterSetType": { "const": "SingleInstance" }
+                    }
+                },
+                "then": {
+                    "properties": {
+                        "counterInstance": { "const": "" }
+                    }
+                },
+                "else": {
+                    "properties": {
+                        "counterInstance": {
+                            "type": "string",
+                            "minLength": 1,
+                            "pattern": "^[^|]+(\\|[^|]+)*$"
                         }
                     }
                 }
