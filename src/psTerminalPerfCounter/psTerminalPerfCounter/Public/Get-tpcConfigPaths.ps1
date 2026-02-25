@@ -45,11 +45,11 @@ function Get-tpcConfigPaths {
         - Get-tpcAvailableCounterConfig: View available configurations from all paths
     #>
 
-    [CmdletBinding()]
-    [OutputType([string[]])]
-    param(
-        [switch] $noDefault
-    )
+[CmdletBinding()]
+[OutputType([string[]])]
+param(
+    [switch] $noDefault
+)
 
     $paths = @()
 

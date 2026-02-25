@@ -31,27 +31,24 @@ function Get-tpcAvailableCounterConfig {
 #>
 
 [CmdletBinding()]
-[OutputType([PSCustomObject[]])]
-param(
-    [switch]    $Raw,
-    [switch]    $TestCounters
+param (
+    [Parameter()]
+    [string] $configPath,
+
+    [Parameter()]
+    [switch] $TestCounters
 )
 
     try {
 
-        # required module for JSON schema validation
         $skipSchemaValidation = $false
-
-        if ( -not (Get-Module -Name GripDevJsonSchemaValidator -ListAvailable) ) {
-            Write-Warning "Module 'GripDevJsonSchemaValidator' not found. Please install it with: Install-Module -Name GripDevJsonSchemaValidator"
-            Write-Warning "JSON schema validation will be skipped."
-            $skipSchemaValidation = $true
-        }
 
         # Check if central schema file exists
         if ( -not (Test-Path $script:JSON_SCHEMA_CONFIG_FILE) ) {
             Write-Warning "Central schema file not found at: $script:JSON_SCHEMA_CONFIG_FILE. Skipping schema validation."
             $skipSchemaValidation = $true
+        } else {
+            $configSchema = Get-Content $script:JSON_SCHEMA_CONFIG_FILE -Raw
         }
 
         # Get all configured paths using Get-tpcConfigPaths
@@ -60,6 +57,12 @@ param(
         if ( $ConfigPaths.Count -eq 0 ) {
             Write-Warning "No configuration paths found. Use Add-tpcConfigPath to add configuration directories."
             return @()
+        }
+
+        if ( $PSBoundParameters.ContainsKey('configPath') ) {
+
+        } else {
+
         }
 
         $AllResults         = @()
@@ -83,34 +86,35 @@ param(
 
             foreach ( $ConfigFile in $ConfigFiles ) {
 
-            try {
+                try {
 
-                $ConfigName    = $ConfigFile.BaseName -replace '^tpc_', ''
+                    $ConfigName    = $ConfigFile.BaseName -replace '^tpc_', ''
 
-                # Track duplicate configurations, 1st action for all files
+                    # Track duplicate configurations, 1st action for all files
 
-                $ConfigNameLower = $ConfigName.ToLower()
-                if ( $ConfigNamesFound.ContainsKey($ConfigNameLower) ) {
+                    $ConfigNameLower = $ConfigName.ToLower()
+
+                    if ( $ConfigNamesFound.ContainsKey($ConfigNameLower) ) {
                         $ConfigNamesFound[$ConfigNameLower] += 1
-                } else {
+                    } else {
                         $ConfigNamesFound[$ConfigNameLower] = 1
-                }
+                    }
 
-                $JsonContent   = Get-Content -Path $ConfigFile.FullName -Raw -ErrorAction Stop
+                    $JsonContent   = Get-Content -Path $ConfigFile.FullName -Raw -ErrorAction Stop
 
-                # Check for empty file
-                $isEmpty = [string]::IsNullOrWhiteSpace($JsonContent)
+                    # Check for empty file
+                    $isEmpty = [string]::IsNullOrWhiteSpace($JsonContent)
 
-                if ( -not $isEmpty ) {
+                    if ( -not $isEmpty ) {
                         $JsonConfig    = $JsonContent | ConvertFrom-Json -ErrorAction Stop
-                }
+                    }
 
-                # Determine if this is a duplicate
-                $IsDuplicate = $ConfigNamesFound[$ConfigNameLower] -gt 1
+                    # Determine if this is a duplicate
+                    $IsDuplicate = $ConfigNamesFound[$ConfigNameLower] -gt 1
 
-                $SchemaValidation = @{IsValid = $true; Errors = @()}
+                    $SchemaValidation = @{IsValid = $true; Errors = @()}
 
-                if ( -not $isEmpty -and -not $skipSchemaValidation ) {
+                    if ( -not $isEmpty -and -not $skipSchemaValidation ) {
 
                         try {
 
@@ -126,15 +130,16 @@ param(
                             $SchemaValidation.Errors      = @("Schema validation failed: $($_.Exception.Message)")
                         }
 
-                } else {
+                    } else {
 
                         Write-Verbose "Skipping schema validation for $ConfigName in path $ConfigPath due to missing module or schema file."
 
-                }
+                    }
 
-                $CounterDetails = @()
+                    $CounterDetails = @()
 
-                if ( -not $isEmpty ) {
+                    if ( -not $isEmpty ) {
+
                         foreach ( $CounterConfig in $JsonConfig.counters ) {
 
                         try {
@@ -188,51 +193,53 @@ param(
 
                             $CounterDetails += $CounterDetail
                         }
+
+                    }
                 }
+
+                    $ConfigOverview = [PSCustomObject]@{
+                            ConfigName               = $ConfigName
+                            ConfigPath               = $ConfigPath
+                            Description              = if ($isEmpty) { "Error: Empty configuration file" } else { $JsonConfig.description }
+                            ConfigFile               = $ConfigFile.FullName
+                            JsonValid                = if ($isEmpty) { $false } else { $SchemaValidation.IsValid }
+                            JsonValidationErrors     = if ($isEmpty) { @("Configuration file is empty or contains only whitespace") } else { $SchemaValidation.Errors }
+                            CounterCount             = $CounterDetails.Count
+                            ValidCounters            = if ($TestCounters) { ($CounterDetails | Where-Object { $_.Valid -eq $true }).Count }  else { "Not tested" }
+                            InvalidCounters          = if ($TestCounters) { ($CounterDetails | Where-Object { $_.Valid -eq $false }).Count } else { "Not tested" }
+                            Counters                 = $CounterDetails
+                            IsDuplicate              = $IsDuplicate
+                    }
+
+                    $PathResults += $ConfigOverview
+
+                } catch {
+
+                    Write-Error "Error processing configuration file '$($ConfigFile.Name)': $($_.Exception.Message)"
+
+                    # Determine if this is a duplicate (also for error configs)
+                    $ConfigNameLower = ($ConfigFile.BaseName -replace '^tpc_', '').ToLower()
+                    $IsDuplicate = $ConfigNamesFound[$ConfigNameLower] -gt 1
+
+                    $ErrorConfig = [PSCustomObject]@{
+                            ConfigName               = $ConfigFile.BaseName -replace '^tpc_', ''
+                            ConfigPath               = $ConfigPath
+                            Description              = "Error loading configuration"
+                            ConfigFile               = $ConfigFile.FullName
+                            JsonValid                = $false
+                            JsonValidationErrors     = @($_.Exception.Message)
+                            CounterCount             = 0
+                            ValidCounters            = if ($TestCounters) { 0 } else { "Not tested" }
+                            InvalidCounters          = if ($TestCounters) { 0 } else { "Not tested" }
+                            Counters                 = @()
+                            IsDuplicate              = $IsDuplicate
+                    }
+
+                    $PathResults += $ErrorConfig
+
+                }
+
             }
-
-                $ConfigOverview = [PSCustomObject]@{
-                        ConfigName               = $ConfigName
-                        ConfigPath               = $ConfigPath
-                        Description              = if ($isEmpty) { "Error: Empty configuration file" } else { $JsonConfig.description }
-                        ConfigFile               = $ConfigFile.FullName
-                        JsonValid                = if ($isEmpty) { $false } else { $SchemaValidation.IsValid }
-                        JsonValidationErrors     = if ($isEmpty) { @("Configuration file is empty or contains only whitespace") } else { $SchemaValidation.Errors }
-                        CounterCount             = $CounterDetails.Count
-                        ValidCounters            = if ($TestCounters) { ($CounterDetails | Where-Object { $_.Valid -eq $true }).Count }  else { "Not tested" }
-                        InvalidCounters          = if ($TestCounters) { ($CounterDetails | Where-Object { $_.Valid -eq $false }).Count } else { "Not tested" }
-                        Counters                 = $CounterDetails
-                        IsDuplicate              = $IsDuplicate
-                }
-
-                $PathResults += $ConfigOverview
-
-            } catch {
-
-                Write-Error "Error processing configuration file '$($ConfigFile.Name)': $($_.Exception.Message)"
-
-                # Determine if this is a duplicate (also for error configs)
-                $ConfigNameLower = ($ConfigFile.BaseName -replace '^tpc_', '').ToLower()
-                $IsDuplicate = $ConfigNamesFound[$ConfigNameLower] -gt 1
-
-                $ErrorConfig = [PSCustomObject]@{
-                        ConfigName               = $ConfigFile.BaseName -replace '^tpc_', ''
-                        ConfigPath               = $ConfigPath
-                        Description              = "Error loading configuration"
-                        ConfigFile               = $ConfigFile.FullName
-                        JsonValid                = $false
-                        JsonValidationErrors     = @($_.Exception.Message)
-                        CounterCount             = 0
-                        ValidCounters            = if ($TestCounters) { 0 } else { "Not tested" }
-                        InvalidCounters          = if ($TestCounters) { 0 } else { "Not tested" }
-                        Counters                 = @()
-                        IsDuplicate              = $IsDuplicate
-                }
-
-                $PathResults += $ErrorConfig
-
-            }
-        }
 
         # Add path results to overall results
         if ( $PathResults.Count -gt 0 ) {
