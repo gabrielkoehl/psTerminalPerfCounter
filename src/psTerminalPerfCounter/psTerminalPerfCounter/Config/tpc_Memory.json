@@ -16,18 +16,6 @@
                 "500": "RED",
                 "1000": "Yellow",
                 "999999": "Green"
-            },
-            "graphConfiguration": {
-                "Samples": 100,
-                "graphType": "Bar",
-                "showStatistics": true,
-                "yAxisStep": 500,
-                "yAxisMaxRows": 10,
-                "colors": {
-                    "title": "Green",
-                    "statistics": "Gray",
-                    "default": "White"
-                }
             }
         },
         {
@@ -44,18 +32,6 @@
                 "90": "Red",
                 "75": "Yellow",
                 "0": "Green"
-            },
-            "graphConfiguration": {
-                "Samples": 100,
-                "graphType": "Bar",
-                "showStatistics": true,
-                "yAxisStep": 10,
-                "yAxisMaxRows": 10,
-                "colors": {
-                    "title": "Red",
-                    "statistics": "Gray",
-                    "default": "White"
-                }
             }
         }
     ]
