@@ -1,4 +1,4 @@
-function Get-tpcAvailableCounterConfig {
+function Test-tpcAvailableCounterConfig {
 <#
 .SYNOPSIS
     Lists available performance counter configurations from all configured paths.
@@ -111,29 +111,28 @@ param (
                         $ConfigNamesFound[$ConfigNameLower] = 1
                     }
 
-
-                    $JsonContent   = Get-Content -Path $ConfigFile.FullName -Raw -ErrorAction Stop
-
-                    # Check for empty file
-                    $isEmpty = [string]::IsNullOrWhiteSpace($JsonContent)
-
-                    if ( -not $isEmpty ) {
-                        $JsonConfig    = $JsonContent | ConvertFrom-Json -ErrorAction Stop
-                    }
+                    $JsonContent        = Get-Content -Path $ConfigFile.FullName -Raw -ErrorAction Stop | ConvertFrom-Json -AsHashtable
+                    $mergedJsonContent  = Merge-JsonConfigDefaultValues -CounterConfig $JsonContent
+                    $rawJson            = $mergedJsonContent | ConvertTo-Json -Depth 10
+                    $isEmpty            = [string]::IsNullOrWhiteSpace($rawJson)
 
                     # Determine if this is a duplicate
                     $IsDuplicate = $ConfigNamesFound[$ConfigNameLower] -gt 1
 
                     $SchemaValidation = @{IsValid = $true; Errors = @()}
+                    $validationErrors = @()
 
-                    if ( -not $isEmpty -and -not $skipSchemaValidation ) {
+                    if ( -not $isEmpty -and -not $skipSchemaValidation) {
 
                         try {
 
-                            $ValidationResult = Test-JsonSchema -SchemaPath $script:JSON_SCHEMA_CONFIG_FILE -JsonPath $ConfigFile.FullName -ErrorAction Stop 6>$null
-                            $SchemaValidation.IsValid = $ValidationResult.Valid
+                            $isValid = Test-Json -Json $rawJson -Schema $schemaContent -ErrorAction SilentlyContinue -ErrorVariable validationErrors
+
+                            $SchemaValidation['IsValid']    = $isValid
+                            $SchemaValidation['Errors']     = $validationErrors.Exception.Message
+
                             if ( -not $ValidationResult.Valid ) {
-                                $SchemaValidation.Errors = @($ValidationResult.Errors | ForEach-Object { "$($_.Message) | Path: $($_.Path) | Line: $($_.LineNumber)" })
+                                $SchemaValidation.Errors = @($ValidationResult.Errors | ForEach-Object { $_ -replace '^.*?:\s', '' })
                             }
 
                         } catch {
