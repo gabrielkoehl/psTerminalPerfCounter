@@ -15,10 +15,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   * new configuration parameter `decimalPlaces` to specify the number of fractional digits for counter values
 * Get-tpcPerformanceCounterInfo
   * added remoting capability
+* Get-tpcAvailableCounterConfig -> Renamed Test-tpcAvailableCounterConfig
+  * added `configFilePath` parameter for single ConfigFile testing and validation
 
 ### Changed
 
 * JSON Configs simplified. Optional style and customization parameters are outsourced to `default_template_values.json` and merged at runtime when missing. Only include mandatory and optional parameters you want to customize.
+* Get-tpcAvailableCounterConfig -> Renamed Test-tpcAvailableCounterConfig
 
 ### Deprecated
 
