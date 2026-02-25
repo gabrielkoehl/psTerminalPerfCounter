@@ -126,14 +126,10 @@ param (
 
                         try {
 
-                            $isValid = Test-Json -Json $rawJson -Schema $schemaContent -ErrorAction SilentlyContinue -ErrorVariable validationErrors
+                            $isValid = Test-Json -Json $rawJson -Schema $configSchema -ErrorAction SilentlyContinue -ErrorVariable validationErrors
 
                             $SchemaValidation['IsValid']    = $isValid
-                            $SchemaValidation['Errors']     = $validationErrors.Exception.Message
-
-                            if ( -not $ValidationResult.Valid ) {
-                                $SchemaValidation.Errors = @($ValidationResult.Errors | ForEach-Object { $_ -replace '^.*?:\s', '' })
-                            }
+                            $SchemaValidation['Errors'] = @($validationErrors.Exception.Message | ForEach-Object { $_ -replace '^.*?:\s', '' })
 
                         } catch {
 
