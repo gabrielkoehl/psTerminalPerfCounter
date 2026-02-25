@@ -28,6 +28,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 
 * Requirement for 3rd Party Module 'GripDevJsonSchemaValidator' removed since PowerShell 7.4 fully supports Test-Json and Schema Validation
+* orphaned private `Get-ServerConfiguration`
 
 ### Fixed
 
