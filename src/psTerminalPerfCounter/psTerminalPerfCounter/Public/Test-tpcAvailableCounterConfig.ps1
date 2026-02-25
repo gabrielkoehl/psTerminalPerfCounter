@@ -48,8 +48,9 @@ param (
         $isSingleFile           = $false
         $AllResults             = @()
         $ConfigNamesFound       = @{}
+        $localCounterMap        = Get-CounterMap
 
-        # Check if central schema file exists
+
         if ( -not (Test-Path $script:JSON_SCHEMA_CONFIG_FILE) ) {
             Write-Warning "Central schema file not found at: $script:JSON_SCHEMA_CONFIG_FILE. Skipping schema validation."
             $skipSchemaValidation = $true
@@ -68,6 +69,7 @@ param (
             Write-Warning "No configuration paths found. Use Add-tpcConfigPath to add configuration directories."
             return @()
         }
+
 
         foreach ( $ConfigPath in $ConfigPaths ) {
 
@@ -108,6 +110,7 @@ param (
                     } else {
                         $ConfigNamesFound[$ConfigNameLower] = 1
                     }
+
 
                     $JsonContent   = Get-Content -Path $ConfigFile.FullName -Raw -ErrorAction Stop
 
@@ -169,7 +172,7 @@ param (
                                 $false,
                                 "",
                                 $NULL,
-                                $(get-CounterMap)
+                                $localCounterMap
                             )
 
                             $IsAvailable = if ($TestCounters) { $Counter.TestAvailability() } else { $null }
