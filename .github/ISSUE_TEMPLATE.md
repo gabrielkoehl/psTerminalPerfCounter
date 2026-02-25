@@ -15,7 +15,7 @@
 <!--- Not obligatory, but suggest a fix/reason for the bug, -->
 <!--- or ideas how to implement the addition or change -->
 
-## Configuration Test passed ( Get-tpcAvailableCounterConfig.ps1 -testcounters ) ?
+## Configuration Test passed ( Test-tpcAvailableCounterConfig.ps1 ) ?
 
 ## Steps to Reproduce (for bugs)
 <!--- Provide a link to a live example, or an unambiguous set of steps to -->

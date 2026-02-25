@@ -5,7 +5,7 @@ online version:
 schema: 2.0.0
 ---
 
-# Get-tpcAvailableCounterConfig
+# Test-tpcAvailableCounterConfig
 
 ## SYNOPSIS
 Retrieves, validates, and displays detailed information about available performance counter configurations from all configured paths.
@@ -13,7 +13,7 @@ Retrieves, validates, and displays detailed information about available performa
 ## SYNTAX
 
 ```
-Get-tpcAvailableCounterConfig [-Raw] [-TestCounters] [-ProgressAction <ActionPreference>] [<CommonParameters>]
+Test-tpcAvailableCounterConfig [-Raw] [-TestCounters] [-ProgressAction <ActionPreference>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -33,7 +33,7 @@ Template files (containing 'template' in the basename) are automatically exclude
 
 ### EXAMPLE 1
 ```
-Get-tpcAvailableCounterConfig
+Test-tpcAvailableCounterConfig
 ```
 
 Shows formatted overview of all available configurations from all configured paths.
@@ -41,7 +41,7 @@ Displays configuration names, descriptions, counter counts, and validation statu
 
 ### EXAMPLE 2
 ```
-Get-tpcAvailableCounterConfig -TestCounters
+Test-tpcAvailableCounterConfig -TestCounters
 ```
 
 Shows formatted overview with counter availability testing from all configured paths.
@@ -49,14 +49,14 @@ Validates each counter to ensure it's available on the current system.
 
 ### EXAMPLE 3
 ```
-Get-tpcAvailableCounterConfig -Raw
+Test-tpcAvailableCounterConfig -Raw
 ```
 
 Returns raw configuration objects for further processing or custom filtering.
 
 ### EXAMPLE 4
 ```
-Get-tpcAvailableCounterConfig | Where-Object { $_.JsonValid -eq $false }
+Test-tpcAvailableCounterConfig | Where-Object { $_.JsonValid -eq $false }
 ```
 
 Lists only configurations with JSON validation errors (when used with -Raw).
@@ -116,11 +116,6 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 ## INPUTS
 
 ## OUTPUTS
-
-### Formatted console output by default (grouped by path), PSCustomObject[] when -Raw is used.
-## NOTES
-This function requires the GripDevJsonSchemaValidator module for JSON schema validation.
-If not installed, validation will be skipped with a warning.
 
 Related commands:
 - Get-tpcConfigPaths: List all configured configuration paths

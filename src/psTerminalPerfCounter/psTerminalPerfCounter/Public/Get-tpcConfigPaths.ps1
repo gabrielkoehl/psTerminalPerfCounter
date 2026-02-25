@@ -42,7 +42,7 @@ function Get-tpcConfigPaths {
         Related commands:
         - Add-tpcConfigPath: Add new paths to configuration
         - Remove-tpcConfigPath: Remove paths from configuration
-        - Get-tpcAvailableCounterConfig: View available configurations from all paths
+        - Test-tpcAvailableCounterConfig: View available configurations from all paths
     #>
 
 [CmdletBinding()]

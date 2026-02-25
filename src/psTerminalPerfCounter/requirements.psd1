@@ -23,7 +23,4 @@
     'PSScriptAnalyzer' = @{
         Version = '1.19.1'
     }
-    'GripDevJsonSchemaValidator' = @{
-        Version = '1.0.29'
-    }
 }

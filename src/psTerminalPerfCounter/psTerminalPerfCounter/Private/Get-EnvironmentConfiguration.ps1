@@ -61,12 +61,6 @@ function Get-EnvironmentConfiguration {
 
         $skipSchemaValidation = $false
 
-        if ( -not (Get-Module -Name GripDevJsonSchemaValidator -ListAvailable) ) {
-            Write-Warning "Module 'GripDevJsonSchemaValidator' not found. Please install it with: Install-Module -Name GripDevJsonSchemaValidator"
-            Write-Warning "JSON schema validation will be skipped."
-            $skipSchemaValidation = $true
-        }
-
         if ( -not (Test-Path $script:JSON_SCHEMA_ENVIRONMENT_FILE) ) {
             Write-Warning "Environment schema file not found at: $script:JSON_SCHEMA_ENVIRONMENT_FILE. Skipping schema validation."
             $skipSchemaValidation = $true

@@ -318,7 +318,7 @@ param (
 
     } catch {
 
-        Write-Error "Error in Get-tpcAvailableCounterConfig: $($_.Exception.Message)"
+        Write-Error "Error in Test-tpcAvailableCounterConfig: $($_.Exception.Message)"
 
     }
 
