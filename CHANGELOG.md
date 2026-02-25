@@ -27,6 +27,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Removed
 
+* Requirement for 3rd Party Module 'GripDevJsonSchemaValidator' removed since PowerShell 7.4 fully supports Test-Json and Schema Validation
+
 ### Fixed
 
 * Get-PerformanceCounterLookup
@@ -42,7 +44,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 * Show-CounterTable
   * fixed bug with conversion int -> double, when counter returns doubles -> skipped colormap
   * seperator current value not colored anymore
-* several internal function calls, parameters, logic
+* a shitload of minor bugs, logic errors and orphaned code
 
 ### Security
 
