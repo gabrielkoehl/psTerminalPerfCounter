@@ -3,8 +3,8 @@
           "name": "SQL_ENVIRONMENT_001",
           "description": "SQL Server Environment Production",
           "interval": 2,
-          "secretvaultname": "SecretStore",
-          "credentialname": "integrated",
+          "secretvaultname2": "SecretStore",
+          "credentialname2": "integrated",
           "servers": [
                {
                     "computername": "LAB-NODE2",

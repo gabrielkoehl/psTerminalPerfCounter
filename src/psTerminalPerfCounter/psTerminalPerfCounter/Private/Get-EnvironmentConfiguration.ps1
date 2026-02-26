@@ -81,10 +81,14 @@ function Get-EnvironmentConfiguration {
                 $isValid = Test-Json -Json $configContentRaw -Schema $configSchema -ErrorAction SilentlyContinue -ErrorVariable validationErrors
 
                 if ( -not $isValid ) {
+
+                    Write-Host "JSON validation error found" -ForegroundColor Red
+
                     $validationErrors.Exception.Message | ForEach-Object {
-                        Write-Warning "  - $($_ -replace '^.*?:\s', '')"
-                        throw "Environment configuration JSON schema validation failed"
+                        Write-Host "  - $($_ -replace '^.*?:\s', '')" -ForegroundColor Yellow
                     }
+
+                    throw "Environment configuration JSON schema validation failed"
                 }
 
                 Write-Host "Environment configuration passed JSON schema validation"

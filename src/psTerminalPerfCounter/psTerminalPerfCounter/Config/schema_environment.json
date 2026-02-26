@@ -27,7 +27,7 @@
             },
             "credentialname": {
                 "type": "string",
-                "description": "Optional credential name to use for authentication (e.g., 'integrated' for integrated authentication)"
+                "description": "Optional credential name (e.g. 'integrated' for Windows auth)"
             },
             "servers": {
                 "type": "array",
@@ -48,16 +48,31 @@
                         },
                         "counterConfig": {
                             "type": "array",
-                            "description": "Array of counter configuration names (e.g., 'CPU', 'Memory', 'DISK')",
+                            "description": "Counter names or file paths (local or UNC)",
                             "minItems": 1,
                             "items": {
                                 "type": "string",
-                                "minLength": 1
+                                "anyOf": [
+                                    {
+                                        "description": "Simple counter name (e.g. CPU, Memory, DISK)",
+                                        "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+                                    },
+                                    {
+                                        "description": "Windows local path (e.g. C:\\PerfLogs\\counter.blg)",
+                                        "pattern": "^[A-Za-z]:\\\\.+"
+                                    },
+                                    {
+                                        "description": "UNC path (e.g. \\\\server\\share\\counter.blg)",
+                                        "pattern": "^\\\\\\\\.+"
+                                    }
+                                ]
                             }
                         }
-                    }
+                    },
+                    "additionalProperties": false
                 }
             }
-        }
+        },
+        "additionalProperties": false
     }
 }
