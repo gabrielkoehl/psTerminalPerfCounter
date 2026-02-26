@@ -7,6 +7,6 @@ import-module -fullyqualifiedname ".\src\psTerminalPerfCounter\psTerminalPerfCou
 
 # start-tpcMonitor -ConfigName CPU
 
-#Start-tpcEnvironmentMonitor -ConfigPath "src\psTerminalPerfCounter\psTerminalPerfCounter\Config\ENV_SERVER_EXAMPLE.json"
+Start-tpcEnvironmentMonitor -EnvConfigPath "src\psTerminalPerfCounter\psTerminalPerfCounter\Config\ENV_SERVER_EXAMPLE.json"
 
-Test-tpcAvailableCounterConfig
+# Test-tpcAvailableCounterConfig
