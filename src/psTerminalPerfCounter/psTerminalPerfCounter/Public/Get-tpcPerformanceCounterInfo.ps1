@@ -2,21 +2,13 @@
 function Get-tpcPerformanceCounterInfo {
 <#
     .SYNOPSIS
-        Resolves performance counter IDs (SetID-PathID) from names or validates existing composite IDs.
-
-    .DESCRIPTION
-        Discovers and validates language-independent composite counter IDs for JSON configuration templates.
-        Supports local and remote execution via Invoke-Command.
-
-        Input modes:
-        - Composite ID ("238-6"): Resolves to localized counter names and metadata
-        - Name/pattern ("Processor"): Searches all counter sets and returns matching composite IDs
+        Resolves performance counter IDs from names or validates existing composite IDs. Supports local and remote lookup.
 
     .PARAMETER SearchTerm
-        Composite ID (format "SetID-PathID") or localized counter name/pattern (wildcards supported).
+        Composite ID ("238-6") or localized counter name/pattern (wildcards supported).
 
     .PARAMETER ComputerName
-        Target remote machine. Triggers connectivity check and remote execution.
+        Target remote machine for remote lookup.
 
     .PARAMETER Credential
         Alternate credentials for remote execution.
@@ -29,9 +21,6 @@ function Get-tpcPerformanceCounterInfo {
 
     .EXAMPLE
         Get-tpcPerformanceCounterInfo -SearchTerm "Processor" -ComputerName 'lab-node1'
-
-    .OUTPUTS
-        PSCustomObject: ID, CounterSet, Path, SetType, Instances
     #>
 
     [CmdletBinding(DefaultParameterSetName = 'Local')]

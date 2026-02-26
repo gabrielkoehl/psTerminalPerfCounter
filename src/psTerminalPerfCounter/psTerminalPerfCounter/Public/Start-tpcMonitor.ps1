@@ -1,35 +1,24 @@
 ﻿function Start-tpcMonitor {
 <#
     .SYNOPSIS
-        Starts real-time performance counter monitoring for local or remote systems using predefined JSON configuration templates.
-
-    .DESCRIPTION
-        Main entry point for the psTerminalPerfCounter module singler server monitoring. Loads counter configurations from JSON templates,
-        resolves language-independent counter IDs via Get-CounterMap, and starts continuous monitoring via Start-MonitoringLoop.
-        Supports local and remote monitoring. Remote targets are validated via Test-Connection before counter resolution.
-        If ComputerName matches the local hostname, monitoring falls back to local mode.
-        Press Ctrl+C to stop monitoring.
+        Starts real-time performance counter monitoring for a single local or remote system.
 
     .PARAMETER ConfigName
         Name of the configuration template (without 'tpc_' prefix and '.json' extension).
-        Must correspond to a file in the module's config directories.
         Cannot be combined with ConfigPath.
 
     .PARAMETER ConfigPath
-        Absolute path to a JSON configuration file. Must match the pattern 'tpc_*.json'.
+        Absolute path to a JSON configuration file (pattern 'tpc_*.json').
         Cannot be combined with ConfigName.
 
     .PARAMETER ComputerName
         DNS name of the remote computer to monitor.
-        Requires network connectivity and remote performance counter access.
 
     .PARAMETER Credential
-        PSCredential for remote authentication. Defaults to current user credentials.
-        Only applicable with ComputerName.
+        PSCredential for remote authentication. Only applicable with ComputerName.
 
     .PARAMETER UpdateInterval
         Seconds between counter updates. Default: 1.
-        Graph time span = Samples (from config) × UpdateInterval.
 
     .EXAMPLE
         Start-tpcMonitor -ConfigName "CPU"

@@ -1,45 +1,16 @@
 function Remove-tpcConfigPath {
     <#
     .SYNOPSIS
-        Removes custom configuration paths from the TPC_CONFIGPATH environment variable.
-
-    .DESCRIPTION
-        This function provides an interactive menu to remove custom paths from the TPC_CONFIGPATH user
-        environment variable. It displays all currently configured paths with their existence status
-        and allows the user to select which path(s) to remove.
-
-        The function provides an interactive selection menu where users can choose paths by number.
-        Paths are displayed with indicators showing whether they exist (✓) or not (✗).
-
-        Note: This function only affects custom paths stored in the environment variable. The module's
-        default config directory cannot be removed through this function.
+        Removes custom configuration paths from the TPC_CONFIGPATH user environment variable.
 
     .PARAMETER All
-        If specified, removes all custom paths from the TPC_CONFIGPATH environment variable without prompting.
-        The module's default config directory is not affected.
-
-    .PARAMETER ProgressAction
-        Common parameter to control the display of progress bars. (PowerShell 7.4+)
+        Removes all custom paths without prompting. Module default is not affected.
 
     .EXAMPLE
         Remove-tpcConfigPath
 
-        Shows an interactive menu to select and remove custom configuration paths.
-        Displays path existence status and allows sequential removal with confirmation.
-
     .EXAMPLE
         Remove-tpcConfigPath -All
-
-        Removes all custom configuration paths from TPC_CONFIGPATH without prompting.
-
-    .OUTPUTS
-        None. Updates the TPC_CONFIGPATH user environment variable.
-
-    .NOTES
-        Related commands:
-        - Get-tpcConfigPaths: List all configured paths
-        - Add-tpcConfigPath: Add new paths to configuration
-        - Test-tpcAvailableCounterConfig: View available configurations from all paths
     #>
 
     [CmdletBinding()]

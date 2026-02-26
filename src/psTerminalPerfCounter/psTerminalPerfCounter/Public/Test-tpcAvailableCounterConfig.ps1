@@ -1,13 +1,7 @@
 function Test-tpcAvailableCounterConfig {
 <#
 .SYNOPSIS
-    Validates and displays available tpc counter configurations.
-
-.DESCRIPTION
-    Scans configured paths (or a single file) for 'tpc_*.json' files.
-    Validates against JSON schema using Test-Json (PowerShell 7.4+),
-    merges default values, resolves counter paths, and detects duplicates.
-    Template files are excluded.
+    Validates and lists available tpc counter configurations from all registered paths.
 
 .PARAMETER configFilePath
     Path to a single configuration file. If omitted, all configured paths are scanned.
@@ -23,9 +17,6 @@ function Test-tpcAvailableCounterConfig {
 
 .EXAMPLE
     Test-tpcAvailableCounterConfig -Raw | Where-Object { -not $_.JsonValid }
-
-.OUTPUTS
-    Formatted console output (default) or PSCustomObject[] (-Raw).
 #>
 
 [CmdletBinding()]
