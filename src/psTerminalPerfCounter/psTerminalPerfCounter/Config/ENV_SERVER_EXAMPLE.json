@@ -19,7 +19,7 @@
                     "comment": "Sql Server Node A Production",
                     "counterConfig": [
                          "CPU",
-                         "DISK"
+                         "C:\\syncthing\\gabi_development\\repositories\\psTerminalPerfCounter\\src\\psTerminalPerfCounter\\psTerminalPerfCounter\\Config\\tpc_Disk.json"
                     ]
                },
                {

@@ -32,7 +32,23 @@
 
                         if ( $null -eq $setCredential ) { $param['Credential'] = $setCredential }
 
-                        $config = Get-CounterConfiguration -ConfigName $CounterConfig -computername $ServerConfig.computername -credential $setCredential -counterMap $serverCounterMap
+                        $param = @{
+                            "computername"  = $ServerConfig.computername
+                            "credential"    = $setCredential
+                            "counterMap"    = $serverCounterMap
+                        }
+
+                        if ($CounterConfig -match '^[A-Za-z][A-Za-z0-9_]*$') {
+                            # counter name
+                            $param['ConfigName'] = $CounterConfig
+                        } elseif ($CounterConfig -match '^[A-Za-z]:\\|^\\\\') {
+                            # counter path (local, unc)
+                            $param['ConfigPath'] = $CounterConfig
+                        } else {
+                            # Nothing to do here - schema validation would have already aborted before reaching this point
+                        }
+
+                        $config = Get-CounterConfiguration @param
 
                         if ( $config.SkipServer ) {
                             $skipServer = $true
@@ -45,6 +61,7 @@
 
                 if ( $skipServer ) {
                     Write-Warning "Skipping server '$($ServerConfig.computername)' - marked as unreachable during counter configuration."
+                    Start-Sleep 1
                     continue
                 }
 
