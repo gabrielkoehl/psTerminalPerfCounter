@@ -52,20 +52,8 @@
                             "minItems": 1,
                             "items": {
                                 "type": "string",
-                                "anyOf": [
-                                    {
-                                        "description": "Simple counter name (e.g. CPU, Memory, DISK)",
-                                        "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
-                                    },
-                                    {
-                                        "description": "Windows local path (e.g. C:\\PerfLogs\\counter.blg)",
-                                        "pattern": "^[A-Za-z]:\\\\.+"
-                                    },
-                                    {
-                                        "description": "UNC path (e.g. \\\\server\\share\\counter.blg)",
-                                        "pattern": "^\\\\\\\\.+"
-                                    }
-                                ]
+                                "minLength": 1,
+                                "pattern": "^([A-Za-z][A-Za-z0-9_]*|[A-Za-z]:\\\\.+|\\\\\\\\.+)$"
                             }
                         }
                     },
