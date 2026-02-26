@@ -1,0 +1,2 @@
+- Samples Configweit, nicht per sample -> Verzerrt sonst countersets
+- Wenn später Output nach csv, html usw. ggf. konsolenoutput nur auf processing reduzieren, sonst stirbt die konsole.
