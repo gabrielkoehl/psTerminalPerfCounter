@@ -1,28 +1,4 @@
 function Get-EnvironmentConfiguration {
-    <#
-    .SYNOPSIS
-        Loads an environment configuration from JSON file containing multiple servers
-
-    .DESCRIPTION
-        Parses a JSON configuration file that defines an environment with multiple servers.
-        Each server can have multiple counter configurations (e.g., CPU, Memory).
-        Creates EnvironmentConfiguration object with all ServerConfiguration objects.
-
-    .PARAMETER ConfigPath
-        Path to the JSON configuration file (e.g., _remoteconfigs\AD_SERVER_001.json)
-
-    .EXAMPLE
-        $env = Get-EnvironmentConfiguration -ConfigPath "_remoteconfigs\AD_SERVER_001.json"
-        $env.GetAllValuesParallelAsync().GetAwaiter().GetResult()
-
-    .OUTPUTS
-        EnvironmentConfiguration object
-
-    .NOTES
-        Requires PowerShellLogger to be initialized in $script:logger
-        JSON file must contain: name, description, interval, servers array
-    #>
-
     [CmdletBinding()]
     [OutputType([psTPCCLASSES.EnvironmentConfiguration])]
     param(

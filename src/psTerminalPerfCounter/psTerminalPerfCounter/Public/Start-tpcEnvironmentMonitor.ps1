@@ -90,7 +90,7 @@ function Start-tpcEnvironmentMonitor {
     try {
 
         # Load environment configuration
-        Write-Host "Loading environment configuration from '$ConfigPath'..." -ForegroundColor Yellow
+        Write-Host "Loading environment configuration from '$EnvConfigPath'..." -ForegroundColor Yellow
 
         $environment = Get-EnvironmentConfiguration -EnvConfigPath $EnvConfigPath
         if ( -not $environment ) {
