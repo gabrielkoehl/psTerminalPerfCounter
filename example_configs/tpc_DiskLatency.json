@@ -1,0 +1,64 @@
+{
+    "name": "Disk Latency Analysis",
+    "description": "Read/Write latency per drive. Adjust counterInstance to your drive letters or mountpoints.",
+    "counters": [
+        {
+            "title": "Avg. Read Latency",
+            "unit": "ms",
+            "conversionFactor": 1000,
+            "conversionExponent": 1,
+            "conversionType": "M",
+            "decimalPlaces": 2,
+            "format": "both",
+            "counterID": "234-208",
+            "counterSetType": "MultiInstance",
+            "counterInstance": "0 C:|1 D:",
+            "colorMap": {
+                "5": "Green",
+                "15": "Yellow",
+                "30": "Red"
+            },
+            "graphConfiguration": {
+                "Samples": 100,
+                "graphType": "Line",
+                "showStatistics": true,
+                "yAxisStep": 5,
+                "yAxisMaxRows": 10,
+                "colors": {
+                    "title": "Cyan",
+                    "statistics": "Gray",
+                    "default": "White"
+                }
+            }
+        },
+        {
+            "title": "Avg. Write Latency",
+            "unit": "ms",
+            "conversionFactor": 1000,
+            "conversionExponent": 1,
+            "conversionType": "M",
+            "decimalPlaces": 2,
+            "format": "both",
+            "counterID": "234-210",
+            "counterSetType": "MultiInstance",
+            "counterInstance": "0 C:|1 D:",
+            "colorMap": {
+                "5": "Green",
+                "15": "Yellow",
+                "30": "Red"
+            },
+            "graphConfiguration": {
+                "Samples": 100,
+                "graphType": "Line",
+                "showStatistics": true,
+                "yAxisStep": 5,
+                "yAxisMaxRows": 10,
+                "colors": {
+                    "title": "Yellow",
+                    "statistics": "Gray",
+                    "default": "White"
+                }
+            }
+        }
+    ]
+}

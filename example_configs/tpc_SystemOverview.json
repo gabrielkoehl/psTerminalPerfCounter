@@ -1,0 +1,75 @@
+{
+    "name": "System Overview",
+    "description": "Quick single-view: CPU, Memory, Disk Queue",
+    "counters": [
+        {
+            "title": "CPU Total",
+            "unit": "%",
+            "format": "both",
+            "counterID": "238-6",
+            "counterSetType": "MultiInstance",
+            "counterInstance": "_Total",
+            "colorMap": {
+                "30": "Green",
+                "70": "Yellow",
+                "90": "Red"
+            }
+        },
+        {
+            "title": "Available Memory",
+            "unit": "MB",
+            "conversionFactor": 1048576,
+            "conversionExponent": 1,
+            "conversionType": "D",
+            "decimalPlaces": 0,
+            "format": "table",
+            "counterID": "4-24",
+            "counterSetType": "SingleInstance",
+            "counterInstance": "",
+            "colorMap": {
+                "512": "Red",
+                "1024": "Yellow",
+                "999999": "Green"
+            }
+        },
+        {
+            "title": "Committed Bytes In Use",
+            "unit": "%",
+            "format": "table",
+            "counterID": "4-1406",
+            "counterSetType": "SingleInstance",
+            "counterInstance": "",
+            "colorMap": {
+                "60": "Green",
+                "80": "Yellow",
+                "90": "Red"
+            }
+        },
+        {
+            "title": "Processor Queue Length",
+            "unit": "Threads",
+            "format": "table",
+            "counterID": "2-44",
+            "counterSetType": "SingleInstance",
+            "counterInstance": "",
+            "colorMap": {
+                "2": "Green",
+                "4": "Yellow",
+                "8": "Red"
+            }
+        },
+        {
+            "title": "Disk Queue Length",
+            "unit": "",
+            "format": "table",
+            "counterID": "234-198",
+            "counterSetType": "MultiInstance",
+            "counterInstance": "_Total",
+            "colorMap": {
+                "2": "Green",
+                "5": "Yellow",
+                "10": "Red"
+            }
+        }
+    ]
+}

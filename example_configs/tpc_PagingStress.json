@@ -1,0 +1,93 @@
+{
+    "name": "Paging & Memory Pressure",
+    "description": "Detects memory pressure through paging activity.",
+    "counters": [
+        {
+            "title": "Available Memory",
+            "unit": "MB",
+            "conversionFactor": 1024,
+            "conversionExponent": 2,
+            "conversionType": "D",
+            "decimalPlaces": 0,
+            "format": "both",
+            "counterID": "4-24",
+            "counterSetType": "SingleInstance",
+            "counterInstance": "",
+            "colorMap": {
+                "256": "Red",
+                "512": "Yellow",
+                "999999": "Green"
+            }
+        },
+        {
+            "title": "Pages/sec",
+            "unit": "",
+            "format": "both",
+            "counterID": "4-822",
+            "counterSetType": "SingleInstance",
+            "counterInstance": "",
+            "decimalPlaces": 0,
+            "colorMap": {
+                "20": "Green",
+                "100": "Yellow",
+                "500": "Red"
+            },
+            "graphConfiguration": {
+                "Samples": 100,
+                "graphType": "Bar",
+                "showStatistics": true,
+                "yAxisStep": 50,
+                "yAxisMaxRows": 10,
+                "colors": {
+                    "title": "Cyan",
+                    "statistics": "Gray",
+                    "default": "White"
+                }
+            }
+        },
+        {
+            "title": "Page Faults/sec",
+            "unit": "",
+            "format": "table",
+            "counterID": "4-28",
+            "counterSetType": "SingleInstance",
+            "counterInstance": "",
+            "decimalPlaces": 0,
+            "colorMap": {
+                "1000": "Green",
+                "5000": "Yellow",
+                "20000": "Red"
+            }
+        },
+        {
+            "title": "Committed Bytes In Use",
+            "unit": "%",
+            "format": "table",
+            "counterID": "4-1406",
+            "counterSetType": "SingleInstance",
+            "counterInstance": "",
+            "colorMap": {
+                "60": "Green",
+                "80": "Yellow",
+                "95": "Red"
+            }
+        },
+        {
+            "title": "Avg. Disk Read Latency",
+            "unit": "ms",
+            "conversionFactor": 1000,
+            "conversionExponent": 1,
+            "conversionType": "M",
+            "decimalPlaces": 2,
+            "format": "table",
+            "counterID": "234-208",
+            "counterSetType": "MultiInstance",
+            "counterInstance": "_Total",
+            "colorMap": {
+                "5": "Green",
+                "20": "Yellow",
+                "50": "Red"
+            }
+        }
+    ]
+}
