@@ -124,17 +124,13 @@ param (
                             $isValid = Test-Json -Json $rawJson -Schema $configSchema -ErrorAction SilentlyContinue -ErrorVariable validationErrors
 
                             $SchemaValidation['IsValid']    = $isValid
-                            $SchemaValidation['Errors'] = @($validationErrors.Exception.Message | ForEach-Object { $_ -replace '^.*?:\s', '' })
+                            $SchemaValidation['Errors']     = @($validationErrors.Exception.Message | ForEach-Object { $_ -replace '^.*?:\s', '' })
 
                         } catch {
 
                             $SchemaValidation.IsValid     = $false
                             $SchemaValidation.Errors      = @("Schema validation failed: $($_.Exception.Message)")
                         }
-
-                    } else {
-
-                        Write-Verbose "Skipping schema validation for $ConfigName in path $ConfigPath due to missing module or schema file."
 
                     }
 
