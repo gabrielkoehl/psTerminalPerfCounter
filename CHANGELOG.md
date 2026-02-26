@@ -15,14 +15,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   * new configuration parameter `decimalPlaces` to specify the number of fractional digits for counter values
 * Get-tpcPerformanceCounterInfo
   * added remoting capability
+* Get-tpcAvailableCounterConfig -> Renamed Test-tpcAvailableCounterConfig
+  * added `configFilePath` parameter for single ConfigFile testing and validation
 
 ### Changed
 
 * JSON Configs simplified. Optional style and customization parameters are outsourced to `default_template_values.json` and merged at runtime when missing. Only include mandatory and optional parameters you want to customize.
+* Get-tpcAvailableCounterConfig -> Renamed Test-tpcAvailableCounterConfig
 
 ### Deprecated
 
 ### Removed
+
+* Requirement for 3rd Party Module 'GripDevJsonSchemaValidator' removed since PowerShell 7.4 fully supports Test-Json and Schema Validation
+* orphaned private `Get-ServerConfiguration`
+* `Test-tpcServerConfiguration` was an older DEV/Test function, other functions now are stable enough
 
 ### Fixed
 
@@ -39,7 +46,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 * Show-CounterTable
   * fixed bug with conversion int -> double, when counter returns doubles -> skipped colormap
   * seperator current value not colored anymore
-* several internal function calls, parameters, logic
+* a shitload of minor bugs, logic errors and orphaned code
 
 ### Security
 

@@ -53,25 +53,25 @@ at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPer
               <test-case description="Has example help" name="Test help for Add-tpcConfigPath.Has example help" time="0.0123" asserts="0" success="True" result="Success" executed="True" />
             </results>
           </test-suite>
-          <test-suite type="TestFixture" name="Test help for Get-tpcAvailableCounterConfig" executed="True" result="Failure" success="False" time="0.6286" asserts="0" description="Test help for Get-tpcAvailableCounterConfig">
+          <test-suite type="TestFixture" name="Test help for Test-tpcAvailableCounterConfig" executed="True" result="Failure" success="False" time="0.6286" asserts="0" description="Test help for Test-tpcAvailableCounterConfig">
             <results>
-              <test-suite type="TestFixture" name="Test help for Get-tpcAvailableCounterConfig.Parameter ProgressAction" executed="True" result="Failure" success="False" time="0.1061" asserts="0" description="Test help for Get-tpcAvailableCounterConfig.Parameter ProgressAction">
+              <test-suite type="TestFixture" name="Test help for Test-tpcAvailableCounterConfig.Parameter ProgressAction" executed="True" result="Failure" success="False" time="0.1061" asserts="0" description="Test help for Test-tpcAvailableCounterConfig.Parameter ProgressAction">
                 <results>
-                  <test-case description="Has description" name="Test help for Get-tpcAvailableCounterConfig.Parameter ProgressAction.Has description" time="0.0229" asserts="0" success="False" result="Failure" executed="True">
+                  <test-case description="Has description" name="Test help for Test-tpcAvailableCounterConfig.Parameter ProgressAction.Has description" time="0.0229" asserts="0" success="False" result="Failure" executed="True">
                     <failure>
                       <message>Expected a value, but got $null or empty.</message>
                       <stack-trace>at $parameterHelp.Description.Text | Should -Not -BeNullOrEmpty, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:95
 at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:95</stack-trace>
                     </failure>
                   </test-case>
-                  <test-case description="Has correct [mandatory] value" name="Test help for Get-tpcAvailableCounterConfig.Parameter ProgressAction.Has correct [mandatory] value" time="0.0213" asserts="0" success="False" result="Failure" executed="True">
+                  <test-case description="Has correct [mandatory] value" name="Test help for Test-tpcAvailableCounterConfig.Parameter ProgressAction.Has correct [mandatory] value" time="0.0213" asserts="0" success="False" result="Failure" executed="True">
                     <failure>
                       <message>Expected 'False', but got $null.</message>
                       <stack-trace>at $parameterHelp.Required | Should -Be $codeMandatory, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:101
 at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:101</stack-trace>
                     </failure>
                   </test-case>
-                  <test-case description="Has correct parameter type" name="Test help for Get-tpcAvailableCounterConfig.Parameter ProgressAction.Has correct parameter type" time="0.0287" asserts="0" success="False" result="Failure" executed="True">
+                  <test-case description="Has correct parameter type" name="Test help for Test-tpcAvailableCounterConfig.Parameter ProgressAction.Has correct parameter type" time="0.0287" asserts="0" success="False" result="Failure" executed="True">
                     <failure>
                       <message>Expected 'ActionPreference', but got $null.</message>
                       <stack-trace>at $parameterHelpType | Should -Be $parameter.ParameterType.Name, C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\tests\help.tests.ps1:106
@@ -80,24 +80,24 @@ at &lt;ScriptBlock&gt;, C:\syncthing\gabi_development\repositories\psTerminalPer
                   </test-case>
                 </results>
               </test-suite>
-              <test-suite type="TestFixture" name="Test help for Get-tpcAvailableCounterConfig.Parameter Raw" executed="True" result="Success" success="True" time="0.135" asserts="0" description="Test help for Get-tpcAvailableCounterConfig.Parameter Raw">
+              <test-suite type="TestFixture" name="Test help for Test-tpcAvailableCounterConfig.Parameter Raw" executed="True" result="Success" success="True" time="0.135" asserts="0" description="Test help for Test-tpcAvailableCounterConfig.Parameter Raw">
                 <results>
-                  <test-case description="Has description" name="Test help for Get-tpcAvailableCounterConfig.Parameter Raw.Has description" time="0.0108" asserts="0" success="True" result="Success" executed="True" />
-                  <test-case description="Has correct [mandatory] value" name="Test help for Get-tpcAvailableCounterConfig.Parameter Raw.Has correct [mandatory] value" time="0.0064" asserts="0" success="True" result="Success" executed="True" />
-                  <test-case description="Has correct parameter type" name="Test help for Get-tpcAvailableCounterConfig.Parameter Raw.Has correct parameter type" time="0.0064" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="Has description" name="Test help for Test-tpcAvailableCounterConfig.Parameter Raw.Has description" time="0.0108" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="Has correct [mandatory] value" name="Test help for Test-tpcAvailableCounterConfig.Parameter Raw.Has correct [mandatory] value" time="0.0064" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="Has correct parameter type" name="Test help for Test-tpcAvailableCounterConfig.Parameter Raw.Has correct parameter type" time="0.0064" asserts="0" success="True" result="Success" executed="True" />
                 </results>
               </test-suite>
-              <test-suite type="TestFixture" name="Test help for Get-tpcAvailableCounterConfig.Parameter TestCounters" executed="True" result="Success" success="True" time="0.1672" asserts="0" description="Test help for Get-tpcAvailableCounterConfig.Parameter TestCounters">
+              <test-suite type="TestFixture" name="Test help for Test-tpcAvailableCounterConfig.Parameter TestCounters" executed="True" result="Success" success="True" time="0.1672" asserts="0" description="Test help for Test-tpcAvailableCounterConfig.Parameter TestCounters">
                 <results>
-                  <test-case description="Has description" name="Test help for Get-tpcAvailableCounterConfig.Parameter TestCounters.Has description" time="0.0124" asserts="0" success="True" result="Success" executed="True" />
-                  <test-case description="Has correct [mandatory] value" name="Test help for Get-tpcAvailableCounterConfig.Parameter TestCounters.Has correct [mandatory] value" time="0.0087" asserts="0" success="True" result="Success" executed="True" />
-                  <test-case description="Has correct parameter type" name="Test help for Get-tpcAvailableCounterConfig.Parameter TestCounters.Has correct parameter type" time="0.0065" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="Has description" name="Test help for Test-tpcAvailableCounterConfig.Parameter TestCounters.Has description" time="0.0124" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="Has correct [mandatory] value" name="Test help for Test-tpcAvailableCounterConfig.Parameter TestCounters.Has correct [mandatory] value" time="0.0087" asserts="0" success="True" result="Success" executed="True" />
+                  <test-case description="Has correct parameter type" name="Test help for Test-tpcAvailableCounterConfig.Parameter TestCounters.Has correct parameter type" time="0.0065" asserts="0" success="True" result="Success" executed="True" />
                 </results>
               </test-suite>
-              <test-case description="Help is not auto-generated" name="Test help for Get-tpcAvailableCounterConfig.Help is not auto-generated" time="0.01" asserts="0" success="True" result="Success" executed="True" />
-              <test-case description="Has description" name="Test help for Get-tpcAvailableCounterConfig.Has description" time="0.0051" asserts="0" success="True" result="Success" executed="True" />
-              <test-case description="Has example code" name="Test help for Get-tpcAvailableCounterConfig.Has example code" time="0.0051" asserts="0" success="True" result="Success" executed="True" />
-              <test-case description="Has example help" name="Test help for Get-tpcAvailableCounterConfig.Has example help" time="0.0057" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="Help is not auto-generated" name="Test help for Test-tpcAvailableCounterConfig.Help is not auto-generated" time="0.01" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="Has description" name="Test help for Test-tpcAvailableCounterConfig.Has description" time="0.0051" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="Has example code" name="Test help for Test-tpcAvailableCounterConfig.Has example code" time="0.0051" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="Has example help" name="Test help for Test-tpcAvailableCounterConfig.Has example help" time="0.0057" asserts="0" success="True" result="Success" executed="True" />
             </results>
           </test-suite>
           <test-suite type="TestFixture" name="Test help for Get-tpcConfigPaths" executed="True" result="Failure" success="False" time="0.8724" asserts="0" description="Test help for Get-tpcConfigPaths">

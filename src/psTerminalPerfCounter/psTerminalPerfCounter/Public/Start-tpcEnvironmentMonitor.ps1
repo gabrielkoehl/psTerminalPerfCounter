@@ -79,7 +79,7 @@ function Start-tpcEnvironmentMonitor {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
-        [string] $ConfigPath,
+        [string] $EnvConfigPath,
 
         [Parameter()]
         [int] $UpdateInterval = 0  # 0 = use from config
@@ -90,9 +90,9 @@ function Start-tpcEnvironmentMonitor {
     try {
 
         # Load environment configuration
-        Write-Host "Loading environment configuration from '$ConfigPath'..." -ForegroundColor Yellow
+        Write-Host "Loading environment configuration from '$EnvConfigPath'..." -ForegroundColor Yellow
 
-        $environment = Get-EnvironmentConfiguration -ConfigPath $ConfigPath
+        $environment = Get-EnvironmentConfiguration -EnvConfigPath $EnvConfigPath
         if ( -not $environment ) {
             Write-Warning "Failed to load environment configuration"
             Return

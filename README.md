@@ -66,7 +66,7 @@ You can configure any combination of performance counters that your system provi
 - **[Get-tpcConfigPaths](src/psTerminalPerfCounter/docs/en-US/Get-tpcConfigPaths.md)** - List configured pathes containing configurations
 - **[Add-tpcConfigPath](src/psTerminalPerfCounter/docs/en-US/Add-tpcConfigPath.md)** - Adds custom path contianing configurations
 - **[Remove-tpcConfigPath](src/psTerminalPerfCounter/docs/en-US/Remove-tpcConfigPath.md)** - Removes custom pathes
-- **[Get-tpcAvailableCounterConfig](src/psTerminalPerfCounter/docs/en-US/Get-tpcAvailableCounterConfig.md)** - shows all available confiogurations from all pathes
+- **[Test-tpcAvailableCounterConfig](src/psTerminalPerfCounter/docs/en-US/Test-tpcAvailableCounterConfig.md)** - shows all available confiogurations from all pathes
 - **[Get-tpcPerformanceCounterInfo](src/psTerminalPerfCounter/docs/en-US/Get-tpcPerformanceCounterInfo.md)** - shows detailed information about performance counters
 
 - **[Building Custom Configuration Sets](src/psTerminalPerfCounter/docs/en-US/Building_Custom_ConfigurationSets.md)** - How to create custom configurations including Environments
@@ -78,9 +78,6 @@ You can configure any combination of performance counters that your system provi
 
 # Install module
 Install-Module -Name psTerminalPerfCounter
-
-# Install required dependencies if automatic fails
-Install-Module GripDevJsonSchemaValidator
 
 # Import the module
 Import-Module psTerminalPerfCounter
@@ -134,7 +131,7 @@ Start-tpcEnvironmentMonitor -ConfigPath "C:\Configs\MyEnvironment.json" -UpdateI
 |---------|-------------|
 | `Start-tpcMonitor` | Main monitoring function with real-time display |
 | `Start-tpcEnvironmentMonitor` | Monitor multiple servers simultaneously (Environment) |
-| `Get-tpcAvailableCounterConfig` | List available configuration templates |
+| `Test-tpcAvailableCounterConfig` | List available configuration templates |
 | `Get-tpcPerformanceCounterInfo` | Get detailed information about performance counters |
 
 ## Configuration Templates
@@ -173,7 +170,7 @@ Get-tpcPerformanceCounterInfo -SearchTerm "Processor Time"
 # See docs/en-US/Building_Custom_Configs.md for complete templates
 
 # Validate configuration
-Get-tpcAvailableCounterConfig -TestCounters
+Test-tpcAvailableCounterConfig -TestCounters
 ```
 
 ## Acknowledgments

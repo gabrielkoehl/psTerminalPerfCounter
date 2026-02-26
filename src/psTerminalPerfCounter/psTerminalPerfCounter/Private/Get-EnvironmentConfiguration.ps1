@@ -1,59 +1,44 @@
 function Get-EnvironmentConfiguration {
-    <#
-    .SYNOPSIS
-        Loads an environment configuration from JSON file containing multiple servers
-
-    .DESCRIPTION
-        Parses a JSON configuration file that defines an environment with multiple servers.
-        Each server can have multiple counter configurations (e.g., CPU, Memory).
-        Creates EnvironmentConfiguration object with all ServerConfiguration objects.
-
-    .PARAMETER ConfigPath
-        Path to the JSON configuration file (e.g., _remoteconfigs\AD_SERVER_001.json)
-
-    .EXAMPLE
-        $env = Get-EnvironmentConfiguration -ConfigPath "_remoteconfigs\AD_SERVER_001.json"
-        $env.GetAllValuesParallelAsync().GetAwaiter().GetResult()
-
-    .OUTPUTS
-        EnvironmentConfiguration object
-
-    .NOTES
-        Requires PowerShellLogger to be initialized in $script:logger
-        JSON file must contain: name, description, interval, servers array
-    #>
-
     [CmdletBinding()]
     [OutputType([psTPCCLASSES.EnvironmentConfiguration])]
     param(
         [Parameter(Mandatory=$true)]
-        [string] $ConfigPath
+        [string] $EnvConfigPath
     )
 
     try {
 
-        if ( [string]::IsNullOrWhiteSpace($ConfigPath) ) {
+        if ( [string]::IsNullOrWhiteSpace($EnvConfigPath) ) {
             throw "Environment configuration path parameter cannot be null or empty"
         }
 
-        if ( -not (Test-Path $ConfigPath) ) {
-            throw "Environment configuration file not found: $ConfigPath"
+        if ( -not (Test-Path $EnvConfigPath) ) {
+            throw "Environment configuration file not found: $EnvConfigPath"
+        } else {
+            $configContentRaw = Get-Content $EnvConfigPath -Raw
         }
 
-        $configContent = Get-Content $ConfigPath -Raw
+        if ( -not (Test-Path $script:JSON_SCHEMA_ENVIRONMENT_FILE) ) {
+            throw "Environment JSON Schema not found: $script:JSON_SCHEMA_ENVIRONMENT_FILE"
+        } else {
+            $configSchema = Get-Content -Path $script:JSON_SCHEMA_ENVIRONMENT_FILE -Raw
+        }
 
-        if ( -not [string]::IsNullOrWhiteSpace($configContent) ) {
+
+        if ( -not [string]::IsNullOrWhiteSpace($configContentRaw) ) {
 
             try {
-                $jsonContent = $configContent | ConvertFrom-Json
+                $jsonContent = $configContentRaw | ConvertFrom-Json
             } catch {
-                Write-Warning "Failed to parse JSON from environment configuration file: $ConfigPath"
+                Write-Warning "Failed to parse JSON from environment configuration file: $EnvConfigPath"
                 Return
             }
 
         } else {
-            Write-Warning "Environment configuration file is empty: $ConfigPath"
+
+            Write-Warning "Environment configuration file is empty: $EnvConfigPath"
             Return
+
         }
 
         # JSON Schema Validation
@@ -61,34 +46,31 @@ function Get-EnvironmentConfiguration {
 
         $skipSchemaValidation = $false
 
-        if ( -not (Get-Module -Name GripDevJsonSchemaValidator -ListAvailable) ) {
-            Write-Warning "Module 'GripDevJsonSchemaValidator' not found. Please install it with: Install-Module -Name GripDevJsonSchemaValidator"
-            Write-Warning "JSON schema validation will be skipped."
-            $skipSchemaValidation = $true
-        }
-
         if ( -not (Test-Path $script:JSON_SCHEMA_ENVIRONMENT_FILE) ) {
             Write-Warning "Environment schema file not found at: $script:JSON_SCHEMA_ENVIRONMENT_FILE. Skipping schema validation."
             $skipSchemaValidation = $true
         }
 
-        # Perform schema validation if module and schema are available
         if ( -not $skipSchemaValidation ) {
             try {
-                $ValidationResult = Test-JsonSchema -SchemaPath $script:JSON_SCHEMA_ENVIRONMENT_FILE -JsonPath $ConfigPath -ErrorAction Stop 6>$null
 
-                if ( -not $ValidationResult.Valid ) {
-                    $errorMessages = $ValidationResult.Errors | ForEach-Object {
-                        "  - $($_.Message) | Path: $($_.Path) | Line: $($_.LineNumber)"
+                $isValid = Test-Json -Json $configContentRaw -Schema $configSchema -ErrorAction SilentlyContinue -ErrorVariable validationErrors
+
+                if ( -not $isValid ) {
+
+                    Write-Host "JSON validation error found" -ForegroundColor Red
+
+                    $validationErrors.Exception.Message | ForEach-Object {
+                        Write-Host "  - $($_ -replace '^.*?:\s', '')" -ForegroundColor Yellow
                     }
-                    $errorDetails = $errorMessages -join "`n"
-                    throw "Environment configuration JSON schema validation failed:`n$errorDetails"
+
+                    throw "Environment configuration JSON schema validation failed"
                 }
 
-                Write-Verbose "Environment configuration passed JSON schema validation"
+                Write-Host "Environment configuration passed JSON schema validation"
 
             } catch {
-                throw "Schema validation error for environment configuration '$ConfigPath': $($_.Exception.Message)"
+                throw "Schema validation error for environment configuration '$EnvConfigPath': $($_.Exception.Message)"
             }
         }
 
@@ -96,7 +78,7 @@ function Get-EnvironmentConfiguration {
         $servers = New-ServerConfigurationFromJson -JsonConfig $jsonContent
 
         if ( $servers.Count -eq 0 ) {
-            Write-Warning "No valid servers found in environment configuration '$ConfigPath'"
+            Write-Warning "No valid servers found in environment configuration '$EnvConfigPath'"
             Return
         }
 
@@ -114,7 +96,7 @@ function Get-EnvironmentConfiguration {
 
     } catch {
 
-        $errorMessage = "Error loading environment configuration from '$ConfigPath': $($_.Exception.Message)"
+        $errorMessage = "Error loading environment configuration from '$EnvConfigPath': $($_.Exception.Message)"
         throw $errorMessage
 
     }

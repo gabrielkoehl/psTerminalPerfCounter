@@ -21,17 +21,16 @@
 
             try {
 
+                $param                  = @{'Computername' = $ServerConfig.computername }
                 $performanceCounters    = @()
                 $skipServer             = $false
+                $serverCounterMap       = Get-CounterMap @param
 
                 if ( $ServerConfig.CounterConfig ) {
+
                     foreach ( $CounterConfig in $ServerConfig.CounterConfig ) {
 
-                        $param = @{}
-
                         if ( $null -eq $setCredential ) { $param['Credential'] = $setCredential }
-
-                        $serverCounterMap = Get-CounterMap @param
 
                         $config = Get-CounterConfiguration -ConfigName $CounterConfig -computername $ServerConfig.computername -credential $setCredential -counterMap $serverCounterMap
 

@@ -115,7 +115,7 @@ Language-independent approach ensures templates work across different Windows sy
 Composite IDs returned by this function are used directly in the counterID field of JSON configuration files.
 
 Related commands:
-- Get-tpcAvailableCounterConfig: View existing configurations
+- Test-tpcAvailableCounterConfig: View existing configurations
 - Start-tpcMonitor: Start monitoring with a configuration
 - Add-tpcConfigPath: Add custom configuration paths
 

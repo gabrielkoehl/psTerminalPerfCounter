@@ -8,7 +8,6 @@ Configuration files define which performance counters to monitor and how to disp
 
 ## Prerequisites
 
-- **GripDevJsonSchemaValidator** module installed (for validation)
 - Understanding of Windows Performance Counters
 - Access to `Get-tpcPerformanceCounterInfo` for discovering counter IDs
 
@@ -217,14 +216,14 @@ Create `tpc_MyCustomCPU.json`:
 Get-tpcConfigPaths
 
 # Validate the configuration
-Get-tpcAvailableCounterConfig -Raw | Where-Object { $_.ConfigName -eq "MyCustomCPU" }
+Test-tpcAvailableCounterConfig -Raw | Where-Object { $_.ConfigName -eq "MyCustomCPU" }
 ```
 
 ### 4. Test the Configuration
 
 ```powershell
 # Test counter availability
-Get-tpcAvailableCounterConfig -TestCounters | Where-Object { $_.ConfigName -eq "MyCustomCPU" }
+Test-tpcAvailableCounterConfig | Where-Object { $_.ConfigName -eq "MyCustomCPU" }
 
 # Run monitoring
 Start-tpcMonitor -ConfigName "MyCustomCPU"
@@ -483,7 +482,7 @@ psTerminalPerfCounter\Config\schema_config.json
 - Minimum values
 - Allowed enumerations
 
-If validation fails, `Get-tpcAvailableCounterConfig` will show detailed error messages including:
+If validation fails, `Test-tpcAvailableCounterConfig` will show detailed error messages including:
 
 - Error description
 - JSON path to the problematic field
@@ -548,8 +547,7 @@ The module searches all configured paths for files matching the pattern `tpc_*.j
 
 ### JSON Validation Errors
 
-- Install `GripDevJsonSchemaValidator` module
-- Review error messages from `Get-tpcAvailableCounterConfig`
+- Review error messages from `Test-tpcAvailableCounterConfig`
 - Compare with example configurations in `psTerminalPerfCounter\Config\`
 
 ### Counter Not Available
@@ -557,7 +555,7 @@ The module searches all configured paths for files matching the pattern `tpc_*.j
 - Verify counter ID with `Get-tpcPerformanceCounterInfo`
 - Check that counter exists on target system
 - Ensure correct `counterSetType` and `counterInstance`
-- Review `LastError` property from `Get-tpcAvailableCounterConfig -TestCounters`
+- Review `LastError` property from `Test-tpcAvailableCounterConfig -TestCounters`
 
 ### Display Issues
 
@@ -578,6 +576,6 @@ See the following configurations in `psTerminalPerfCounter\Config\` for complete
 - **[Start-tpcEnvironmentMonitor](Start-tpcEnvironmentMonitor.md)** - Run multi-server environment monitors
 - **[Start-tpcMonitor](Start-tpcMonitor.md)** - Use configurations
 - **[Get-tpcPerformanceCounterInfo](Get-tpcPerformanceCounterInfo.md)** - Find counter IDs
-- **[Get-tpcAvailableCounterConfig](Get-tpcAvailableCounterConfig.md)** - Validate configurations
+- **[Test-tpcAvailableCounterConfig](Test-tpcAvailableCounterConfig.md)** - Validate configurations
 - **[Get-tpcConfigPaths](Get-tpcConfigPaths.md)** - Manage configuration paths
 - **[Add-tpcConfigPath](Add-tpcConfigPath.md)** - Add custom paths

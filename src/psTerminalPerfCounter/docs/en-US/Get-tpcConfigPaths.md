@@ -93,6 +93,6 @@ The module's default config directory is always included unless -noDefault is sp
 Related commands:
 - Add-tpcConfigPath: Add new paths to configuration
 - Remove-tpcConfigPath: Remove paths from configuration
-- Get-tpcAvailableCounterConfig: View available configurations from all paths
+- Test-tpcAvailableCounterConfig: View available configurations from all paths
 
 ## RELATED LINKS

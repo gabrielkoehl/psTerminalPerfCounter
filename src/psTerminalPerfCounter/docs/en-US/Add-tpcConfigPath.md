@@ -105,6 +105,6 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 Related commands:
 - Get-tpcConfigPaths: List all configured paths
 - Remove-tpcConfigPath: Remove paths from configuration
-- Get-tpcAvailableCounterConfig: View available configurations from all paths
+- Test-tpcAvailableCounterConfig: View available configurations from all paths
 
 ## RELATED LINKS
