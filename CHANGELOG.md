@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   * unit conversion now supports configurable scaling operations by new parameter `conversionType` (multiply "M" / divide "D")
   * `MultiInstanceCounter` now requires only a single configuration; instances are automatically cloned based on the specified instance names
   * new configuration parameter `decimalPlaces` to specify the number of fractional digits for counter values
+* Environment ServerConfiguration (JSON)
+  * `counterConfig` now accepts ConfigName, found in registered pathes or path to custom ConfigJson
 * Get-tpcPerformanceCounterInfo
   * added remoting capability
 * Get-tpcAvailableCounterConfig -> Renamed Test-tpcAvailableCounterConfig
