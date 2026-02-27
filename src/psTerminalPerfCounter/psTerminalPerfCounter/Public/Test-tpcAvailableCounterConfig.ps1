@@ -1,32 +1,34 @@
 function Test-tpcAvailableCounterConfig {
-<#
-.SYNOPSIS
-    Validates and lists available tpc counter configurations from all registered paths.
+    <#
+    .SYNOPSIS
 
-.PARAMETER configFilePath
-    Path to a single configuration file. If omitted, all configured paths are scanned.
+    .DESCRIPTION
+        Validates and lists available tpc counter configurations from all registered paths.
 
-.PARAMETER Raw
-    Returns PSCustomObject[] instead of formatted console output.
+    .PARAMETER configFilePath
+        Path to a single configuration file. If omitted, all configured paths are scanned.
 
-.EXAMPLE
-    Test-tpcAvailableCounterConfig
+    .PARAMETER Raw
+        Returns PSCustomObject[] instead of formatted console output.
 
-.EXAMPLE
-    Test-tpcAvailableCounterConfig -configFilePath "C:\configs\tpc_CPU.json"
+    .EXAMPLE
+        Test-tpcAvailableCounterConfig
 
-.EXAMPLE
-    Test-tpcAvailableCounterConfig -Raw | Where-Object { -not $_.JsonValid }
-#>
+    .EXAMPLE
+        Test-tpcAvailableCounterConfig -configFilePath "C:\configs\tpc_CPU.json"
 
-[CmdletBinding()]
-param (
-    [Parameter()]
-    [string] $configFilePath,
+    .EXAMPLE
+        Test-tpcAvailableCounterConfig -Raw | Where-Object { -not $_.JsonValid }
+    #>
 
-    [Parameter()]
-    [switch] $Raw
-)
+    [CmdletBinding()]
+    param (
+        [Parameter()]
+        [string] $configFilePath,
+
+        [Parameter()]
+        [switch] $Raw
+    )
 
     try {
 

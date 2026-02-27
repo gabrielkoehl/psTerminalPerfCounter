@@ -1,6 +1,8 @@
 function Remove-tpcConfigPath {
     <#
     .SYNOPSIS
+
+    .DESCRIPTION
         Removes custom configuration paths from the TPC_CONFIGPATH user environment variable.
 
     .PARAMETER All

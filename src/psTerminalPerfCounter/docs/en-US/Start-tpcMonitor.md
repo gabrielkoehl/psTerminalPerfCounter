@@ -8,11 +8,11 @@ schema: 2.0.0
 # Start-tpcMonitor
 
 ## SYNOPSIS
-Starts real-time performance counter monitoring for local or remote systems using predefined configuration templates with language-independent counter IDs.
+Starts real-time performance counter monitoring for a single local or remote system.
 
 ## SYNTAX
 
-### SingleRemoteServer
+### RemoteByName
 ```
 Start-tpcMonitor -ConfigName <String> -ComputerName <String> [-Credential <PSCredential>]
  [-UpdateInterval <Int32>] [-ProgressAction <ActionPreference>] [<CommonParameters>]
@@ -24,6 +24,12 @@ Start-tpcMonitor -ConfigName <String> [-UpdateInterval <Int32>] [-ProgressAction
  [<CommonParameters>]
 ```
 
+### RemoteByPath
+```
+Start-tpcMonitor -ConfigPath <String> -ComputerName <String> [-Credential <PSCredential>]
+ [-UpdateInterval <Int32>] [-ProgressAction <ActionPreference>] [<CommonParameters>]
+```
+
 ### ConfigPath
 ```
 Start-tpcMonitor -ConfigPath <String> [-UpdateInterval <Int32>] [-ProgressAction <ActionPreference>]
@@ -31,69 +37,34 @@ Start-tpcMonitor -ConfigPath <String> [-UpdateInterval <Int32>] [-ProgressAction
 ```
 
 ## DESCRIPTION
-This function launches the main monitoring interface of the psTerminalPerfCounter module.
-It loads performance
-counter configurations from JSON templates, validates counter availability, and starts continuous real-time
-monitoring with configurable update intervals and data retention.
-
-The function uses the module's language-independent ID system to ensure configurations work across different
-system locales.
-It automatically filters unavailable counters and provides detailed feedback about monitoring status.
-Supports interactive monitoring with graphical displays, tables, and statistics based on configuration settings.
-
-Monitoring can be performed on the local system or on remote computers by specifying ComputerName parameter.
-Remote monitoring requires appropriate permissions and network connectivity to the target system.
+{{ Fill in the Description }}
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-Start-tpcMonitor
+Start-tpcMonitor -ConfigName "CPU"
 ```
-
-Starts monitoring using the default CPU configuration with 1-second updates and 100 historical data points.
-Graph displays 70 samples covering 70 seconds (70 samples × 1 second interval).
 
 ### EXAMPLE 2
 ```
 Start-tpcMonitor -ConfigPath "C:\MyConfigs\tpc_CustomCPU.json"
 ```
 
-Starts monitoring using a custom configuration file from an absolute path.
-
 ### EXAMPLE 3
 ```
-Start-tpcMonitor -ConfigName "Memory" -UpdateInterval 2
+Start-tpcMonitor -ConfigName "Memory" -ComputerName "Server01" -Credential $cred -UpdateInterval 2
 ```
-
-Starts memory monitoring with 2-second update intervals using the 'tpc_Memory.json' configuration.
-
-### EXAMPLE 5
-```
-Start-tpcMonitor -ConfigName "CPU" -ComputerName "Server01"
-```
-
-Monitors CPU performance on remote server 'Server01' using current user credentials.
-
-### EXAMPLE 6
-```
-Start-tpcMonitor -ConfigName "Memory" -ComputerName "SQLServer01" -Credential $cred
-```
-
-Monitors memory performance on remote server 'SQLServer01' using specified credentials.
 
 ## PARAMETERS
 
 ### -ConfigName
-Name of the configuration template to load (without 'tpc_' prefix and '.json' extension).
-Must correspond to a JSON file in the config directories (e.g., 'CPU' loads 'tpc_CPU.json').
-Default: 'CPU'
-Cannot be used together with ConfigPath parameter.
-Required when using remote monitoring with ComputerName parameter.
+Name of the configuration template (without 'tpc_' prefix and '.json' extension).
+Cannot be combined with ConfigPath.
 
 ```yaml
 Type: String
-Parameter Sets: SingleRemoteServer, ConfigName
+Parameter Sets: RemoteByName, ConfigName
 Aliases:
 
 Required: True
@@ -104,14 +75,12 @@ Accept wildcard characters: False
 ```
 
 ### -ConfigPath
-Absolute path to a specific JSON configuration file.
-The file must follow the naming convention 'tpc_*.json' and exist at the specified location.
-Cannot be used together with ConfigName parameter.
-Only available for local monitoring.
+Absolute path to a JSON configuration file (pattern 'tpc_*.json').
+Cannot be combined with ConfigName.
 
 ```yaml
 Type: String
-Parameter Sets: ConfigPath
+Parameter Sets: RemoteByPath, ConfigPath
 Aliases:
 
 Required: True
@@ -123,12 +92,10 @@ Accept wildcard characters: False
 
 ### -ComputerName
 DNS name of the remote computer to monitor.
-Requires ConfigName parameter to be specified.
-The remote system must be reachable and allow remote performance counter access.
 
 ```yaml
 Type: String
-Parameter Sets: SingleRemoteServer
+Parameter Sets: RemoteByName, RemoteByPath
 Aliases:
 
 Required: True
@@ -139,13 +106,12 @@ Accept wildcard characters: False
 ```
 
 ### -Credential
-PSCredential object for authenticating to the remote computer.
-If not specified, uses the current user's credentials.
-Only applicable when ComputerName is specified.
+PSCredential for remote authentication.
+Only applicable with ComputerName.
 
 ```yaml
 Type: PSCredential
-Parameter Sets: SingleRemoteServer
+Parameter Sets: RemoteByName, RemoteByPath
 Aliases:
 
 Required: False
@@ -156,10 +122,8 @@ Accept wildcard characters: False
 ```
 
 ### -UpdateInterval
-Interval in seconds between performance counter updates and display refreshes.
-Lower values provide more responsive monitoring but increase system load.
-Graph time span = Samples (from JSON config) × UpdateInterval seconds.
-Default: 1 second
+Seconds between counter updates.
+Default: 1.
 
 ```yaml
 Type: Int32
@@ -195,19 +159,6 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## OUTPUTS
 
-### Interactive real-time monitoring display with configurable output formats:
-### - Graphical plots (line, bar, scatter based on configuration)
-### - Statistical summaries (min, max, average, current values)
-### - Tabular data with formatted values and units
-### - Session summary upon completion
 ## NOTES
-Main entry point for the psTerminalPerfCounter monitoring system.
-Requires JSON configuration files in the module's config directory or custom directories.
-Press Ctrl+C to stop monitoring and display session summary.
-
-Remote monitoring requires:
-- Network connectivity to target system
-- Appropriate permissions for remote performance counter access
-- Windows Remote Management (WinRM) enabled on target system
 
 ## RELATED LINKS

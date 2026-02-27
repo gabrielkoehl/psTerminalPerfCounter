@@ -1,10 +1,8 @@
-## Development Status V 0.3.0
+## Development Status V 0.3.1
 
 This module is actively developed with the following features planned
 
 ### Planned Features
-
-- Get-tpcPerformanceCounterInfo --> Remote Option
 
 - 🔄 Continuous data export to file
   - 🔄 Excel export with ImportExcel module integration

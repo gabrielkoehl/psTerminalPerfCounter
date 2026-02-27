@@ -1,6 +1,8 @@
 function Start-tpcEnvironmentMonitor {
     <#
     .SYNOPSIS
+
+    .DESCRIPTION
         Starts parallel environment monitoring across multiple remote servers using a JSON environment configuration.
 
     .PARAMETER EnvConfigPath

@@ -1,6 +1,8 @@
 ﻿function Start-tpcMonitor {
 <#
     .SYNOPSIS
+
+    .DESCRIPTION
         Starts real-time performance counter monitoring for a single local or remote system.
 
     .PARAMETER ConfigName

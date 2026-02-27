@@ -4,7 +4,7 @@
 RootModule = 'psTerminalPerfCounter.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.3.0'
+ModuleVersion = '0.3.1'
 
 # Supported PSEditions
 CompatiblePSEditions = @('Core')
@@ -19,7 +19,7 @@ Author = 'Gabriel Köhl'
 CompanyName = 'dbavonnebenan.de'
 
 # Copyright statement for this module
-Copyright = '(c) Gabriel Köhl. All rights reserved.'
+Copyright = '(c) 2026 Gabriel Köhl. All rights reserved.'
 
 # Description of the functionality provided by this module
 Description = 'A PowerShell module for displaying real-time graphs of Windows Performance Counters directly in the terminal console. This module provides an easy way to visualize system performance metrics without requiring external graphing tools or GUI applications by using templates and multilanguage support.'

@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [-]
+## [0.3.1]
 
 ### Added
 
@@ -70,6 +70,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Code Quality
 
+* Strict-Mode latest implemented (forgot to set it again at the beginning :P)
 * Replaced array `+=` handling by `[System.Collections.Generic.List[T]]::new()` with `.Add()` across the board
   * New-ServerConfigurationFromJson
   * Start-MonitoringLoop

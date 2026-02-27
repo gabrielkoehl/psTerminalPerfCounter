@@ -8,7 +8,7 @@ schema: 2.0.0
 # Get-tpcConfigPaths
 
 ## SYNOPSIS
-Retrieves all configured paths from the TPC_CONFIGPATH environment variable and module defaults.
+Returns all registered configuration paths (module default + TPC_CONFIGPATH).
 
 ## SYNTAX
 
@@ -17,15 +17,7 @@ Get-tpcConfigPaths [-noDefault] [-ProgressAction <ActionPreference>] [<CommonPar
 ```
 
 ## DESCRIPTION
-This function returns an array of all paths where the module searches for configuration files.
-By default, it includes the module's default config directory and any custom paths defined
-in the TPC_CONFIGPATH user environment variable.
-
-The function validates that each path exists and returns only valid paths.
-Non-existent
-paths generate warnings but do not cause the function to fail.
-
-Paths are automatically deduplicated and sorted in the output.
+{{ Fill in the Description }}
 
 ## EXAMPLES
 
@@ -34,22 +26,15 @@ Paths are automatically deduplicated and sorted in the output.
 Get-tpcConfigPaths
 ```
 
-Returns all configured paths including the module's default config directory and
-any custom paths from the TPC_CONFIGPATH environment variable.
-
 ### EXAMPLE 2
 ```
 Get-tpcConfigPaths -noDefault
 ```
 
-Returns only custom paths from the TPC_CONFIGPATH environment variable, excluding
-the module's default config directory.
-
 ## PARAMETERS
 
 ### -noDefault
-If specified, excludes the module's default config directory from the returned paths.
-Only custom paths from the TPC_CONFIGPATH environment variable will be returned.
+Excludes the module's default config directory from results.
 
 ```yaml
 Type: SwitchParameter
@@ -85,14 +70,7 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## OUTPUTS
 
-### String[]. Array of validated, unique configuration paths sorted alphabetically.
+### System.String[]
 ## NOTES
-Custom paths are stored in the user-level TPC_CONFIGPATH environment variable.
-The module's default config directory is always included unless -noDefault is specified.
-
-Related commands:
-- Add-tpcConfigPath: Add new paths to configuration
-- Remove-tpcConfigPath: Remove paths from configuration
-- Test-tpcAvailableCounterConfig: View available configurations from all paths
 
 ## RELATED LINKS

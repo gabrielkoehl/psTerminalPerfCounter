@@ -1,6 +1,8 @@
 function Get-tpcConfigPaths {
     <#
     .SYNOPSIS
+
+    .DESCRIPTION
         Returns all registered configuration paths (module default + TPC_CONFIGPATH).
 
     .PARAMETER noDefault

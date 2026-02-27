@@ -1,6 +1,8 @@
 function Add-tpcConfigPath {
     <#
     .SYNOPSIS
+
+    .DESCRIPTION
         Adds a custom configuration path to the TPC_CONFIGPATH user environment variable.
 
     .PARAMETER Path

@@ -5,15 +5,16 @@ online version:
 schema: 2.0.0
 ---
 
-# Remove-tpcConfigPath
+# Test-tpcAvailableCounterConfig
 
 ## SYNOPSIS
-Removes custom configuration paths from the TPC_CONFIGPATH user environment variable.
+Validates and lists available tpc counter configurations from all registered paths.
 
 ## SYNTAX
 
 ```
-Remove-tpcConfigPath [-All] [-ProgressAction <ActionPreference>] [<CommonParameters>]
+Test-tpcAvailableCounterConfig [[-configFilePath] <String>] [-Raw] [-ProgressAction <ActionPreference>]
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -23,19 +24,39 @@ Remove-tpcConfigPath [-All] [-ProgressAction <ActionPreference>] [<CommonParamet
 
 ### EXAMPLE 1
 ```
-Remove-tpcConfigPath
+Test-tpcAvailableCounterConfig
 ```
 
 ### EXAMPLE 2
 ```
-Remove-tpcConfigPath -All
+Test-tpcAvailableCounterConfig -configFilePath "C:\configs\tpc_CPU.json"
+```
+
+### EXAMPLE 3
+```
+Test-tpcAvailableCounterConfig -Raw | Where-Object { -not $_.JsonValid }
 ```
 
 ## PARAMETERS
 
-### -All
-Removes all custom paths without prompting.
-Module default is not affected.
+### -configFilePath
+Path to a single configuration file.
+If omitted, all configured paths are scanned.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 1
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Raw
+Returns PSCustomObject\[\] instead of formatted console output.
 
 ```yaml
 Type: SwitchParameter

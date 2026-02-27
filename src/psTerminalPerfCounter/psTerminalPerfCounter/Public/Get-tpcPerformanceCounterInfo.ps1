@@ -2,6 +2,8 @@
 function Get-tpcPerformanceCounterInfo {
 <#
     .SYNOPSIS
+
+    .DESCRIPTION
         Resolves performance counter IDs from names or validates existing composite IDs. Supports local and remote lookup.
 
     .PARAMETER SearchTerm
