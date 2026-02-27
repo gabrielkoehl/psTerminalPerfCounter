@@ -4,7 +4,7 @@
         "description": "SQL Server Environment Production",
         "interval": 2,
         "secretvaultname": "SecretStore",
-        "credentialname": "integrated",
+        "credentialname": "get",
         "servers": [
             {
                 "computername": "LAB-NODE2",

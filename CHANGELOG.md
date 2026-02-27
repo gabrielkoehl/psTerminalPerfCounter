@@ -48,6 +48,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 * Show-CounterTable
   * fixed bug with conversion int -> double, when counter returns doubles -> skipped colormap
   * seperator current value not colored anymore
+* New-ServerConfigurationFromJson
+  * credential handling fixed
+  * param creation for splatting fixed
 * a shitload of minor bugs, logic errors and orphaned code
 
 ### Security
