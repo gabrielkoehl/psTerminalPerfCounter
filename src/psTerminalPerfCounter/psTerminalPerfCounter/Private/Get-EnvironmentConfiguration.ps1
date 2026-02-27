@@ -44,35 +44,27 @@ function Get-EnvironmentConfiguration {
         # JSON Schema Validation
         # ------------------------------------
 
-        $skipSchemaValidation = $false
+        try {
 
-        if ( -not (Test-Path $script:JSON_SCHEMA_ENVIRONMENT_FILE) ) {
-            Write-Warning "Environment schema file not found at: $script:JSON_SCHEMA_ENVIRONMENT_FILE. Skipping schema validation."
-            $skipSchemaValidation = $true
-        }
+            $isValid = Test-Json -Json $configContentRaw -Schema $configSchema -ErrorAction SilentlyContinue -ErrorVariable validationErrors
 
-        if ( -not $skipSchemaValidation ) {
-            try {
+            if ( -not $isValid ) {
 
-                $isValid = Test-Json -Json $configContentRaw -Schema $configSchema -ErrorAction SilentlyContinue -ErrorVariable validationErrors
+                Write-Host "JSON validation error found" -ForegroundColor Red
 
-                if ( -not $isValid ) {
-
-                    Write-Host "JSON validation error found" -ForegroundColor Red
-
-                    $validationErrors.Exception.Message | ForEach-Object {
-                        Write-Host "  - $($_ -replace '^.*?:\s', '')" -ForegroundColor Yellow
-                    }
-
-                    throw "Environment configuration JSON schema validation failed"
+                $validationErrors.Exception.Message | ForEach-Object {
+                    Write-Host "  - $($_ -replace '^.*?:\s', '')" -ForegroundColor Yellow
                 }
 
-                Write-Host "Environment configuration passed JSON schema validation"
-
-            } catch {
-                throw "Schema validation error for environment configuration '$EnvConfigPath': $($_.Exception.Message)"
+                throw "Environment configuration JSON schema validation failed"
             }
+
+            Write-Host "Environment configuration passed JSON schema validation"
+
+        } catch {
+            throw "Schema validation error for environment configuration '$EnvConfigPath': $($_.Exception.Message)"
         }
+
 
         # Create server configurations from JSON
         $servers = New-ServerConfigurationFromJson -JsonConfig $jsonContent
