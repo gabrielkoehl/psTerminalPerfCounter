@@ -1,6 +1,6 @@
 ﻿function New-CounterConfigurationFromJson {
     [CmdletBinding()]
-    [OutputType([System.Collections.Generic.List[psTPCCLASSES.CounterConfiguration]])]
+    [OutputType([System.Object[]])]
     param(
         [Parameter(Mandatory=$true)]
         [PSCustomObject]    $JsonConfig,

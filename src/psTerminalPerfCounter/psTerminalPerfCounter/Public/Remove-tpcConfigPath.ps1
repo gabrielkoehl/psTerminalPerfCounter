@@ -1,4 +1,4 @@
-function Remove-tpcConfigPath {
+﻿function Remove-tpcConfigPath {
     <#
     .SYNOPSIS
 

@@ -1,6 +1,6 @@
 ﻿function New-ServerConfigurationFromJson {
     [CmdletBinding()]
-    [OutputType([psTPCCLASSES.ServerConfiguration[]])]
+    [OutputType([System.Object[]])]
     param(
         [Parameter(Mandatory=$true)]
         [PSCustomObject] $JsonConfig

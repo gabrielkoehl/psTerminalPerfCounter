@@ -1,6 +1,6 @@
 Function Get-LinePlot {
     [cmdletbinding()]
-    [OutputType([System.Object[,]])]
+    [OutputType([System.Object[]])]
     Param(
         [Parameter(Mandatory=$true)]
         [int[]] $Datapoints,

@@ -28,7 +28,7 @@ function Test-tpcAvailableCounterConfig {
     #>
 
     [CmdletBinding()]
-    [OutputType([PSCustomObject[]])]
+    [OutputType([System.Collections.Generic.List[PSCustomObject]])]
     param (
         [Parameter()]
         [string] $configFilePath,
@@ -62,7 +62,7 @@ function Test-tpcAvailableCounterConfig {
 
         if ( $ConfigPaths.Count -eq 0 -and -not $isSingleFile ) {
             Write-Warning "No configuration paths found. Use Add-tpcConfigPath to add configuration directories."
-            return @()
+            return [System.Collections.Generic.List[PSCustomObject]]::new()
         }
 
 
