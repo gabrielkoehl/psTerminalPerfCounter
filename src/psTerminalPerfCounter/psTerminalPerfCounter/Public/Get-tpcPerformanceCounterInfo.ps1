@@ -41,7 +41,7 @@ function Get-tpcPerformanceCounterInfo {
 
     if ( $PSCmdlet.ParameterSetName -eq 'Remote' ) {
 
-        $param.Computername = $computername
+        $param.Computername = $ComputerName
 
         if ( $null -ne $Credential ) {
             $param.Credential = $Credential
@@ -51,7 +51,7 @@ function Get-tpcPerformanceCounterInfo {
     try {
 
         if ( $PSCmdlet.ParameterSetName -eq 'Remote' -and -not $(Test-Connection -ComputerName $ComputerName -Count 1 -Quiet) ) {
-            THROW "Remote computer $computername not reachable. Aborting"
+            THROW "Remote computer $ComputerName not reachable. Aborting"
         }
 
         # is ID

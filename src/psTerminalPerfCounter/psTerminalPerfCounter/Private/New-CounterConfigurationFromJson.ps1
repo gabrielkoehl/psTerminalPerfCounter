@@ -11,9 +11,9 @@
         [Parameter()]
         [bool]              $isRemote,
         [Parameter()]
-        [string]            $computername,
+        [string]            $ComputerName,
         [Parameter()]
-        [pscredential]      $credential
+        [pscredential]      $Credential
     )
 
     $PerformanceCounters = [System.Collections.Generic.List[psTPCCLASSES.CounterConfiguration]]::new()
@@ -35,8 +35,8 @@
             $CounterConfig.colorMap,
             $CounterConfig.graphConfiguration,
             $isRemote,
-            $computername,
-            $credential,
+            $ComputerName,
+            $Credential,
             $counterMap
         )
 

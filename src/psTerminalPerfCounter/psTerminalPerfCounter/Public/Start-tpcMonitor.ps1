@@ -97,10 +97,10 @@
 
             $configParams['ComputerName'] = $ComputerName
 
-            Write-Host "Starting remote monitoring for $computername " -ForegroundColor Yellow -NoNewline
+            Write-Host "Starting remote monitoring for $ComputerName " -ForegroundColor Yellow -NoNewline
 
-            if ( $credential ) {
-                Write-Host "using $($credential.UserName)." -ForegroundColor Yellow
+            if ( $Credential ) {
+                Write-Host "using $($Credential.UserName)." -ForegroundColor Yellow
                 $configParams['Credential'] = $Credential
             } else {
                 Write-Host "using $env:USERDOMAIN\$env:USERNAME ." -ForegroundColor Yellow
@@ -117,7 +117,7 @@
 
             } else {
 
-                Write-Warning "Remote computer $computername not reachable. Aborting"
+                Write-Warning "Remote computer $ComputerName not reachable. Aborting"
                 Return
 
             }

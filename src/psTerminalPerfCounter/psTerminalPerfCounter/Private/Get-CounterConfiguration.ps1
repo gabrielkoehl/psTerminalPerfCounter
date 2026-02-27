@@ -12,18 +12,18 @@ function Get-CounterConfiguration {
         [string]        $ConfigPath,
 
         [Parameter()]
-        [string]        $computername,
+        [string]        $ComputerName,
 
         [Parameter()]
-        [pscredential]  $credential = $null
+        [pscredential]  $Credential = $null
     )
 
-    $isRemote = $PSBoundParameters.ContainsKey('computername') -and $computername -ne $env:COMPUTERNAME
+    $isRemote = $PSBoundParameters.ContainsKey('computername') -and $ComputerName -ne $env:COMPUTERNAME
 
     $counterParam = @{
         isRemote        = $isRemote
-        computername    = if ( $PSBoundParameters.ContainsKey('computername') ) { $computername } else { $env:COMPUTERNAME }
-        credential      = $credential
+        computername    = if ( $PSBoundParameters.ContainsKey('computername') ) { $ComputerName } else { $env:COMPUTERNAME }
+        credential      = $Credential
         counterMap      = $counterMap
     }
 
@@ -33,12 +33,12 @@ function Get-CounterConfiguration {
 
             try {
 
-                $testResult = Test-Connection -ComputerName $computername -Count 1 -Quiet -TimeoutSeconds 2 -ErrorAction Stop
+                $testResult = Test-Connection -ComputerName $ComputerName -Count 1 -Quiet -TimeoutSeconds 2 -ErrorAction Stop
 
                 if ( -not $testResult ) {
-                    Write-Warning "Server '$computername' is not reachable. Skipping counter configuration."
+                    Write-Warning "Server '$ComputerName' is not reachable. Skipping counter configuration."
                     return @{
-                        Name        = if ( $ConfigName ) { "$ConfigName @ Remote $computername" } else { "Unknown" }
+                        Name        = if ( $ConfigName ) { "$ConfigName @ Remote $ComputerName" } else { "Unknown" }
                         Description = "Server unreachable"
                         Counters    = @()
                         ConfigPath  = ""
@@ -48,9 +48,9 @@ function Get-CounterConfiguration {
 
             } catch {
 
-                Write-Warning "Cannot reach server '$computername': $_. Skipping counter configuration."
+                Write-Warning "Cannot reach server '$ComputerName': $_. Skipping counter configuration."
                 return @{
-                    Name        = if ( $ConfigName ) { "$ConfigName @ Remote $computername" } else { "Unknown" }
+                    Name        = if ( $ConfigName ) { "$ConfigName @ Remote $ComputerName" } else { "Unknown" }
                     Description = "Server unreachable"
                     Counters    = @()
                     ConfigPath  = ""
@@ -90,7 +90,7 @@ function Get-CounterConfiguration {
             $counters = New-CounterConfigurationFromJson @counterParam -JsonConfig $mergedJsonContent
 
             return @{
-                Name        = $( if ( $isRemote ) { "$($mergedJsonContent.name) @ Remote $computername" } else { $mergedJsonContent.name } )
+                Name        = $( if ( $isRemote ) { "$($mergedJsonContent.name) @ Remote $ComputerName" } else { $mergedJsonContent.name } )
                 Description = $mergedJsonContent.description
                 Counters    = $counters
                 ConfigPath  = Split-Path $ConfigPath -Parent
@@ -155,7 +155,7 @@ function Get-CounterConfiguration {
         $counters       = New-CounterConfigurationFromJson @counterParam -JsonConfig $mergedJsonContent
 
         return @{
-            Name        = $( if ( $isRemote ) { "$($mergedJsonContent.name) @ Remote $computername" } else { $mergedJsonContent.name } )
+            Name        = $( if ( $isRemote ) { "$($mergedJsonContent.name) @ Remote $ComputerName" } else { $mergedJsonContent.name } )
             Description = $mergedJsonContent.description
             Counters    = $counters
             ConfigPath  = $selectedConfig.ConfigPath
