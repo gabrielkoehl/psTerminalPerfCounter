@@ -115,7 +115,9 @@ param (
                             $isValid = Test-Json -Json $rawJson -Schema $configSchema -ErrorAction SilentlyContinue -ErrorVariable validationErrors
 
                             $SchemaValidation['IsValid']    = $isValid
-                            $SchemaValidation['Errors']     = @($validationErrors.Exception.Message | ForEach-Object { $_ -replace '^.*?:\s', '' })
+                            $SchemaValidation['Errors']     = if ($validationErrors.Count -gt 0) {
+                                @($validationErrors | ForEach-Object { $_.Exception.Message -replace '^.*?:\s', '' })
+                            } else { @() }
 
                         } catch {
 
