@@ -6,7 +6,7 @@
         [PSCustomObject] $JsonConfig
     )
 
-        $servers = @()
+        $servers = [System.Collections.Generic.List[psTPCCLASSES.ServerConfiguration]]::new()
 
         # Credential
         if ( $JsonConfig.CredentialName -and $JsonConfig.CredentialName -eq 'integrated') {
@@ -21,41 +21,42 @@
 
             try {
 
-                $param                  = @{'Computername' = $ServerConfig.computername }
-                $performanceCounters    = @()
+                $paramServer                = @{ 'Computername' = $ServerConfig.computername }
+                if ( $null -ne $setCredential ) {
+                    $paramServer['Credential'] = $setCredential
+                }
+                $serverCounterMap           = Get-CounterMap @paramServer
+                $paramServer['counterMap']  = $serverCounterMap
+
+
+                $performanceCounters    = [System.Collections.Generic.List[psTPCCLASSES.CounterConfiguration]]::new()
                 $skipServer             = $false
-                $serverCounterMap       = Get-CounterMap @param
+
 
                 if ( $ServerConfig.CounterConfig ) {
 
                     foreach ( $CounterConfig in $ServerConfig.CounterConfig ) {
 
-                        if ( $null -eq $setCredential ) { $param['Credential'] = $setCredential }
-
-                        $param = @{
-                            "computername"  = $ServerConfig.computername
-                            "credential"    = $setCredential
-                            "counterMap"    = $serverCounterMap
-                        }
+                        $paramCounter = $paramServer.Clone()
 
                         if ($CounterConfig -match '^[A-Za-z][A-Za-z0-9_]*$') {
                             # counter name
-                            $param['ConfigName'] = $CounterConfig
+                            $paramCounter['ConfigName'] = $CounterConfig
                         } elseif ($CounterConfig -match '^[A-Za-z]:\\|^\\\\') {
                             # counter path (local, unc)
-                            $param['ConfigPath'] = $CounterConfig
+                            $paramCounter['ConfigPath'] = $CounterConfig
                         } else {
                             # Nothing to do here - schema validation would have already aborted before reaching this point
                         }
 
-                        $config = Get-CounterConfiguration @param
+                        $config = Get-CounterConfiguration @paramCounter
 
                         if ( $config.SkipServer ) {
                             $skipServer = $true
                             break
                         }
 
-                        $performanceCounters += $config.Counters
+                        $performanceCounters.AddRange($config.Counters)
                     }
                 }
 
@@ -68,10 +69,11 @@
                 $serverConfiguration = [psTPCCLASSES.ServerConfiguration]::new(
                     $ServerConfig.computername,
                     $ServerConfig.comment,
-                    $performanceCounters
+                    $performanceCounters,
+                    $true # skip availability check - server already validated via Get-CounterMap
                 )
 
-                $servers += $serverConfiguration
+                $servers.Add($serverConfiguration)
 
             } catch {
 
@@ -82,7 +84,7 @@
 
         }
 
-    return $servers
+    return , $servers
 
 
 }

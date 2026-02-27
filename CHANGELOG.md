@@ -14,11 +14,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   * `MultiInstanceCounter` now requires only a single configuration; instances are automatically cloned based on the specified instance names
   * new configuration parameter `decimalPlaces` to specify the number of fractional digits for counter values
 * Environment ServerConfiguration (JSON)
-  * `counterConfig` now accepts ConfigName, found in registered pathes or path to custom ConfigJson
+  * `counterConfig` now accepts ConfigName, found in registered paths or path to custom ConfigJson
 * Get-tpcPerformanceCounterInfo
   * added remoting capability
 * Get-tpcAvailableCounterConfig -> Renamed Test-tpcAvailableCounterConfig
   * added `configFilePath` parameter for single ConfigFile testing and validation
+* ServerConfiguration Class
+  * new optional constructor parameter `skipAvailabilityCheck` to skip redundant Test-Connection when server was already validated
 
 ### Changed
 
@@ -32,28 +34,50 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 * Requirement for 3rd Party Module 'GripDevJsonSchemaValidator' removed since PowerShell 7.4 fully supports Test-Json and Schema Validation
 * orphaned private `Get-ServerConfiguration`
 * `Test-tpcServerConfiguration` was an older DEV/Test function, other functions now are stable enough
+* orphaned private `Show-SessionSummary`
 
 ### Fixed
 
+* New-ServerConfigurationFromJson
+  * credential handling fixed
+  * param creation for splatting fixed
+  * fixed pipeline unwrapping: `return $servers` -> `return , $servers` to preserve List type (single-server environments would crash)
+  * skips redundant availability check since server is already validated via Get-CounterMap
 * Get-PerformanceCounterLookup
-  * improved / fixed remoting (some functions were local, some remote,
-    would crash with different system languages)
+  * improved / fixed remoting (some functions were local, some remote, would crash with different system languages)
   * credential passing improved
-* start-tpcMonitor
-  * accepts `-ConfigPath` paramter now when remoting
-  * improved / fixed remoting (some functions were local, some remote,
-    would crash with different system languages)
-* Get-tpcAvailableCounterConfig
+* Start-tpcMonitor
+  * accepts `-ConfigPath` parameter now when remoting
+  * improved / fixed remoting (some functions were local, some remote, would crash with different system languages)
+* Test-tpcAvailableCounterConfig
   * missed changes for CounterClass Rebuild
 * Show-CounterTable
   * fixed bug with conversion int -> double, when counter returns doubles -> skipped colormap
-  * seperator current value not colored anymore
+  * separator current value not colored anymore
+* CounterConfiguration Class
+  * fallback implemented in GetValuesBatched if conversion type "D" / "M" not matching -> raw value, instead of 0
+  * removed dead code, optimized counter lookup in GetValuesBatched()
+    * replaced unused `pathMap` dictionary with a duplicate-safe version using `GroupBy`. Changed `pathsToQuery` to derive directly from `countersOnServer` via `Select()`. Replaced O(n) `FirstOrDefault` + `EndsWith` lookup with O(1) dictionary lookup via `TryGetValue`, including normalization to strip computer name prefix from returned counter paths
+* ColorMap handling
+  * replaced Dictionary<int, string> with pre-sorted KeyValuePair<int, string>[] built once at counter instantiation (C#) instead of re-sorting on every refresh (PowerShell)
+  * fixed bug: OrderedDictionary lookup used loop index as key instead of positional access, returning wrong colors for values in lower thresholds
+  * simplified color lookup in Show-CounterTable (Get-ValueColor) and Show-Graph to use the same linear search pattern over the pre-sorted array
+* EnvironmentConfiguration Class
+  * `server.LastUpdate` is now set during batch queries (was always null before)
 * a shitload of minor bugs, logic errors and orphaned code
 
 ### Security
 
 ### Code Quality
 
+* Replaced array `+=` handling by `[System.Collections.Generic.List[T]]::new()` with `.Add()` across the board
+  * New-ServerConfigurationFromJson
+  * Start-MonitoringLoop
+  * Get-tpcPerformanceCounterInfo
+  * Show-CounterTable
+  * Get-CounterConfiguration
+* Get-PerformanceCounterLookup: added reverse lookup cache (Name -> ID) for O(1) ByName resolution instead of O(n) enumeration
+* Formatting: consistent PascalCase for variable names and hashtable keys
 * Refactoring, removing old code base
 
 ### Known Issues

@@ -12,11 +12,6 @@ function Show-CounterStatistic {
     $Indent             = "  "
     $StatLine           = ""
 
-    $colorMapOrdered = [ordered]@{}
-    $colorMap.Keys | Sort-Object | ForEach-Object {
-        $colorMapOrdered.add($_, $colorMap[$_])
-    }
-
     $StatLine = "$Indent Current: $($Stats.Current) | Min: $($Stats.Minimum) | Max: $($Stats.Maximum) | Avg: $($Stats.Average)"
     Write-Host -ForegroundColor $Config.Colors.Statistics -NoNewline $StatLine
 
@@ -26,16 +21,17 @@ function Show-CounterStatistic {
 
         foreach ( $currentValue in $Stats.Last5 ) {
 
-            $color = for ( $b = 0; $b -lt $colorMapOrdered.Count; $b++ ) {
-                $bound = $colorMapOrdered.Keys[$b]
-                if ( $currentValue -lt $bound ) {
-                    $colorMapOrdered[$b]
+            $color = "White"
+
+            foreach ( $entry in $Counter.ColorMap ) {
+                if ( $currentValue -lt $entry.Key ) {
+                    $color = $entry.Value
                     break
                 }
             }
 
-            if ( [string]::IsNullOrEmpty($color) ) {
-                $color = $colorMapOrdered[-1]
+            if ( $color -eq "White" ) {
+                $color = $Counter.ColorMap[-1].Value
             }
 
             Write-Host -ForegroundColor $color -NoNewline "$currentValue"

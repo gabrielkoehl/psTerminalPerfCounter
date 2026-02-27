@@ -18,6 +18,7 @@ function Get-PerformanceCounterLookup {
 
     # Global cache to prevent repeated registry reads
     if (-not $script:tpcPerfCounterCache) { $script:tpcPerfCounterCache = @{} }
+    if (-not $script:tpcPerfCounterReverseCache) { $script:tpcPerfCounterReverseCache = @{} }
 
     $cacheKey = $ComputerName.ToLower()
 
@@ -53,7 +54,8 @@ function Get-PerformanceCounterLookup {
 
             if (-not $rawCounterData) { Throw "No data returned from registry." }
 
-            $tempMap = @{}
+            $tempMap        = @{}
+            $tempReverse    = @{}
 
             for ($i = 0; $i -lt ($rawCounterData.Count - 1); $i += 2) {
                 if ([string]$rawCounterData[$i] -match '^\d+$') {
@@ -61,14 +63,19 @@ function Get-PerformanceCounterLookup {
                     $cName = $rawCounterData[$i+1]
 
                     if ($cName) {
-                        # Use lowercase key for case-insensitive lookup later if needed, trimmed... safe
-                        # but keeping ID mapping clean
-                        $tempMap[$cId] = $cName.Trim()
+                        $trimmedName        = $cName.Trim()
+                        $tempMap[$cId]      = $trimmedName
+
+                        # Reverse lookup: Name -> ID (first match wins, needed for SQL multi-instance)
+                        if (-not $tempReverse.ContainsKey($trimmedName)) {
+                            $tempReverse[$trimmedName] = $cId
+                        }
                     }
                 }
             }
 
-            $script:tpcPerfCounterCache[$cacheKey] = $tempMap
+            $script:tpcPerfCounterCache[$cacheKey]          = $tempMap
+            $script:tpcPerfCounterReverseCache[$cacheKey]    = $tempReverse
 
         } catch {
 
@@ -78,13 +85,14 @@ function Get-PerformanceCounterLookup {
         }
     }
 
-    $counterMap = $script:tpcPerfCounterCache[$cacheKey]
+    $counterMap         = $script:tpcPerfCounterCache[$cacheKey]
+    $reverseMap         = $script:tpcPerfCounterReverseCache[$cacheKey]
 
     if ($PSCmdlet.ParameterSetName -eq 'ByName') {
-        $result = $counterMap.GetEnumerator() | Where-Object { $_.Value -eq $Name } | Select-Object -First 1 # not shure if this breaks things later, needed for sql for example with multiple instances
 
-        if ($result) {
-            return $result.Key
+        # O(1) reverse lookup instead of O(n) enumeration
+        if ($reverseMap.ContainsKey($Name)) {
+            return $reverseMap[$Name]
         } else {
             return $null
         }

@@ -29,16 +29,16 @@ function Get-CredentialFromVault {
 
         if ( -not $secretStore_isAvailable -or -not $secretManagement_isAvailable ) {
 
-            [pscredential] $credential = Get-Credential -Message "Required modules 'Microsoft.PowerShell.SecretStore' and 'Microsoft.PowerShell.SecretManagement' are not available. Please install them first. Enter credentials manually"
-            return $credential
+            [pscredential] $Credential = Get-Credential -Message "Required modules 'Microsoft.PowerShell.SecretStore' and 'Microsoft.PowerShell.SecretManagement' are not available. Please install them first. Enter credentials manually"
+            return $Credential
 
         }
 
-        [pscredential] $credential = Get-Secret -Vault $currentVault -Name $currentCredential
+        [pscredential] $Credential = Get-Secret -Vault $currentVault -Name $currentCredential
 
-        if ( $credential ) {
+        if ( $Credential ) {
 
-            return $credential
+            return $Credential
 
         } else {
 
@@ -70,10 +70,10 @@ function Get-CredentialFromVault {
 
                             try {
 
-                                [pscredential] $credential = Get-Secret -Vault $currentVault -Name $currentCredential
+                                [pscredential] $Credential = Get-Secret -Vault $currentVault -Name $currentCredential
 
-                                if ( $credential ) {
-                                        return $credential
+                                if ( $Credential ) {
+                                        return $Credential
                                 } else {
 
                                         Write-Warning "No credential found in vault '$currentVault' with name '$currentCredential'."
