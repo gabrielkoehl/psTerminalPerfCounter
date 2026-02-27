@@ -103,7 +103,7 @@
                 Write-Host "using $($credential.UserName)." -ForegroundColor Yellow
                 $configParams['Credential'] = $Credential
             } else {
-                Write-Host "using $(whoami)." -ForegroundColor Yellow
+                Write-Host "using $env:USERDOMAIN\$env:USERNAME ." -ForegroundColor Yellow
             }
 
             if ( Test-Connection -ComputerName $ComputerName -Count 1 -Quiet ) {
