@@ -100,7 +100,7 @@ public class CounterConfiguration
         // Group by computerName and credentials
         var serverGroups = activeCounters.GroupBy(c => new { c.ComputerName, c.IsRemote, c.Credential });
 
-        // parallel per server
+        // parallel per server ( not thread safe, design is safe because grouped by server)
         Parallel.ForEach(serverGroups, group =>
         {
             var serverConfig        = group.Key;
