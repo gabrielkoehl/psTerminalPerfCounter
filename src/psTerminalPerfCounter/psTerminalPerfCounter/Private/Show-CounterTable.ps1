@@ -87,14 +87,6 @@
         $last5SubWidths += $maxWidthAtPos
     }
 
-    # Calculate total Last5 width: sum of all sub-widths plus separators
-    if ( $last5SubWidths.Count -gt 0 ) {
-        $totalLast5Width    = ($last5SubWidths | Measure-Object -Sum).Sum + (($last5SubWidths.Count - 1) * 3) # 3 chars for " | "
-        $widths.Last5       = $totalLast5Width + 2
-    } else {
-        $widths.Last5       = $headers.Last5.Length + 2
-    }
-
     # Ensure minimum widths for headers
     $headers = @{
         ComputerName        = "Computer Name"
@@ -108,6 +100,15 @@
         LastUpdate          = "ExecTime"
         ExecutionDuration   = "Dur.Time (ms)"
     }
+
+    # Calculate total Last5 width: sum of all sub-widths plus separators
+    if ( $last5SubWidths.Count -gt 0 ) {
+        $totalLast5Width    = ($last5SubWidths | Measure-Object -Sum).Sum + (($last5SubWidths.Count - 1) * 3) # 3 chars for " | "
+        $widths.Last5       = $totalLast5Width + 2
+    } else {
+        $widths.Last5       = $headers.Last5.Length + 2
+    }
+
 
     foreach ( $key in $headers.Keys ) {
         if ( $widths[$key] -lt ($headers[$key].Length + 2) ) {
