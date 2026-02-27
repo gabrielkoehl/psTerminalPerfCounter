@@ -10,17 +10,17 @@ function Show-CounterStatistic {
     $Stats              = $Counter.Statistics
     $ExecutionTime      = $Counter.ExecutionDuration
     $Indent             = "  "
-    $StatColor          = if ($null -ne $Config -and $null -ne $Config.Colors) { $Config.Colors.statistics } else { "Gray" }
+    $StatColor          = if ($null -ne $Config -and $Config.ContainsKey('Colors')) { $Config['Colors']['statistics'] } else { "Gray" }
 
-    $current = if ($Stats.ContainsKey('Current')) { $Stats.Current } else { "-" }
-    $min     = if ($Stats.ContainsKey('Minimum')) { $Stats.Minimum } else { "-" }
-    $max     = if ($Stats.ContainsKey('Maximum')) { $Stats.Maximum } else { "-" }
-    $avg     = if ($Stats.ContainsKey('Average')) { $Stats.Average } else { "-" }
+    $current = if ($Stats.ContainsKey('Current')) { $Stats['Current'] } else { "-" }
+    $min     = if ($Stats.ContainsKey('Minimum')) { $Stats['Minimum'] } else { "-" }
+    $max     = if ($Stats.ContainsKey('Maximum')) { $Stats['Maximum'] } else { "-" }
+    $avg     = if ($Stats.ContainsKey('Average')) { $Stats['Average'] } else { "-" }
 
     $StatLine = "$Indent Current: $current | Min: $min | Max: $max | Avg: $avg"
     Write-Host -ForegroundColor $StatColor -NoNewline $StatLine
 
-    $last5Values = if ( $Stats.ContainsKey('Last5') ) { @($Stats.Last5) } else { @() }
+    $last5Values = if ( $Stats.ContainsKey('Last5') ) { ,@($Stats['Last5']) } else { ,@() }
 
     if ( $last5Values.Count -gt 0 ) {
 

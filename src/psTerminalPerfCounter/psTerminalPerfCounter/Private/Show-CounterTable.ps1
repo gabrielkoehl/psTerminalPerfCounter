@@ -42,11 +42,11 @@
             ComputerName        = $Counter.ComputerName
             CounterName         = $Counter.Title
             Unit                = $Counter.Unit
-            Current             = if ( $Stats.ContainsKey('Current') )   { $Stats.Current }  else { "-" }
-            Last5               = if ( $Stats.ContainsKey('Last5') -and @($Stats.Last5).Count -gt 0 ) { @($Stats.Last5) } else { @() }
-            Min                 = if ( $Stats.ContainsKey('Minimum') )   { $Stats.Minimum }  else { "-" }
-            Max                 = if ( $Stats.ContainsKey('Maximum') )   { $Stats.Maximum }  else { "-" }
-            Avg                 = if ( $Stats.ContainsKey('Average') )   { $Stats.Average }  else { "-" }
+            Current             = if ( $Stats.ContainsKey('Current') )   { $Stats['Current'] }  else { "-" }
+            Last5               = if ( $Stats.ContainsKey('Last5') -and @($Stats['Last5']).Count -gt 0 ) { ,@($Stats['Last5']) } else { ,@() }
+            Min                 = if ( $Stats.ContainsKey('Minimum') )   { $Stats['Minimum'] }  else { "-" }
+            Max                 = if ( $Stats.ContainsKey('Maximum') )   { $Stats['Maximum'] }  else { "-" }
+            Avg                 = if ( $Stats.ContainsKey('Average') )   { $Stats['Average'] }  else { "-" }
             LastUpdate          = if ( $null -ne $Counter.LastUpdate )       { $Counter.LastUpdate.ToString("HH:mm:ss") } else { $null }
             ExecutionDuration   = if ( $null -ne $Counter.ExecutionDuration) { $Counter.ExecutionDuration } else { $null }
             ColorMap            = $Counter.ColorMap
