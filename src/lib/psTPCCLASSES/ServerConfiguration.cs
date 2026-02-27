@@ -24,7 +24,8 @@ public class ServerConfiguration
      public ServerConfiguration(
           string computerName,
           string comment,
-          List<CounterConfiguration> counters)
+          List<CounterConfiguration> counters,
+          bool skipAvailabilityCheck = false)
      {
           _source        = "ServerConfiguration";
           ComputerName   = computerName;
@@ -34,7 +35,14 @@ public class ServerConfiguration
           IsAvailable    = false;
           LastError      = string.Empty;
 
-          TestServerAvailability();
+          if (skipAvailabilityCheck)
+          {
+               IsAvailable = true;
+          }
+          else
+          {
+               TestServerAvailability();
+          }
      }
 
      private void TestServerAvailability()
