@@ -42,15 +42,19 @@ function Get-PerformanceCounterLookup {
                 ErrorAction = 'Stop'
             }
 
-            if (-not [string]::IsNullOrWhiteSpace($ComputerName) -and $ComputerName -ne $env:COMPUTERNAME) {
+            $isLocal = [string]::IsNullOrWhiteSpace($ComputerName) -or ($ComputerName -eq $env:COMPUTERNAME)
+
+            if ($isLocal) {
+                $rawCounterData = & $remoteScript
+            } else {
                 $conParam['ComputerName'] = $ComputerName
 
                 if ($Credential) {
                     $conParam['Credential'] = $Credential
                 }
-            }
 
-            $rawCounterData = Invoke-Command @conParam
+                $rawCounterData = Invoke-Command @conParam
+            }
 
             if (-not $rawCounterData) { Throw "No data returned from registry." }
 

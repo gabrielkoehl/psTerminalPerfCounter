@@ -42,11 +42,11 @@
             ComputerName        = $Counter.ComputerName
             CounterName         = $Counter.Title
             Unit                = $Counter.Unit
-            Current             = if ( $null -ne $Stats.Current )   { $Stats.Current }  else { "-" }
-            Last5               = if ( $Stats.Last5.Count -gt 0 )   { $Stats.Last5 }    else { @() }
-            Min                 = if ( $null -ne $Stats.Minimum )   { $Stats.Minimum }  else { "-" }
-            Max                 = if ( $null -ne $Stats.Maximum )   { $Stats.Maximum }  else { "-" }
-            Avg                 = if ( $null -ne $Stats.Average )   { $Stats.Average }  else { "-" }
+            Current             = if ( $Stats.ContainsKey('Current') )   { $Stats['Current'] }  else { "-" }
+            Last5               = if ( $Stats.ContainsKey('Last5') -and @($Stats['Last5']).Count -gt 0 ) { ,@($Stats['Last5']) } else { ,@() }
+            Min                 = if ( $Stats.ContainsKey('Minimum') )   { $Stats['Minimum'] }  else { "-" }
+            Max                 = if ( $Stats.ContainsKey('Maximum') )   { $Stats['Maximum'] }  else { "-" }
+            Avg                 = if ( $Stats.ContainsKey('Average') )   { $Stats['Average'] }  else { "-" }
             LastUpdate          = if ( $null -ne $Counter.LastUpdate )       { $Counter.LastUpdate.ToString("HH:mm:ss") } else { $null }
             ExecutionDuration   = if ( $null -ne $Counter.ExecutionDuration) { $Counter.ExecutionDuration } else { $null }
             ColorMap            = $Counter.ColorMap
@@ -66,9 +66,15 @@
         Min                 = ($tableData | ForEach-Object { $_.Min.ToString().Length } | Measure-Object -Maximum).Maximum + 2
         Max                 = ($tableData | ForEach-Object { $_.Max.ToString().Length } | Measure-Object -Maximum).Maximum + 2
         Avg                 = ($tableData | ForEach-Object { $_.Avg.ToString().Length } | Measure-Object -Maximum).Maximum + 2
-        LastUpdate          = ($tableData | Where-Object { $_.LastUpdate }                   | ForEach-Object { $_.LastUpdate.Length }                   | Measure-Object -Maximum).Maximum + 2
-        ExecutionDuration   = ($tableData | Where-Object { $null -ne $_.ExecutionDuration }  | ForEach-Object { $_.ExecutionDuration.ToString().Length } | Measure-Object -Maximum).Maximum + 2
+        LastUpdate          = 0
+        ExecutionDuration   = 0
     }
+
+    $lastUpdateMax = ($tableData | Where-Object { $_.LastUpdate } | ForEach-Object { $_.LastUpdate.Length } | Measure-Object -Maximum).Maximum
+    $widths.LastUpdate = if ($null -ne $lastUpdateMax) { $lastUpdateMax + 2 } else { 0 }
+
+    $execDurationMax = ($tableData | Where-Object { $null -ne $_.ExecutionDuration } | ForEach-Object { $_.ExecutionDuration.ToString().Length } | Measure-Object -Maximum).Maximum
+    $widths.ExecutionDuration = if ($null -ne $execDurationMax) { $execDurationMax + 2 } else { 0 }
 
     # Calculate Last5 width
     $maxLast5Count      = ($tableData | ForEach-Object { $_.Last5.Count } | Measure-Object -Maximum).Maximum

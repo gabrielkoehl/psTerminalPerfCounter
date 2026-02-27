@@ -6,7 +6,7 @@ function Show-CounterGraph {
     )
 
     $Config     = $Counter.GraphConfiguration
-    $GraphData  = $Counter.GetGraphData($Config.Samples)
+    $GraphData  = $Counter.GetGraphData($Config['Samples'])
 
     if ( $GraphData.Count -eq 0 ) {
         Write-Host "$($Counter.GetFormattedTitle()): No data available" -ForegroundColor Yellow
@@ -17,9 +17,9 @@ function Show-CounterGraph {
     $GraphParams = @{
         Datapoints      = $GraphData
         GraphTitle      = $Counter.GetFormattedTitle()
-        Type            = $Config.graphType
-        YAxisStep       = $Config.yAxisStep
-        yAxisMaxRows    = $Config.yAxisMaxRows
+        Type            = $Config['graphType']
+        YAxisStep       = $Config['yAxisStep']
+        yAxisMaxRows    = $Config['yAxisMaxRows']
     }
 
     if ( $Counter.ColorMap.Count -gt 0 ) {
@@ -29,7 +29,7 @@ function Show-CounterGraph {
     Show-Graph @GraphParams
 
     # Show statistics if enabled
-    if ( $Config.ShowStatistics -and $Counter.Statistics.Count -gt 0 ) {
+    if ( $Config['showStatistics'] -and $Counter.Statistics.Count -gt 0 ) {
         Show-CounterStatistic -Counter $Counter
     }
 

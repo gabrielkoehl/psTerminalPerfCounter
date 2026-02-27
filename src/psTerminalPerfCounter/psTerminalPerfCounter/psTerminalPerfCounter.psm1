@@ -1,6 +1,8 @@
 ﻿# Script Handling
 $ErrorActionPreference = "Stop"
 
+Set-StrictMode -Version latest
+
 # Config Path Management
 $script:TPC_CONFIG_PATH_VAR             = "TPC_CONFIGPATH"
 $script:DEFAULT_CONFIG_PATH             = Join-Path $PSScriptRoot -ChildPath "Config"
@@ -10,6 +12,10 @@ $script:JSON_DEFAULT_TEMPLATE_FILE      = Join-Path $script:DEFAULT_CONFIG_PATH 
 
 # Loading Logger (Singleton)
 $script:logger = [psTPCCLASSES.PowerShellLogger]::Instance
+
+# Performance Counter Cache (used by Get-PerformanceCounterLookup)
+$script:tpcPerfCounterCache        = @{}
+$script:tpcPerfCounterReverseCache = @{}
 
 # Dot source public/private functions
 $public             = @(Get-ChildItem -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Public/*.ps1')  -Recurse -ErrorAction Stop)
