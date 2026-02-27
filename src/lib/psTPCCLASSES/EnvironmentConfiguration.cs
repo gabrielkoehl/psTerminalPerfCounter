@@ -52,8 +52,9 @@ public class EnvironmentConfiguration
                 CounterConfiguration.GetValuesBatched(allCounters);
             }
 
-            foreach(var server in Servers)
+            foreach(var server in Servers.Where(s => s.IsAvailable))
             {
+                server.LastUpdate = DateTime.Now;
                 server.UpdateStatistics();
             }
 
