@@ -48,7 +48,7 @@ param (
             $ConfigPaths    = @($configFilePath)
             $isSingleFile   = $true
         } else {
-            $ConfigPaths    = Get-tpcConfigPaths
+            $ConfigPaths    = @(Get-tpcConfigPaths)
         }
 
         if ( $ConfigPaths.Count -eq 0 -and -not $isSingleFile ) {
@@ -68,7 +68,7 @@ param (
 
             if ( -not $isSingleFile ) {
 
-                $ConfigFiles = Get-ChildItem -Path $ConfigPath -Filter "tpc_*.json" -File | Where-Object { $_.BaseName -notlike "*template*" }
+                $ConfigFiles = @(Get-ChildItem -Path $ConfigPath -Filter "tpc_*.json" -File | Where-Object { $_.BaseName -notlike "*template*" })
 
                 if ( $ConfigFiles.Count -eq 0 ) {
                     Write-Verbose "No configuration files found with 'tpc_' prefix in: $ConfigPath"
@@ -231,7 +231,7 @@ param (
     }
 
     # Identify duplicates for summary
-    $duplicateNames = $ConfigNamesFound.Keys | Where-Object { $ConfigNamesFound[$_] -gt 1 }
+    $duplicateNames = @($ConfigNamesFound.Keys | Where-Object { $ConfigNamesFound[$_] -gt 1 })
 
         if ( $Raw ) {
 
@@ -292,7 +292,7 @@ param (
                 $separatorLine = "=" * 35
                 Write-Host $separatorLine -ForegroundColor Red
                 foreach ( $dupName in $duplicateNames ) {
-                    $dupConfigs = $AllResults | Where-Object { $_.ConfigName.ToLower() -eq $dupName }
+                    $dupConfigs = @($AllResults | Where-Object { $_.ConfigName.ToLower() -eq $dupName })
                     Write-Host "`n'$dupName' found in:" -ForegroundColor Yellow
                     foreach ( $dupConfig in $dupConfigs ) {
                         Write-Host "- $($dupConfig.ConfigPath) ($([System.IO.Path]::GetFileName($dupConfig.ConfigFile)))" -ForegroundColor Gray
