@@ -11,8 +11,12 @@ function Remove-tpcConfigPath {
     .EXAMPLE
         Remove-tpcConfigPath
 
+        Interactively select and remove individual configuration paths.
+
     .EXAMPLE
         Remove-tpcConfigPath -All
+
+        Removes all custom configuration paths without prompting.
     #>
 
     [CmdletBinding()]

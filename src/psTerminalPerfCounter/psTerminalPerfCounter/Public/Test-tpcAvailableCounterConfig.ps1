@@ -14,11 +14,17 @@ function Test-tpcAvailableCounterConfig {
     .EXAMPLE
         Test-tpcAvailableCounterConfig
 
+        Validates all configurations found in registered paths and displays formatted results.
+
     .EXAMPLE
         Test-tpcAvailableCounterConfig -configFilePath "C:\configs\tpc_CPU.json"
 
+        Validates a single configuration file.
+
     .EXAMPLE
         Test-tpcAvailableCounterConfig -Raw | Where-Object { -not $_.JsonValid }
+
+        Returns raw objects and filters for invalid JSON configurations.
     #>
 
     [CmdletBinding()]

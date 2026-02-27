@@ -14,8 +14,12 @@ function Add-tpcConfigPath {
     .EXAMPLE
         Add-tpcConfigPath -Path "C:\MyConfigs"
 
+        Adds a local path to TPC_CONFIGPATH. Prompts to create the directory if it does not exist.
+
     .EXAMPLE
         Add-tpcConfigPath -Path "\\server\share\configs" -Force
+
+        Adds a UNC path and creates it without prompting.
     #>
 
     [CmdletBinding()]

@@ -11,8 +11,12 @@ function Get-tpcConfigPaths {
     .EXAMPLE
         Get-tpcConfigPaths
 
+        Returns all registered configuration paths including the module default.
+
     .EXAMPLE
         Get-tpcConfigPaths -noDefault
+
+        Returns only user-defined configuration paths.
     #>
 
 [CmdletBinding()]

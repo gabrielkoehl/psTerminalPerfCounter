@@ -14,8 +14,12 @@ function Start-tpcEnvironmentMonitor {
     .EXAMPLE
         Start-tpcEnvironmentMonitor -EnvConfigPath "C:\Configs\SQL_PROD.json"
 
+        Starts environment monitoring using the interval defined in the JSON config.
+
     .EXAMPLE
         Start-tpcEnvironmentMonitor -EnvConfigPath "C:\Configs\SQL_PROD.json" -UpdateInterval 5
+
+        Starts environment monitoring with a 5-second update interval.
     #>
 
     [CmdletBinding()]

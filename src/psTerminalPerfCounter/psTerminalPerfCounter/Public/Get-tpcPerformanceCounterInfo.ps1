@@ -18,11 +18,17 @@ function Get-tpcPerformanceCounterInfo {
     .EXAMPLE
         Get-tpcPerformanceCounterInfo -SearchTerm "238-6"
 
+        Validates and resolves a composite counter ID.
+
     .EXAMPLE
         Get-tpcPerformanceCounterInfo -SearchTerm "Processor"
 
+        Searches for counters matching the name pattern on the local machine.
+
     .EXAMPLE
         Get-tpcPerformanceCounterInfo -SearchTerm "Processor" -ComputerName 'lab-node1'
+
+        Searches for counters on a remote machine.
     #>
 
     [CmdletBinding(DefaultParameterSetName = 'Local')]

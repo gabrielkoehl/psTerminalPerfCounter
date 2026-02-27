@@ -25,11 +25,17 @@
     .EXAMPLE
         Start-tpcMonitor -ConfigName "CPU"
 
+        Starts local CPU monitoring using the built-in CPU template.
+
     .EXAMPLE
         Start-tpcMonitor -ConfigPath "C:\MyConfigs\tpc_CustomCPU.json"
 
+        Starts monitoring using a custom configuration file.
+
     .EXAMPLE
         Start-tpcMonitor -ConfigName "Memory" -ComputerName "Server01" -Credential $cred -UpdateInterval 2
+
+        Starts remote memory monitoring with 2-second intervals.
     #>
 
     [CmdletBinding()]
