@@ -51,6 +51,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 * New-ServerConfigurationFromJson
   * credential handling fixed
   * param creation for splatting fixed
+* CounterConfiguration Class Public GetValuesBatched
+  * fallback implemented if conversion type "D" / "M" not matching -> raw value, instead of 0
 * a shitload of minor bugs, logic errors and orphaned code
 
 ### Security
