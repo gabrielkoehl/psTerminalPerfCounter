@@ -26,8 +26,8 @@ function Start-MonitoringLoop {
             Show-SessionHeader -ConfigName $Config.Name -StartTime $StartTime -SampleCount $SampleCount
 
             # Separate counters by format
-            $graphCounters = [System.Collections.Generic.List[object]]::new()
-            $tableCounters = [System.Collections.Generic.List[object]]::new()
+            $graphCounters = [System.Collections.Generic.List[psTPCCLASSES.CounterConfiguration]]::new()
+            $tableCounters = [System.Collections.Generic.List[psTPCCLASSES.CounterConfiguration]]::new()
 
             foreach ( $Counter in $Config.Counters ) {
                 if ( $Counter.HistoricalData.Count -gt 3 ) {  # Need some data points
@@ -87,7 +87,7 @@ function Start-MonitoringLoop {
             Write-Host ""
 
             # Collect all counters from all servers for display
-            $allCounters = [System.Collections.Generic.List[object]]::new()
+            $allCounters = [System.Collections.Generic.List[psTPCCLASSES.CounterConfiguration]]::new()
 
             foreach ( $server in $Config.Servers ) {
                 if ( $server.IsAvailable ) {

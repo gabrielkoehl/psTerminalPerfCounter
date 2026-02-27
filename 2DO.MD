@@ -1,2 +1,3 @@
 - Samples Configweit, nicht per sample -> Verzerrt sonst countersets
-- Wenn später Output nach csv, html usw. ggf. konsolenoutput nur auf processing reduzieren, sonst stirbt die konsole.
+- massives type problem, teilweise ([System.Collections.Generic.List[psTPCCLASSES.CounterConfiguration]])] definiert als return, aber return macht ne liste draus. ( New-CounterConfiguration , return
+  das unterwandert c#

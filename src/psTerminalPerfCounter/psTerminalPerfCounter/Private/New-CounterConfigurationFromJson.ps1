@@ -43,6 +43,6 @@
         $PerformanceCounters.Add($CounterConfiguration)
     }
 
-    return $PerformanceCounters
+    return , $PerformanceCounters
 
 }
