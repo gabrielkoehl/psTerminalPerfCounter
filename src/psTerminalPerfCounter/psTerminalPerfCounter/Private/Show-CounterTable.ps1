@@ -66,9 +66,15 @@
         Min                 = ($tableData | ForEach-Object { $_.Min.ToString().Length } | Measure-Object -Maximum).Maximum + 2
         Max                 = ($tableData | ForEach-Object { $_.Max.ToString().Length } | Measure-Object -Maximum).Maximum + 2
         Avg                 = ($tableData | ForEach-Object { $_.Avg.ToString().Length } | Measure-Object -Maximum).Maximum + 2
-        LastUpdate          = ($tableData | Where-Object { $_.LastUpdate }                   | ForEach-Object { $_.LastUpdate.Length }                   | Measure-Object -Maximum).Maximum + 2
-        ExecutionDuration   = ($tableData | Where-Object { $null -ne $_.ExecutionDuration }  | ForEach-Object { $_.ExecutionDuration.ToString().Length } | Measure-Object -Maximum).Maximum + 2
+        LastUpdate          = 0
+        ExecutionDuration   = 0
     }
+
+    $lastUpdateMax = ($tableData | Where-Object { $_.LastUpdate } | ForEach-Object { $_.LastUpdate.Length } | Measure-Object -Maximum).Maximum
+    $widths.LastUpdate = if ($null -ne $lastUpdateMax) { $lastUpdateMax + 2 } else { 0 }
+
+    $execDurationMax = ($tableData | Where-Object { $null -ne $_.ExecutionDuration } | ForEach-Object { $_.ExecutionDuration.ToString().Length } | Measure-Object -Maximum).Maximum
+    $widths.ExecutionDuration = if ($null -ne $execDurationMax) { $execDurationMax + 2 } else { 0 }
 
     # Calculate Last5 width
     $maxLast5Count      = ($tableData | ForEach-Object { $_.Last5.Count } | Measure-Object -Maximum).Maximum

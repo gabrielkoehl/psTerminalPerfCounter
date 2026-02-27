@@ -10,14 +10,14 @@ function Show-CounterStatistic {
     $Stats              = $Counter.Statistics
     $ExecutionTime      = $Counter.ExecutionDuration
     $Indent             = "  "
-    $StatLine           = ""
+    $StatColor          = if ($null -ne $Config -and $null -ne $Config.Colors) { $Config.Colors.Statistics } else { "Gray" }
 
     $StatLine = "$Indent Current: $($Stats.Current) | Min: $($Stats.Minimum) | Max: $($Stats.Maximum) | Avg: $($Stats.Average)"
-    Write-Host -ForegroundColor $Config.Colors.Statistics -NoNewline $StatLine
+    Write-Host -ForegroundColor $StatColor -NoNewline $StatLine
 
     if ( $Stats.Last5.Count -gt 0 ) {
 
-        Write-Host -ForegroundColor $Config.Colors.Statistics -NoNewline " | Last 5: "
+        Write-Host -ForegroundColor $StatColor -NoNewline " | Last 5: "
 
         foreach ( $currentValue in $Stats.Last5 ) {
 
@@ -35,7 +35,7 @@ function Show-CounterStatistic {
             }
 
             Write-Host -ForegroundColor $color -NoNewline "$currentValue"
-            Write-Host -ForegroundColor $Config.Colors.Statistics -NoNewline " | "
+            Write-Host -ForegroundColor $StatColor -NoNewline " | "
 
         }
 
