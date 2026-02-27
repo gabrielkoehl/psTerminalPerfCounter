@@ -3,10 +3,7 @@
     param(
         [Parameter(Mandatory=$true)]
         [System.Collections.Generic.List[psTPCCLASSES.CounterConfiguration]]
-        $Counters,
-        [Parameter(Mandatory=$true)]
-        [string]
-        $MonitorType
+        $Counters
     )
 
     $tableData     = [System.Collections.Generic.List[PSCustomObject]]::new()

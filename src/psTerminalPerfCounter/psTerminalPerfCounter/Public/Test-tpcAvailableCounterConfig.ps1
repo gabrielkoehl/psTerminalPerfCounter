@@ -28,6 +28,7 @@ function Test-tpcAvailableCounterConfig {
     #>
 
     [CmdletBinding()]
+    [OutputType([PSCustomObject[]])]
     param (
         [Parameter()]
         [string] $configFilePath,

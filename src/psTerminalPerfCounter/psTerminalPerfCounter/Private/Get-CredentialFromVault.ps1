@@ -9,6 +9,7 @@
 #>
 
 function Get-CredentialFromVault {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPlainTextForPassword', 'CredentialName')]
     [CmdletBinding()]
     [OutputType([PSCredential])]
     param(
