@@ -59,6 +59,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 * CounterConfiguration Class
   * Removed dead code, optimized counter lookup in GetValuesBatched()
     * Replaced unused `pathMap` dictionary with a duplicate-safe version using `GroupBy`. Changed `pathsToQuery` to derive directly from `countersOnServer` via `Select()`. Replaced O(n) `FirstOrDefault` + `EndsWith` lookup with O(1) dictionary lookup via `TryGetValue`, including normalization to strip computer name prefix from returned counter paths
+* Replaced array handling by [System.Collections.Generic.List[object]]::new() with increased performance
+  * New-ServerConfigurationFromJson
+  * Start-MonitoringLoop
+  * Get-tpcPerformanceCounterInfo
 
 
 * a shitload of minor bugs, logic errors and orphaned code

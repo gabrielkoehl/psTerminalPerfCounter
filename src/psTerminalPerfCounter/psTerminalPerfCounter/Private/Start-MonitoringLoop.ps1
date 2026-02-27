@@ -26,19 +26,19 @@ function Start-MonitoringLoop {
             Show-SessionHeader -ConfigName $Config.Name -StartTime $StartTime -SampleCount $SampleCount
 
             # Separate counters by format
-            $graphCounters = @()
-            $tableCounters = @()
+            $graphCounters = [System.Collections.Generic.List[object]]::new()
+            $tableCounters = [System.Collections.Generic.List[object]]::new()
 
             foreach ( $Counter in $Config.Counters ) {
                 if ( $Counter.HistoricalData.Count -gt 3 ) {  # Need some data points
                     switch ($Counter.Format) {
-                        "graph" { $graphCounters += $Counter }
-                        "table" { $tableCounters += $Counter }
+                        "graph" { $graphCounters.Add($Counter) }
+                        "table" { $tableCounters.Add($Counter) }
                         "both"  {
-                                $graphCounters += $Counter
-                                $tableCounters += $Counter
+                                $graphCounters.Add($Counter)
+                                $tableCounters.Add($Counter)
                         }
-                        default { $graphCounters += $Counter }  # Default to graph
+                        default { $tableCounters.Add($Counter) }  # Default to table
                     }
                 } else {
                     Write-Host "$($Counter.GetFormattedTitle()): Collecting data... ($($Counter.HistoricalData.Count)/3 samples)" -ForegroundColor Yellow
@@ -87,13 +87,13 @@ function Start-MonitoringLoop {
             Write-Host ""
 
             # Collect all counters from all servers for display
-            $allCounters = @()
+            $allCounters = [System.Collections.Generic.List[object]]::new()
 
             foreach ( $server in $Config.Servers ) {
                 if ( $server.IsAvailable ) {
                     foreach ( $counter in $server.Counters ) {
                         if ( $counter.IsAvailable -and $counter.HistoricalData.Count -gt 0 ) {
-                            $allCounters += $counter
+                            $allCounters.Add($counter)
                         }
                     }
                 }

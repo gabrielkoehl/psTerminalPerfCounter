@@ -6,7 +6,7 @@
         [PSCustomObject] $JsonConfig
     )
 
-        $servers = @()
+        $servers = [System.Collections.Generic.List[object]]::new()
 
         # Credential
         if ( $JsonConfig.CredentialName -and $JsonConfig.CredentialName -eq 'integrated') {
@@ -29,7 +29,7 @@
                 $paramServer['counterMap']  = $serverCounterMap
 
 
-                $performanceCounters    = @()
+                $performanceCounters    = [System.Collections.Generic.List[object]]::new()
                 $skipServer             = $false
 
 
@@ -56,7 +56,7 @@
                             break
                         }
 
-                        $performanceCounters += $config.Counters
+                        $performanceCounters.Add($config.Counters)
                     }
                 }
 
@@ -72,7 +72,7 @@
                     $performanceCounters
                 )
 
-                $servers += $serverConfiguration
+                $servers.Add($serverConfiguration)
 
             } catch {
 

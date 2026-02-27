@@ -36,7 +36,7 @@ function Get-tpcPerformanceCounterInfo {
         [string] $SearchTerm
     )
 
-    $Result = @()
+    $Result = [System.Collections.Generic.List[object]]::new()
     $param  = @{}
 
     if ( $PSCmdlet.ParameterSetName -eq 'Remote' ) {
@@ -88,13 +88,13 @@ function Get-tpcPerformanceCounterInfo {
                         } | Select-Object -Unique
                     }
 
-                    $Result = [PSCustomObject]@{
+                    $Result.Add([PSCustomObject]@{
                         ID          = $SearchTerm
                         CounterSet  = $SetName
                         Path        = $PathName
                         SetType     = $SetType
                         Instances   = $($counterInstancesValues -join ', ')
-                    }
+                    })
 
                 } else {
                     Write-Host "Could not resolve ID '$SearchTerm' to counter names." -ForegroundColor Red
@@ -157,13 +157,13 @@ function Get-tpcPerformanceCounterInfo {
 
                         }
 
-                        $Result += [PSCustomObject]@{
+                        $Result.Add([PSCustomObject]@{
                             ID          = $CompositeId
                             CounterSet  = $CounterSet.CounterSetName
                             Path        = $CounterPath
                             SetType     = $SetType
                             Instances   = $($counterInstancesValues -join ', ')
-                        }
+                        })
 
                     } catch {
                         # Warning instead of Error to avoid stopping the entire loop for one bad counter
