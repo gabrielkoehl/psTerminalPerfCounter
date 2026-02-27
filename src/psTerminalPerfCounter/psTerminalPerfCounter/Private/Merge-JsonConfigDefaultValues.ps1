@@ -32,10 +32,7 @@ function Merge-JsonConfigDefaultValues {
 
     function Get-DeepCopy { # Avoiding referenz and shallow clone for hashtable
         param( [hashtable] $Source )
-
-        $xml = [System.Management.Automation.PSSerializer]::Serialize($Source, [int32]::MaxValue)
-        return [System.Management.Automation.PSSerializer]::Deserialize($xml)
-
+        return $Source | ConvertTo-Json -Depth 10 | ConvertFrom-Json -AsHashtable
     }
 
 #endregion
