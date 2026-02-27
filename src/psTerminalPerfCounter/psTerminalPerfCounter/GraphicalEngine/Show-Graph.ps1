@@ -56,6 +56,8 @@
         $NumOfRows = $yAxisMaxRows
     }
 
+    $AddHorizontalLines = $false
+
     # Create a 2D Array to save datapoints  in a 2D format
     switch( $Type ){
         'Bar'       { $Array = Get-BarPlot       -Datapoints $Datapoints -Step $YAxisStep -StartOfRange $StartOfRange -EndofRange $EndofRange -yAxisMaxRows $yAxisMaxRows }
