@@ -36,10 +36,11 @@ function Get-tpcPerformanceCounterInfo {
         [string] $SearchTerm
     )
 
-    $Result = [System.Collections.Generic.List[object]]::new()
-    $param  = @{}
+    $Result  = [System.Collections.Generic.List[object]]::new()
+    $param   = @{}
+    $isLocal = $PSCmdlet.ParameterSetName -eq 'Local'
 
-    if ( $PSCmdlet.ParameterSetName -eq 'Remote' ) {
+    if ( -not $isLocal ) {
 
         $param.Computername = $ComputerName
 
@@ -69,8 +70,12 @@ function Get-tpcPerformanceCounterInfo {
 
                 if ( $SetName -and $PathName ) {
 
-                    $scriptblock = { param([string]$arg1) Get-Counter -ListSet $arg1 -ErrorAction SilentlyContinue }
-                    $ListSetObj  = invoke-command -ScriptBlock $scriptblock @param -ArgumentList $setname
+                    if ( $isLocal ) {
+                        $ListSetObj = Get-Counter -ListSet $setname -ErrorAction SilentlyContinue
+                    } else {
+                        $scriptblock = { param([string]$arg1) Get-Counter -ListSet $arg1 -ErrorAction SilentlyContinue }
+                        $ListSetObj  = Invoke-Command -ScriptBlock $scriptblock @param -ArgumentList $setname
+                    }
 
                     if (-not $ListSetObj) { throw "CounterSet '$SetName' found by ID but not accessible via Get-Counter." }
 
@@ -109,9 +114,13 @@ function Get-tpcPerformanceCounterInfo {
         # Input is a Name (Search Term)
         } else {
 
-            # Retrieve ALL sets... takes time
-            $scriptblock    = { Get-Counter -ListSet * -ErrorAction SilentlyContinue }
-            $AllSets        = invoke-command -ScriptBlock $scriptblock @param
+            # Retrieve ALL sets
+            if ( $isLocal ) {
+                $AllSets = Get-Counter -ListSet * -ErrorAction SilentlyContinue
+            } else {
+                $scriptblock = { Get-Counter -ListSet * -ErrorAction SilentlyContinue }
+                $AllSets     = Invoke-Command -ScriptBlock $scriptblock @param
+            }
 
             foreach ( $CounterSet in $AllSets ) {
 

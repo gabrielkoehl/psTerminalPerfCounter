@@ -9,4 +9,4 @@ import-module -fullyqualifiedname ".\src\psTerminalPerfCounter\psTerminalPerfCou
 
  # Start-tpcEnvironmentMonitor -EnvConfigPath "src\psTerminalPerfCounter\psTerminalPerfCounter\Config\ENV_SERVER_EXAMPLE.json"
 
-Test-tpcAvailableCounterConfig
+# Test-tpcAvailableCounterConfig
