@@ -10,7 +10,7 @@ function Show-CounterStatistic {
     $Stats              = $Counter.Statistics
     $ExecutionTime      = $Counter.ExecutionDuration
     $Indent             = "  "
-    $StatColor          = if ($null -ne $Config -and $null -ne $Config.Colors) { $Config.Colors.Statistics } else { "Gray" }
+    $StatColor          = if ($null -ne $Config -and $null -ne $Config.Colors) { $Config.Colors.statistics } else { "Gray" }
 
     $StatLine = "$Indent Current: $($Stats.Current) | Min: $($Stats.Minimum) | Max: $($Stats.Maximum) | Avg: $($Stats.Average)"
     Write-Host -ForegroundColor $StatColor -NoNewline $StatLine
