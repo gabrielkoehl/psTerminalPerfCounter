@@ -9,7 +9,7 @@
         $MonitorType
     )
 
-    $tableData     = @()
+    $tableData     = [System.Collections.Generic.List[PSCustomObject]]::new()
 
     # Helper function to get color for value
     function Get-ValueColor {
@@ -49,10 +49,10 @@
             Avg                 = if ( $null -ne $Stats.Average )   { $Stats.Average }  else { "-" }
             LastUpdate          = if ( $null -ne $Counter.LastUpdate )       { $Counter.LastUpdate.ToString("HH:mm:ss") } else { $null }
             ExecutionDuration   = if ( $null -ne $Counter.ExecutionDuration) { $Counter.ExecutionDuration } else { $null }
-            ColorMap            = $Counter.colorMap
+            ColorMap            = $Counter.ColorMap
         }
 
-        $tableData += $rowData
+        $tableData.Add($rowData)
 
     }
 
@@ -72,7 +72,7 @@
 
     # Calculate Last5 width
     $maxLast5Count      = ($tableData | ForEach-Object { $_.Last5.Count } | Measure-Object -Maximum).Maximum
-    $last5SubWidths     = @()
+    $last5SubWidths     = [System.Collections.Generic.List[int]]::new()
 
     for ( $pos = 0; $pos -lt $maxLast5Count; $pos++ ) {
         $maxWidthAtPos = 0
@@ -84,7 +84,7 @@
                     }
             }
         }
-        $last5SubWidths += $maxWidthAtPos
+        $last5SubWidths.Add($maxWidthAtPos)
     }
 
     # Ensure minimum widths for headers
@@ -116,18 +116,18 @@
         }
     }
 
-    $headerParts = @()
+    $headerParts = [System.Collections.Generic.List[string]]::new()
 
-    $headerParts += $headers.ComputerName.PadRight($widths.ComputerName - 2)
-    $headerParts += $headers.CounterName.PadRight($widths.CounterName - 2)
-    $headerParts += $headers.Unit.PadRight($widths.Unit - 2)
-    $headerParts += $headers.Current.PadRight($widths.Current - 2)
-    $headerParts += $headers.Last5.PadRight($widths.Last5 - 2)
-    $headerParts += $headers.Min.PadRight($widths.Min - 2)
-    $headerParts += $headers.Max.PadRight($widths.Max - 2)
-    $headerParts += $headers.Avg.PadRight($widths.Avg - 2)
-    $headerParts += $headers.LastUpdate.PadRight($widths.LastUpdate - 2)
-    $headerParts += $headers.ExecutionDuration.PadRight($widths.ExecutionDuration - 2)
+    $headerParts.Add($headers.ComputerName.PadRight($widths.ComputerName - 2))
+    $headerParts.Add($headers.CounterName.PadRight($widths.CounterName - 2))
+    $headerParts.Add($headers.Unit.PadRight($widths.Unit - 2))
+    $headerParts.Add($headers.Current.PadRight($widths.Current - 2))
+    $headerParts.Add($headers.Last5.PadRight($widths.Last5 - 2))
+    $headerParts.Add($headers.Min.PadRight($widths.Min - 2))
+    $headerParts.Add($headers.Max.PadRight($widths.Max - 2))
+    $headerParts.Add($headers.Avg.PadRight($widths.Avg - 2))
+    $headerParts.Add($headers.LastUpdate.PadRight($widths.LastUpdate - 2))
+    $headerParts.Add($headers.ExecutionDuration.PadRight($widths.ExecutionDuration - 2))
 
     $headerLine = " " + ($headerParts -join " | ") + " "
 
@@ -144,50 +144,36 @@
         $maxColor      = Get-ValueColor -value $row.Max        -colorMap $row.ColorMap
         $avgColor      = Get-ValueColor -value $row.Avg        -colorMap $row.ColorMap
 
-        # Format Last5 values with colors
-        $last5Formatted = ""
-        if ( $row.Last5.Count -gt 0 ) {
-            $last5Parts = @()
-            foreach ( $value in $row.Last5) {
-                    $last5Parts += $value
-            }
-            $last5Formatted = ($last5Parts -join " | ")
-        } else {
-            $last5Formatted = "-"
-        }
-
         # Print row parts
-        $rowParts = @()
+        $rowParts = [System.Collections.Generic.List[hashtable]]::new()
 
         # Computer name
-
-        $rowParts += @{
+        $rowParts.Add(@{
             Value = $row.ComputerName
             Width = $widths.ComputerName
             Color = "White"
-        }
-
+        })
 
         # Counter name
-        $rowParts += @{
+        $rowParts.Add(@{
             Value = $row.CounterName
             Width = $widths.CounterName
             Color = "White"
-        }
+        })
 
         # Unit
-        $rowParts += @{
+        $rowParts.Add(@{
             Value = $row.Unit
             Width = $widths.Unit
             Color = "White"
-        }
+        })
 
         # Current value
-        $rowParts += @{
+        $rowParts.Add(@{
             Value = $row.Current.ToString()
             Width = $widths.Current
             Color = $currentColor
-        }
+        })
 
         # Print first columns
         for ( $i = 0; $i -lt $rowParts.Count; $i++ ) {

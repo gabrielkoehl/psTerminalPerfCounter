@@ -18,12 +18,12 @@ function Get-CounterConfiguration {
         [pscredential]  $Credential = $null
     )
 
-    $isRemote = $PSBoundParameters.ContainsKey('computername') -and $ComputerName -ne $env:COMPUTERNAME
+    $isRemote = $PSBoundParameters.ContainsKey('ComputerName') -and $ComputerName -ne $env:COMPUTERNAME
 
     $counterParam = @{
-        isRemote        = $isRemote
-        computername    = if ( $PSBoundParameters.ContainsKey('computername') ) { $ComputerName } else { $env:COMPUTERNAME }
-        credential      = $Credential
+        IsRemote        = $isRemote
+        ComputerName    = if ( $PSBoundParameters.ContainsKey('ComputerName') ) { $ComputerName } else { $env:COMPUTERNAME }
+        Credential      = $Credential
         counterMap      = $counterMap
     }
 
@@ -104,17 +104,17 @@ function Get-CounterConfiguration {
         }
 
         $configPaths  = Get-tpcConfigPaths
-        $foundConfigs = @()
+        $foundConfigs = [System.Collections.Generic.List[hashtable]]::new()
 
         foreach ( $configPath in $configPaths ) {
 
             $jsonFilePath = Join-Path $configPath "tpc_$ConfigName.json"
 
             if ( Test-Path $jsonFilePath ) {
-                $foundConfigs += @{
+                $foundConfigs.Add(@{
                     Path        = $jsonFilePath
                     ConfigPath  = $configPath
-                }
+                })
             }
 
         }
