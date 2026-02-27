@@ -177,6 +177,9 @@ public class CounterConfiguration
                                 else if (matchedCounter.ConversionType == 'D')
                                 {
                                     calculatedValue = Math.Round(rawValue / Math.Pow(matchedCounter.ConversionFactor, matchedCounter.ConversionExponent), matchedCounter.DecimalPlaces);
+                                } else
+                                {
+                                    calculatedValue = Math.Round(rawValue, matchedCounter.DecimalPlaces);
                                 }
 
 
