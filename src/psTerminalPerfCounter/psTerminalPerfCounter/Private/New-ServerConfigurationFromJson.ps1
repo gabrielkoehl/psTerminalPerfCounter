@@ -69,7 +69,8 @@
                 $serverConfiguration = [psTPCCLASSES.ServerConfiguration]::new(
                     $ServerConfig.computername,
                     $ServerConfig.comment,
-                    $performanceCounters
+                    $performanceCounters,
+                    $true # skip availability check - server already validated via Get-CounterMap
                 )
 
                 $servers.Add($serverConfiguration)
@@ -83,7 +84,7 @@
 
         }
 
-    return $servers
+    return , $servers
 
 
 }
