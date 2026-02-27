@@ -106,11 +106,12 @@ public class CounterConfiguration
             var serverConfig        = group.Key;
             var countersOnServer    = group.ToList();
 
-            // create mapping - Path --> Counterobject
-            var pathMap = countersOnServer.ToDictionary(c => c.CounterPath, c => c);
+            var pathMap = countersOnServer
+                            .GroupBy(c => c.CounterPath.ToLowerInvariant())
+                            .ToDictionary(g => g.Key, g => g.First());
 
             // All counter path in one array
-            string[] pathsToQuery = pathMap.Keys.ToArray();
+            string[] pathsToQuery = countersOnServer.Select(c => c.CounterPath).ToArray();
 
             // Script queries all counter at once
             var scriptBlock = ScriptBlock.Create(@"
@@ -157,9 +158,17 @@ public class CounterConfiguration
                         var cookedValueObj  = sample.Properties["CookedValue"]?.Value;
 
                         // Find counter in map
-                        // check end of, in case get-counter adds some stuff
-                        var matchedCounter = countersOnServer.FirstOrDefault(c =>
-                            path != null && path.EndsWith(c.CounterPath, StringComparison.OrdinalIgnoreCase));
+
+                        // Strip computer prefix: "\\SERVER\Memory\X" -> "\Memory\X"
+                        var normalizedPath = path ?? "";
+                        if (normalizedPath.StartsWith("\\\\", StringComparison.Ordinal))
+                        {
+                            var idx = normalizedPath.IndexOf('\\', 2);
+                            if (idx >= 0) normalizedPath = normalizedPath.Substring(idx);
+                        }
+
+                        // O(1) lookup via pathMap
+                        pathMap.TryGetValue(normalizedPath.ToLowerInvariant(), out var matchedCounter);
 
                         if (matchedCounter != null && cookedValueObj != null)
                         {

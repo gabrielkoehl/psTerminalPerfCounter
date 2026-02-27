@@ -37,13 +37,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 * Get-PerformanceCounterLookup
-  * improved / fixed remoting (some functions were local, some remote,
-    would crash with different system languages)
+  * improved / fixed remoting (some functions were local, some remote, would crash with different system languages)
   * credential passing improved
 * start-tpcMonitor
   * accepts `-ConfigPath` paramter now when remoting
-  * improved / fixed remoting (some functions were local, some remote,
-    would crash with different system languages)
+  * improved / fixed remoting (some functions were local, some remote, would crash with different system languages)
 * Get-tpcAvailableCounterConfig
   * missed changes for CounterClass Rebuild
 * Show-CounterTable
@@ -55,12 +53,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 * CounterConfiguration Class Public GetValuesBatched
   * fallback implemented if conversion type "D" / "M" not matching -> raw value, instead of 0
 * Fixed ColorMap handling
-  * Replaced Dictionary<int, string> with pre-sorted KeyValuePair<int, string>[]
-    built once at counter instantiation (C#) instead of re-sorting on every refresh (PowerShell)
-  * Fixed bug: OrderedDictionary lookup used loop index as key instead of positional access,
-    returning wrong colors for values in lower thresholds
-  * Simplified color lookup in Show-CounterTable (Get-ValueColor) and Show-Graph to use
-    the same linear search pattern over the pre-sorted array
+  * Replaced Dictionary<int, string> with pre-sorted KeyValuePair<int, string>[] built once at counter instantiation (C#) instead of re-sorting on every refresh (PowerShell)
+  * Fixed bug: OrderedDictionary lookup used loop index as key instead of positional access, returning wrong colors for values in lower thresholds
+  * Simplified color lookup in Show-CounterTable (Get-ValueColor) and Show-Graph to use the same linear search pattern over the pre-sorted array
+* CounterConfiguration Class
+  * Removed dead code, optimized counter lookup in GetValuesBatched()
+    * Replaced unused `pathMap` dictionary with a duplicate-safe version using `GroupBy`. Changed `pathsToQuery` to derive directly from `countersOnServer` via `Select()`. Replaced O(n) `FirstOrDefault` + `EndsWith` lookup with O(1) dictionary lookup via `TryGetValue`, including normalization to strip computer name prefix from returned counter paths
 
 
 * a shitload of minor bugs, logic errors and orphaned code
