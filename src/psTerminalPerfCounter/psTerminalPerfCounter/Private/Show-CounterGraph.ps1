@@ -29,7 +29,7 @@ function Show-CounterGraph {
     Show-Graph @GraphParams
 
     # Show statistics if enabled
-    if ( $Config.ShowStatistics -and $Counter.Statistics.Count -gt 0 ) {
+    if ( $Config.showStatistics -and $Counter.Statistics.Count -gt 0 ) {
         Show-CounterStatistic -Counter $Counter
     }
 
