@@ -12,14 +12,21 @@ function Show-CounterStatistic {
     $Indent             = "  "
     $StatColor          = if ($null -ne $Config -and $null -ne $Config.Colors) { $Config.Colors.statistics } else { "Gray" }
 
-    $StatLine = "$Indent Current: $($Stats.Current) | Min: $($Stats.Minimum) | Max: $($Stats.Maximum) | Avg: $($Stats.Average)"
+    $current = if ($Stats.ContainsKey('Current')) { $Stats.Current } else { "-" }
+    $min     = if ($Stats.ContainsKey('Minimum')) { $Stats.Minimum } else { "-" }
+    $max     = if ($Stats.ContainsKey('Maximum')) { $Stats.Maximum } else { "-" }
+    $avg     = if ($Stats.ContainsKey('Average')) { $Stats.Average } else { "-" }
+
+    $StatLine = "$Indent Current: $current | Min: $min | Max: $max | Avg: $avg"
     Write-Host -ForegroundColor $StatColor -NoNewline $StatLine
 
-    if ( $Stats.Last5.Count -gt 0 ) {
+    $last5Values = if ( $Stats.ContainsKey('Last5') ) { @($Stats.Last5) } else { @() }
+
+    if ( $last5Values.Count -gt 0 ) {
 
         Write-Host -ForegroundColor $StatColor -NoNewline " | Last 5: "
 
-        foreach ( $currentValue in $Stats.Last5 ) {
+        foreach ( $currentValue in $last5Values ) {
 
             $color = "White"
 
