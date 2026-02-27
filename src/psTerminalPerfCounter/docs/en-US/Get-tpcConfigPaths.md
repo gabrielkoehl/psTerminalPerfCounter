@@ -8,7 +8,6 @@ schema: 2.0.0
 # Get-tpcConfigPaths
 
 ## SYNOPSIS
-Returns all registered configuration paths (module default + TPC_CONFIGPATH).
 
 ## SYNTAX
 
@@ -17,7 +16,7 @@ Get-tpcConfigPaths [-noDefault] [-ProgressAction <ActionPreference>] [<CommonPar
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Returns all registered configuration paths (module default + TPC_CONFIGPATH).
 
 ## EXAMPLES
 
@@ -26,10 +25,14 @@ Get-tpcConfigPaths [-noDefault] [-ProgressAction <ActionPreference>] [<CommonPar
 Get-tpcConfigPaths
 ```
 
+Returns all registered configuration paths including the module default.
+
 ### EXAMPLE 2
 ```
 Get-tpcConfigPaths -noDefault
 ```
+
+Returns only user-defined configuration paths.
 
 ## PARAMETERS
 

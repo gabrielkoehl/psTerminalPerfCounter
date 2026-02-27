@@ -8,8 +8,6 @@ schema: 2.0.0
 # Get-tpcPerformanceCounterInfo
 
 ## SYNOPSIS
-Resolves performance counter IDs from names or validates existing composite IDs.
-Supports local and remote lookup.
 
 ## SYNTAX
 
@@ -25,7 +23,8 @@ Get-tpcPerformanceCounterInfo -ComputerName <String> [-Credential <PSCredential>
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Resolves performance counter IDs from names or validates existing composite IDs.
+Supports local and remote lookup.
 
 ## EXAMPLES
 
@@ -34,15 +33,21 @@ Get-tpcPerformanceCounterInfo -ComputerName <String> [-Credential <PSCredential>
 Get-tpcPerformanceCounterInfo -SearchTerm "238-6"
 ```
 
+Validates and resolves a composite counter ID.
+
 ### EXAMPLE 2
 ```
 Get-tpcPerformanceCounterInfo -SearchTerm "Processor"
 ```
 
+Searches for counters matching the name pattern on the local machine.
+
 ### EXAMPLE 3
 ```
 Get-tpcPerformanceCounterInfo -SearchTerm "Processor" -ComputerName 'lab-node1'
 ```
+
+Searches for counters on a remote machine.
 
 ## PARAMETERS
 

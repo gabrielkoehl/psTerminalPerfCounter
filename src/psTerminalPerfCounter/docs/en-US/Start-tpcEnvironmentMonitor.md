@@ -8,7 +8,6 @@ schema: 2.0.0
 # Start-tpcEnvironmentMonitor
 
 ## SYNOPSIS
-Starts parallel environment monitoring across multiple remote servers using a JSON environment configuration.
 
 ## SYNTAX
 
@@ -18,7 +17,7 @@ Start-tpcEnvironmentMonitor [-EnvConfigPath] <String> [[-UpdateInterval] <Int32>
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Starts parallel environment monitoring across multiple remote servers using a JSON environment configuration.
 
 ## EXAMPLES
 
@@ -27,10 +26,14 @@ Start-tpcEnvironmentMonitor [-EnvConfigPath] <String> [[-UpdateInterval] <Int32>
 Start-tpcEnvironmentMonitor -EnvConfigPath "C:\Configs\SQL_PROD.json"
 ```
 
+Starts environment monitoring using the interval defined in the JSON config.
+
 ### EXAMPLE 2
 ```
 Start-tpcEnvironmentMonitor -EnvConfigPath "C:\Configs\SQL_PROD.json" -UpdateInterval 5
 ```
+
+Starts environment monitoring with a 5-second update interval.
 
 ## PARAMETERS
 

@@ -8,7 +8,6 @@ schema: 2.0.0
 # Add-tpcConfigPath
 
 ## SYNOPSIS
-Adds a custom configuration path to the TPC_CONFIGPATH user environment variable.
 
 ## SYNTAX
 
@@ -17,7 +16,7 @@ Add-tpcConfigPath [-Path] <String> [-Force] [-ProgressAction <ActionPreference>]
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Adds a custom configuration path to the TPC_CONFIGPATH user environment variable.
 
 ## EXAMPLES
 
@@ -26,10 +25,15 @@ Add-tpcConfigPath [-Path] <String> [-Force] [-ProgressAction <ActionPreference>]
 Add-tpcConfigPath -Path "C:\MyConfigs"
 ```
 
+Adds a local path to TPC_CONFIGPATH.
+Prompts to create the directory if it does not exist.
+
 ### EXAMPLE 2
 ```
 Add-tpcConfigPath -Path "\\server\share\configs" -Force
 ```
+
+Adds a UNC path and creates it without prompting.
 
 ## PARAMETERS
 

@@ -8,7 +8,6 @@ schema: 2.0.0
 # Start-tpcMonitor
 
 ## SYNOPSIS
-Starts real-time performance counter monitoring for a single local or remote system.
 
 ## SYNTAX
 
@@ -37,7 +36,7 @@ Start-tpcMonitor -ConfigPath <String> [-UpdateInterval <Int32>] [-ProgressAction
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Starts real-time performance counter monitoring for a single local or remote system.
 
 ## EXAMPLES
 
@@ -46,15 +45,21 @@ Start-tpcMonitor -ConfigPath <String> [-UpdateInterval <Int32>] [-ProgressAction
 Start-tpcMonitor -ConfigName "CPU"
 ```
 
+Starts local CPU monitoring using the built-in CPU template.
+
 ### EXAMPLE 2
 ```
 Start-tpcMonitor -ConfigPath "C:\MyConfigs\tpc_CustomCPU.json"
 ```
 
+Starts monitoring using a custom configuration file.
+
 ### EXAMPLE 3
 ```
 Start-tpcMonitor -ConfigName "Memory" -ComputerName "Server01" -Credential $cred -UpdateInterval 2
 ```
+
+Starts remote memory monitoring with 2-second intervals.
 
 ## PARAMETERS
 

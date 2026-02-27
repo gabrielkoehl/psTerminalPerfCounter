@@ -8,7 +8,6 @@ schema: 2.0.0
 # Test-tpcAvailableCounterConfig
 
 ## SYNOPSIS
-Validates and lists available tpc counter configurations from all registered paths.
 
 ## SYNTAX
 
@@ -18,7 +17,7 @@ Test-tpcAvailableCounterConfig [[-configFilePath] <String>] [-Raw] [-ProgressAct
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Validates and lists available tpc counter configurations from all registered paths.
 
 ## EXAMPLES
 
@@ -27,15 +26,21 @@ Test-tpcAvailableCounterConfig [[-configFilePath] <String>] [-Raw] [-ProgressAct
 Test-tpcAvailableCounterConfig
 ```
 
+Validates all configurations found in registered paths and displays formatted results.
+
 ### EXAMPLE 2
 ```
 Test-tpcAvailableCounterConfig -configFilePath "C:\configs\tpc_CPU.json"
 ```
 
+Validates a single configuration file.
+
 ### EXAMPLE 3
 ```
 Test-tpcAvailableCounterConfig -Raw | Where-Object { -not $_.JsonValid }
 ```
+
+Returns raw objects and filters for invalid JSON configurations.
 
 ## PARAMETERS
 

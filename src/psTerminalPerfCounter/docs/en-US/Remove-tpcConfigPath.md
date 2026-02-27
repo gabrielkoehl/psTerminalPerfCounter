@@ -8,7 +8,6 @@ schema: 2.0.0
 # Remove-tpcConfigPath
 
 ## SYNOPSIS
-Removes custom configuration paths from the TPC_CONFIGPATH user environment variable.
 
 ## SYNTAX
 
@@ -17,7 +16,7 @@ Remove-tpcConfigPath [-All] [-ProgressAction <ActionPreference>] [<CommonParamet
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Removes custom configuration paths from the TPC_CONFIGPATH user environment variable.
 
 ## EXAMPLES
 
@@ -26,10 +25,14 @@ Remove-tpcConfigPath [-All] [-ProgressAction <ActionPreference>] [<CommonParamet
 Remove-tpcConfigPath
 ```
 
+Interactively select and remove individual configuration paths.
+
 ### EXAMPLE 2
 ```
 Remove-tpcConfigPath -All
 ```
+
+Removes all custom configuration paths without prompting.
 
 ## PARAMETERS
 
