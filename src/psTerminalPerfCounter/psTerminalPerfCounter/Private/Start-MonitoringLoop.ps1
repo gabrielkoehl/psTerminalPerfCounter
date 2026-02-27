@@ -59,7 +59,7 @@ function Start-MonitoringLoop {
             # Show table if there are any table counters
             if ( $tableCounters.Count -gt 0 ) {
                 try {
-                    Show-CounterTable -Counters $tableCounters -MonitorType $monitorType
+                    Show-CounterTable -Counters $tableCounters
                 } catch {
                     Write-Host "Table display error: $($_.Exception.Message)" -ForegroundColor Red
                     Write-Host ""
@@ -102,7 +102,7 @@ function Start-MonitoringLoop {
             # Display table with all counters from all servers
             if ( $allCounters.Count -gt 0 ) {
                 try {
-                    Show-CounterTable -Counters $allCounters -MonitorType 'environment'
+                    Show-CounterTable -Counters $allCounters
                 } catch {
                     Write-Host "Table display error: $($_.Exception.Message)" -ForegroundColor Red
                     Write-Host ""
