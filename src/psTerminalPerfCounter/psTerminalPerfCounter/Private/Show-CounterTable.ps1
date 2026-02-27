@@ -19,26 +19,16 @@
             return "White"
         }
 
-        $colorMapOrdered = [ordered]@{}
-        $colorMap.Keys | Sort-Object | ForEach-Object {
-            $colorMapOrdered.add($_, $colorMap[$_])
-        }
-
-        $color = for ( $b = 0; $b -lt $colorMapOrdered.Count; $b++ ) {
-            $bound = $colorMapOrdered.Keys[$b]
-            if ( [double]$value -lt [double]$bound ) {
-                $colorMapOrdered[$b]
-                break
+        foreach ( $entry in $colorMap ) {
+            if ( [double]$value -lt $entry.Key ) {
+                return $entry.Value
             }
         }
 
-        if ( [string]::IsNullOrEmpty($color) ) {
-            $color = $colorMapOrdered[-1]
-        }
+        # Fallback: last color
+        return $colorMap[-1].Value
 
-        return $color
     }
-
 
     if ( $Counters.Count -eq 0 ) { return }
 

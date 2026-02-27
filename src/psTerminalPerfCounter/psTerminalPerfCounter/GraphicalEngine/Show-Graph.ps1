@@ -8,7 +8,7 @@
         [Int]       $yAxisMaxRows   = 10,
         [ValidateSet("Bar","Scatter","Line")]
         [String]    $Type           = 'Bar',
-        [Hashtable] $ColorMap
+                    $ColorMap
     )
 
     Function Format-YAxisValue {
@@ -110,40 +110,29 @@
 
         }
 
-        $CurrentYValue = $StartOfRange + $i * $YAxisStep
-        $FormattedYValue = Format-YAxisValue -Value $CurrentYValue
+        $CurrentYValue      = $StartOfRange + $i * $YAxisStep
+        $FormattedYValue    = Format-YAxisValue -Value $CurrentYValue
 
         If( $ColorMap ) {
 
-            $Keys       = $ColorMap.Keys | Sort-Object
-            $LowerBound = $StartOfRange
-            $Map        = @()
+            $Color = $null
 
-            $Map += For( $k = 0; $k -lt $Keys.count; $k++ ) {
-                [PSCustomObject]@{
-                    LowerBound  = $LowerBound
-                    UpperBound  = $Keys[$k]
-                    Color       = $ColorMap[$Keys[$k]]
+            foreach ( $entry in $ColorMap ) {
+                if ( $CurrentYValue -lt $entry.Key ) {
+                    $Color = $entry.Value
+                    break
                 }
-                $LowerBound = $Keys[$k] + 1
             }
 
-            $Color = $Map.ForEach({
-                if( $CurrentYValue -ge $_.LowerBound -and $CurrentYValue -le $_.UpperBound ) {
-                    $_.Color
-                }
-            })
-
             # if out of bounds, use the last color
-            if ( [String]::IsNullOrEmpty($Color) ) {
-                $Map    = $Map | sort-object -Property UpperBound -Descending
-                $Color  = $Map[0].Color
+            if ( [string]::IsNullOrEmpty($Color) ) {
+                $Color = $ColorMap[-1].Value
             }
 
             Write-Graph ' ' $FormattedYValue $Row $Color 'DarkYellow' $MaxYValueWidth
 
         } else {
-            THROW "ColorMap is not defined. Please provide a valid ColorMap hashtable."
+            THROW "ColorMap is not defined. Please provide a valid ColorMap."
         }
 
     }

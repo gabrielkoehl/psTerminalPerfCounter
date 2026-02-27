@@ -54,6 +54,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   * param creation for splatting fixed
 * CounterConfiguration Class Public GetValuesBatched
   * fallback implemented if conversion type "D" / "M" not matching -> raw value, instead of 0
+* Fixed ColorMap handling
+  * Replaced Dictionary<int, string> with pre-sorted KeyValuePair<int, string>[]
+    built once at counter instantiation (C#) instead of re-sorting on every refresh (PowerShell)
+  * Fixed bug: OrderedDictionary lookup used loop index as key instead of positional access,
+    returning wrong colors for values in lower thresholds
+  * Simplified color lookup in Show-CounterTable (Get-ValueColor) and Show-Graph to use
+    the same linear search pattern over the pre-sorted array
+
+
 * a shitload of minor bugs, logic errors and orphaned code
 
 ### Security

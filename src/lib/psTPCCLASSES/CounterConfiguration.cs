@@ -31,7 +31,7 @@ public class CounterConfiguration
     public List<DataPoint> HistoricalData { get; set; }
 
     public int ExecutionDuration { get; set; }
-    public Dictionary<int, string> ColorMap { get; set; }
+    public KeyValuePair<int, string>[] ColorMap { get; private set; }
     public Dictionary<string, object> Statistics { get; set; }
     public bool IsAvailable { get; set; }
     public bool IsRemote { get; set; }
@@ -228,14 +228,17 @@ public class CounterConfiguration
         }
     }
 
-    private Dictionary<int, string> SetColorMap(PSObject colorMap)
+    private KeyValuePair<int, string>[] SetColorMap(PSObject colorMap)
     {
-        var returnObject = new Dictionary<int, string>();
+        var map = new Dictionary<int, string>();
+
         foreach (PSPropertyInfo property in colorMap.Properties)
         {
-            returnObject[int.Parse(property.Name)] = property.Value.ToString()!;
+            map[int.Parse(property.Name)] = property.Value.ToString()!;
         }
-        return returnObject;
+
+        return map.OrderBy(kv => kv.Key).ToArray();
+
     }
 
     private Dictionary<string, object> SetGraphConfig(PSObject graphConfiguration)
