@@ -1,0 +1,115 @@
+{
+    "name": "File Server Health",
+    "description": "SMB/File Server monitoring: disk throughput, queue, CPU and memory.",
+    "counters": [
+        {
+            "title": "CPU Total",
+            "unit": "%",
+            "format": "table",
+            "counterID": "238-6",
+            "counterSetType": "MultiInstance",
+            "counterInstance": "_Total",
+            "colorMap": {
+                "30": "Green",
+                "70": "Yellow",
+                "90": "Red"
+            }
+        },
+        {
+            "title": "Available Memory",
+            "unit": "MB",
+            "conversionFactor": 1024,
+            "conversionExponent": 2,
+            "conversionType": "D",
+            "decimalPlaces": 0,
+            "format": "table",
+            "counterID": "4-24",
+            "counterSetType": "SingleInstance",
+            "counterInstance": "",
+            "colorMap": {
+                "1024": "Red",
+                "2048": "Yellow",
+                "999999": "Green"
+            }
+        },
+        {
+            "title": "Disk Read KB/sec",
+            "unit": "KB/s",
+            "conversionFactor": 1024,
+            "conversionExponent": 1,
+            "conversionType": "D",
+            "format": "both",
+            "counterID": "234-220",
+            "counterSetType": "MultiInstance",
+            "counterInstance": "_Total",
+            "colorMap": {
+                "50000": "Green",
+                "100000": "Yellow",
+                "500000": "Red"
+            }
+        },
+        {
+            "title": "Disk Write KB/sec",
+            "unit": "KB/s",
+            "conversionFactor": 1024,
+            "conversionExponent": 1,
+            "conversionType": "D",
+            "format": "both",
+            "counterID": "234-222",
+            "counterSetType": "MultiInstance",
+            "counterInstance": "_Total",
+            "colorMap": {
+                "50000": "Green",
+                "100000": "Yellow",
+                "500000": "Red"
+            }
+        },
+        {
+            "title": "Disk Queue Length",
+            "unit": "",
+            "format": "table",
+            "counterID": "234-198",
+            "counterSetType": "MultiInstance",
+            "counterInstance": "_Total",
+            "colorMap": {
+                "2": "Green",
+                "5": "Yellow",
+                "10": "Red"
+            }
+        },
+        {
+            "title": "Avg. Read Latency",
+            "unit": "ms",
+            "conversionFactor": 1000,
+            "conversionExponent": 1,
+            "conversionType": "M",
+            "decimalPlaces": 2,
+            "format": "table",
+            "counterID": "234-208",
+            "counterSetType": "MultiInstance",
+            "counterInstance": "_Total",
+            "colorMap": {
+                "5": "Green",
+                "15": "Yellow",
+                "30": "Red"
+            }
+        },
+        {
+            "title": "Avg. Write Latency",
+            "unit": "ms",
+            "conversionFactor": 1000,
+            "conversionExponent": 1,
+            "conversionType": "M",
+            "decimalPlaces": 2,
+            "format": "table",
+            "counterID": "234-210",
+            "counterSetType": "MultiInstance",
+            "counterInstance": "_Total",
+            "colorMap": {
+                "5": "Green",
+                "15": "Yellow",
+                "30": "Red"
+            }
+        }
+    ]
+}

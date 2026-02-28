@@ -1,12 +1,12 @@
-# dotnet build "src\lib\psTPCLIB.sln"
-# Copy-Item "src\lib\psTPCCLASSES\bin\Debug\net8.0\psTPCCLASSES.dll" "src\psTerminalPerCounter\psTerminalPerfCounter\Lib"
-# Copy-Item "src\lib\psTPCCLASSES\bin\Debug\net8.0\psTPCCLASSES.deps.json" "src\psTerminalPerCounter\psTerminalPerfCounter\Lib"
-
-import-module -fullyqualifiedname ".\src\psTerminalPerCounter\psTerminalPerfCounter\psTerminalPerfCounter.psd1" -force
+import-module -fullyqualifiedname ".\src\psTerminalPerfCounter\psTerminalPerfCounter\psTerminalPerfCounter.psd1" -force
 
 
-start-tpcmonitor -ComputerName lab-node2 -ConfigName CPU
+ #start-tpcmonitor -ComputerName lab-node1 -ConfigName CPU
 
-#start-tpcMonitor -ConfigName CPU
+ # Start-tpcMonitor  -ComputerName 'lab-node1' -ConfigPath 'C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\psTerminalPerfCounter\Config\tpc_cpu.json'
 
-#Start-tpcEnvironmentMonitor -ConfigPath "src\psTerminalPerCounter\psTerminalPerfCounter\Config\ENV_SERVER_EXAMPLE.json"
+  #start-tpcMonitor -ConfigPath 'src\psTerminalPerfCounter\psTerminalPerfCounter\Config\tpc_SystemOverview.json'
+
+ Start-tpcEnvironmentMonitor -EnvConfigPath "example_configs\ENV_SERVER_EXAMPLE.json"
+
+# Test-tpcAvailableCounterConfig

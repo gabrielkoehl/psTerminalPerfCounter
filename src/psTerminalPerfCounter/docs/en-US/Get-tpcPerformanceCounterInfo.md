@@ -1,0 +1,123 @@
+---
+external help file: psTerminalPerfCounter-help.xml
+Module Name: psTerminalPerfCounter
+online version:
+schema: 2.0.0
+---
+
+# Get-tpcPerformanceCounterInfo
+
+## SYNOPSIS
+
+## SYNTAX
+
+### Local (Default)
+```
+Get-tpcPerformanceCounterInfo -SearchTerm <String> [-ProgressAction <ActionPreference>] [<CommonParameters>]
+```
+
+### Remote
+```
+Get-tpcPerformanceCounterInfo -ComputerName <String> [-Credential <PSCredential>] -SearchTerm <String>
+ [-ProgressAction <ActionPreference>] [<CommonParameters>]
+```
+
+## DESCRIPTION
+Resolves performance counter IDs from names or validates existing composite IDs.
+Supports local and remote lookup.
+
+## EXAMPLES
+
+### EXAMPLE 1
+```
+Get-tpcPerformanceCounterInfo -SearchTerm "238-6"
+```
+
+Validates and resolves a composite counter ID.
+
+### EXAMPLE 2
+```
+Get-tpcPerformanceCounterInfo -SearchTerm "Processor"
+```
+
+Searches for counters matching the name pattern on the local machine.
+
+### EXAMPLE 3
+```
+Get-tpcPerformanceCounterInfo -SearchTerm "Processor" -ComputerName 'lab-node1'
+```
+
+Searches for counters on a remote machine.
+
+## PARAMETERS
+
+### -ComputerName
+Target remote machine for remote lookup.
+
+```yaml
+Type: String
+Parameter Sets: Remote
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Credential
+Alternate credentials for remote execution.
+
+```yaml
+Type: PSCredential
+Parameter Sets: Remote
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -SearchTerm
+Composite ID ("238-6") or localized counter name/pattern (wildcards supported).
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ProgressAction
+{{ Fill ProgressAction Description }}
+
+```yaml
+Type: ActionPreference
+Parameter Sets: (All)
+Aliases: proga
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### CommonParameters
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
+
+## INPUTS
+
+## OUTPUTS
+
+## NOTES
+
+## RELATED LINKS

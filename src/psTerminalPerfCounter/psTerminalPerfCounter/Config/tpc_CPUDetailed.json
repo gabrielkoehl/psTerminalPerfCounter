@@ -1,0 +1,111 @@
+{
+    "name": "CPU Detailed Analysis",
+    "description": "Per-core CPU breakdown with user/privileged/interrupt time. Adjust counterInstance for core count.",
+    "counters": [
+        {
+            "title": "CPU Total",
+            "unit": "%",
+            "format": "both",
+            "counterID": "238-6",
+            "counterSetType": "MultiInstance",
+            "counterInstance": "_Total",
+            "colorMap": {
+                "30": "Green",
+                "70": "Yellow",
+                "90": "Red"
+            }
+        },
+        {
+            "title": "CPU User Time",
+            "unit": "%",
+            "format": "both",
+            "counterID": "238-142",
+            "counterSetType": "MultiInstance",
+            "counterInstance": "_Total",
+            "colorMap": {
+                "30": "Green",
+                "60": "Yellow",
+                "80": "Red"
+            }
+        },
+        {
+            "title": "CPU Privileged Time",
+            "unit": "%",
+            "format": "both",
+            "counterID": "238-144",
+            "counterSetType": "MultiInstance",
+            "counterInstance": "_Total",
+            "colorMap": {
+                "10": "Green",
+                "20": "Yellow",
+                "30": "Red"
+            },
+            "graphConfiguration": {
+                "Samples": 70,
+                "graphType": "Bar",
+                "showStatistics": true,
+                "yAxisStep": 5,
+                "yAxisMaxRows": 10,
+                "colors": {
+                    "title": "Yellow",
+                    "statistics": "Gray",
+                    "default": "White"
+                }
+            }
+        },
+        {
+            "title": "CPU Core",
+            "unit": "%",
+            "format": "table",
+            "counterID": "238-6",
+            "counterSetType": "MultiInstance",
+            "counterInstance": "0|1",
+            "colorMap": {
+                "30": "Green",
+                "70": "Yellow",
+                "90": "Red"
+            }
+        },
+        {
+            "title": "Interrupts/sec",
+            "unit": "",
+            "format": "table",
+            "counterID": "238-148",
+            "counterSetType": "MultiInstance",
+            "counterInstance": "_Total",
+            "decimalPlaces": 0,
+            "colorMap": {
+                "5000": "Green",
+                "10000": "Yellow",
+                "50000": "Red"
+            }
+        },
+        {
+            "title": "Processor Queue Length",
+            "unit": "Threads",
+            "format": "table",
+            "counterID": "2-44",
+            "counterSetType": "SingleInstance",
+            "counterInstance": "",
+            "colorMap": {
+                "2": "Green",
+                "4": "Yellow",
+                "8": "Red"
+            }
+        },
+        {
+            "title": "Context Switches/sec",
+            "unit": "",
+            "format": "table",
+            "counterID": "2-146",
+            "counterSetType": "SingleInstance",
+            "counterInstance": "",
+            "decimalPlaces": 0,
+            "colorMap": {
+                "5000": "Green",
+                "15000": "Yellow",
+                "30000": "Red"
+            }
+        }
+    ]
+}

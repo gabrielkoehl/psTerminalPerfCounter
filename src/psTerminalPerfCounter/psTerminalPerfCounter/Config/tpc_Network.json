@@ -1,0 +1,67 @@
+{
+    "name": "Network Interface",
+    "description": "Network throughput and queue monitoring. Verify IDs and Instances with Get-tpcPerformanceCounterInfo -SearchTerm 'Network Interface'",
+    "counters": [
+        {
+            "title": "Bytes Received/sec",
+            "unit": "KB/s",
+            "conversionFactor": 1024,
+            "conversionExponent": 1,
+            "conversionType": "D",
+            "format": "both",
+            "counterID": "510-264",
+            "counterSetType": "MultiInstance",
+            "counterInstance": "Intel[R] 82574L Gigabit Network Connection|Intel[R] 82574L Gigabit Network Connection _2",
+            "colorMap": {
+                "1000": "Green",
+                "10000": "Yellow",
+                "100000": "Red"
+            }
+        },
+        {
+            "title": "Bytes Sent/sec",
+            "unit": "KB/s",
+            "conversionFactor": 1024,
+            "conversionExponent": 1,
+            "conversionType": "D",
+            "format": "both",
+            "counterID": "510-506",
+            "counterSetType": "MultiInstance",
+            "counterInstance": "Intel[R] 82574L Gigabit Network Connection|Intel[R] 82574L Gigabit Network Connection _2",
+            "colorMap": {
+                "1000": "Green",
+                "10000": "Yellow",
+                "100000": "Red"
+            }
+        },
+        {
+            "title": "Bytes Total/sec",
+            "unit": "KB/s",
+            "conversionFactor": 1024,
+            "conversionExponent": 1,
+            "conversionType": "D",
+            "format": "table",
+            "counterID": "510-388",
+            "counterSetType": "MultiInstance",
+            "counterInstance": "Intel[R] 82574L Gigabit Network Connection|Intel[R] 82574L Gigabit Network Connection _2",
+            "colorMap": {
+                "5000": "Green",
+                "50000": "Yellow",
+                "500000": "Red"
+            }
+        },
+        {
+            "title": "Output Queue Length",
+            "unit": "",
+            "format": "table",
+            "counterID": "510-544",
+            "counterSetType": "MultiInstance",
+            "counterInstance": "Intel[R] 82574L Gigabit Network Connection|Intel[R] 82574L Gigabit Network Connection _2",
+            "colorMap": {
+                "1": "Green",
+                "2": "Yellow",
+                "5": "Red"
+            }
+        }
+    ]
+}

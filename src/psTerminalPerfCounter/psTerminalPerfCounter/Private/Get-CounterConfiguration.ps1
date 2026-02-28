@@ -1,0 +1,176 @@
+function Get-CounterConfiguration {
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param(
+        [Parameter(Mandatory)]
+        [System.Collections.Generic.Dictionary[int, string]] $counterMap,
+
+        [Parameter(ParameterSetName = 'ConfigName', Mandatory)]
+        [string]        $ConfigName,
+
+        [Parameter(ParameterSetName = 'ConfigPath', Mandatory)]
+        [string]        $ConfigPath,
+
+        [Parameter()]
+        [string]        $ComputerName,
+
+        [Parameter()]
+        [pscredential]  $Credential = $null
+    )
+
+    $isRemote = $PSBoundParameters.ContainsKey('ComputerName') -and $ComputerName -ne $env:COMPUTERNAME
+
+    $counterParam = @{
+        IsRemote        = $isRemote
+        ComputerName    = if ( $PSBoundParameters.ContainsKey('ComputerName') ) { $ComputerName } else { $env:COMPUTERNAME }
+        Credential      = $Credential
+        counterMap      = $counterMap
+    }
+
+    try {
+
+        if ( $isRemote ) {
+
+            try {
+
+                $testResult = Test-Connection -ComputerName $ComputerName -Count 1 -Quiet -TimeoutSeconds 2 -ErrorAction Stop
+
+                if ( -not $testResult ) {
+                    Write-Warning "Server '$ComputerName' is not reachable. Skipping counter configuration."
+                    return @{
+                        Name        = if ( $ConfigName ) { "$ConfigName @ Remote $ComputerName" } else { "Unknown" }
+                        Description = "Server unreachable"
+                        Counters    = @()
+                        ConfigPath  = ""
+                        SkipServer  = $true
+                    }
+                }
+
+            } catch {
+
+                Write-Warning "Cannot reach server '$ComputerName': $_. Skipping counter configuration."
+                return @{
+                    Name        = if ( $ConfigName ) { "$ConfigName @ Remote $ComputerName" } else { "Unknown" }
+                    Description = "Server unreachable"
+                    Counters    = @()
+                    ConfigPath  = ""
+                    SkipServer  = $true
+                }
+            }
+        }
+
+
+        if ( $PSCmdlet.ParameterSetName -eq 'ConfigPath' ) {
+            if ( [string]::IsNullOrWhiteSpace($ConfigPath) ) {
+                throw "ConfigPath parameter cannot be null or empty"
+            }
+            # Direct path mode - skip folder searching
+            $configContent = Get-Content $ConfigPath -Raw
+
+            if ( -not [string]::IsNullOrWhiteSpace($configContent) ) {
+
+                try {
+
+                    $jsonContent        = $configContent | ConvertFrom-Json -AsHashtable
+                    $mergedJsonContent  = Merge-JsonConfigDefaultValues -CounterConfig $jsonContent
+
+
+                } catch {
+                    Write-Warning "Failed to parse JSON from configuration file: $ConfigPath"
+                    Return
+                }
+
+            } else {
+
+                Write-Warning "Configuration file is empty: $ConfigPath"
+                Return
+
+            }
+
+            $counters = New-CounterConfigurationFromJson @counterParam -JsonConfig $mergedJsonContent
+
+            return @{
+                Name        = $( if ( $isRemote ) { "$($mergedJsonContent.name) @ Remote $ComputerName" } else { $mergedJsonContent.name } )
+                Description = $mergedJsonContent.description
+                Counters    = $counters
+                ConfigPath  = Split-Path $ConfigPath -Parent
+                SkipServer  = $false
+            }
+        }
+
+        # ConfigName mode - use default if not provided
+        if ( [string]::IsNullOrWhiteSpace($ConfigName) ) {
+            throw "ConfigName parameter cannot be null or empty"
+        }
+
+        $configPaths  = Get-tpcConfigPaths
+        $foundConfigs = [System.Collections.Generic.List[hashtable]]::new()
+
+        foreach ( $configPath in $configPaths ) {
+
+            $jsonFilePath = Join-Path $configPath "tpc_$ConfigName.json"
+
+            if ( Test-Path $jsonFilePath ) {
+                $foundConfigs.Add(@{
+                    Path        = $jsonFilePath
+                    ConfigPath  = $configPath
+                })
+            }
+
+        }
+
+        if ( $foundConfigs.Count -eq 0 ) {
+            $searchedPaths = $configPaths | ForEach-Object { Join-Path $_ "tpc_$ConfigName.json" }
+            write-warning "Configuration file 'tpc_$ConfigName.json' not found in any of the following paths: $($searchedPaths -join ', ')"
+            Return
+        }
+
+        if ( $foundConfigs.Count -gt 1 ) {
+            $duplicatePaths = $foundConfigs | ForEach-Object { $_.Path }
+            Write-Warning "Configuration 'tpc_$ConfigName.json' was found in multiple locations: $($duplicatePaths -join ', '). Please resolve this by removing duplicates. Using the first found configuration: $($foundConfigs[0].Path)"
+        }
+
+        $selectedConfig = $foundConfigs[0]
+        $configContent  = Get-Content $selectedConfig.Path -Raw
+
+        if ( -not [string]::IsNullOrWhiteSpace($configContent) ) {
+
+            try {
+
+                $jsonContent        = $configContent | ConvertFrom-Json -AsHashtable
+                $mergedJsonContent  = Merge-JsonConfigDefaultValues -CounterConfig $jsonContent
+
+            } catch {
+
+                Write-Warning "Failed to parse JSON from configuration file: $($selectedConfig.Path)"
+                Return
+
+            }
+
+        } else {
+            Write-Warning "Configuration file is empty: $($selectedConfig.Path)"
+            Return
+        }
+
+        $counters       = New-CounterConfigurationFromJson @counterParam -JsonConfig $mergedJsonContent
+
+        return @{
+            Name        = $( if ( $isRemote ) { "$($mergedJsonContent.name) @ Remote $ComputerName" } else { $mergedJsonContent.name } )
+            Description = $mergedJsonContent.description
+            Counters    = $counters
+            ConfigPath  = $selectedConfig.ConfigPath
+            SkipServer  = $false
+        }
+
+    } catch {
+
+        $errorMessage = if ($PSCmdlet.ParameterSetName -eq 'ConfigPath') {
+            "Error loading performance configuration from '$ConfigPath': $($_.Exception.Message)"
+        } else {
+            "Error loading performance configuration '$ConfigName': $($_.Exception.Message)"
+        }
+        throw $errorMessage
+
+    }
+
+}

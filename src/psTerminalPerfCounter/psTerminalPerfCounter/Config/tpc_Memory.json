@@ -1,0 +1,38 @@
+{
+    "name": "Memory Performance",
+    "description": "Memory usage and paging activity",
+    "counters": [
+        {
+            "title": "Available Memory",
+            "unit": "MB",
+            "conversionFactor": 1,
+            "conversionExponent": 1,
+            "conversionType": "D",
+            "format": "both",
+            "counterID": "4-1382",
+            "counterSetType": "SingleInstance",
+            "counterInstance": "",
+            "colorMap": {
+                "500": "RED",
+                "1000": "Yellow",
+                "999999": "Green"
+            }
+        },
+        {
+            "title": "Memory Committed Bytes",
+            "unit": "%",
+            "conversionFactor": 1,
+            "conversionExponent": 1,
+            "conversionType": "D",
+            "format": "both",
+            "counterID": "4-1406",
+            "counterSetType": "SingleInstance",
+            "counterInstance": "",
+            "colorMap": {
+                "90": "Red",
+                "75": "Yellow",
+                "0": "Green"
+            }
+        }
+    ]
+}

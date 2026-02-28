@@ -17,19 +17,20 @@ public class CounterConfiguration
     public string CounterInstance { get; set; }
     public string CounterPath { get; set; }
     public string Title { get; set; }
-    public string Type { get; set; }
     public string Format { get; set; }
     public int MaxHistoryPoints { get; set; }
     public int ConversionFactor { get; set; }
     public int ConversionExponent { get; set; }
+    public char ConversionType { get; set; }
+    public int DecimalPlaces { get; set; }
     public string Unit { get; set; }
-    public Dictionary<string, object> GraphConfiguration { get; set; }
 
+    public Dictionary<string, object> GraphConfiguration { get; set; }
     public record DataPoint(DateTime Timestamp, double Value);
     public List<DataPoint> HistoricalData { get; set; }
 
     public int ExecutionDuration { get; set; }
-    public Dictionary<int, string> ColorMap { get; set; }
+    public KeyValuePair<int, string>[] ColorMap { get; private set; }
     public Dictionary<string, object> Statistics { get; set; }
     public bool IsAvailable { get; set; }
     public bool IsRemote { get; set; }
@@ -44,11 +45,12 @@ public class CounterConfiguration
         string counterSetType,
         string counterInstance,
         string title,
-        string type,
         string format,
         string unit,
         int conversionFactor,
         int conversionExponent,
+        char conversionType,
+        int decimalPlaces,
         PSObject colorMap,
         PSObject graphConfiguration,
         bool isRemote,
@@ -61,12 +63,13 @@ public class CounterConfiguration
         CounterSetType      = counterSetType;
         CounterInstance     = counterInstance;
         Title               = title;
-        Type                = type;
         Format              = format;
         Unit                = unit;
         MaxHistoryPoints    = 100;
         ConversionFactor    = conversionFactor;
         ConversionExponent  = conversionExponent;
+        ConversionType      = conversionType;
+        DecimalPlaces       = decimalPlaces;
         HistoricalData      = new List<DataPoint>();
         Statistics          = new Dictionary<string, object>();
         IsAvailable         = false;
@@ -82,8 +85,6 @@ public class CounterConfiguration
         ColorMap            = SetColorMap(colorMap);
         GraphConfiguration  = SetGraphConfig(graphConfiguration);
 
-        // TestAvailability(); // is already checked when loading becaufe of loading countermap before
-        // overrides, delete method later
         IsAvailable         = true;
         LastError           = string.Empty;
     }
@@ -98,17 +99,18 @@ public class CounterConfiguration
         // Group by computerName and credentials
         var serverGroups = activeCounters.GroupBy(c => new { c.ComputerName, c.IsRemote, c.Credential });
 
-        // parallel per server
+        // parallel per server ( not thread safe, design is safe because grouped by server)
         Parallel.ForEach(serverGroups, group =>
         {
             var serverConfig        = group.Key;
             var countersOnServer    = group.ToList();
 
-            // create mapping - Path --> Counterobject
-            var pathMap = countersOnServer.ToDictionary(c => c.CounterPath, c => c);
+            var pathMap = countersOnServer
+                            .GroupBy(c => c.CounterPath.ToLowerInvariant())
+                            .ToDictionary(g => g.Key, g => g.First());
 
             // All counter path in one array
-            string[] pathsToQuery = pathMap.Keys.ToArray();
+            string[] pathsToQuery = countersOnServer.Select(c => c.CounterPath).ToArray();
 
             // Script queries all counter at once
             var scriptBlock = ScriptBlock.Create(@"
@@ -155,18 +157,40 @@ public class CounterConfiguration
                         var cookedValueObj  = sample.Properties["CookedValue"]?.Value;
 
                         // Find counter in map
-                        // check end of, in case get-counter adds some stuff
-                        var matchedCounter = countersOnServer.FirstOrDefault(c =>
-                            path != null && path.EndsWith(c.CounterPath, StringComparison.OrdinalIgnoreCase));
+
+                        // Strip computer prefix: "\\SERVER\Memory\X" -> "\Memory\X"
+                        var normalizedPath = path ?? "";
+                        if (normalizedPath.StartsWith("\\\\", StringComparison.Ordinal))
+                        {
+                            var idx = normalizedPath.IndexOf('\\', 2);
+                            if (idx >= 0) normalizedPath = normalizedPath.Substring(idx);
+                        }
+
+                        // O(1) lookup via pathMap
+                        pathMap.TryGetValue(normalizedPath.ToLowerInvariant(), out var matchedCounter);
 
                         if (matchedCounter != null && cookedValueObj != null)
                         {
                             try
                             {
                                 var rawValue = Convert.ToDouble(cookedValueObj);
+                                double calculatedValue = 0;
 
                                 // factorize
-                                var calculatedValue = Math.Round(rawValue / Math.Pow(matchedCounter.ConversionFactor, matchedCounter.ConversionExponent), 2);
+
+                                if (matchedCounter.ConversionType == 'M')
+                                {
+                                    calculatedValue = Math.Round(rawValue * Math.Pow(matchedCounter.ConversionFactor, matchedCounter.ConversionExponent), matchedCounter.DecimalPlaces);
+                                }
+                                else if (matchedCounter.ConversionType == 'D')
+                                {
+                                    calculatedValue = Math.Round(rawValue / Math.Pow(matchedCounter.ConversionFactor, matchedCounter.ConversionExponent), matchedCounter.DecimalPlaces);
+                                } else
+                                {
+                                    calculatedValue = Math.Round(rawValue, matchedCounter.DecimalPlaces);
+                                }
+
+
 
                                 matchedCounter.AddDataPoint(calculatedValue);
                                 matchedCounter.ExecutionDuration = duration;
@@ -212,14 +236,17 @@ public class CounterConfiguration
         }
     }
 
-    private Dictionary<int, string> SetColorMap(PSObject colorMap)
+    private KeyValuePair<int, string>[] SetColorMap(PSObject colorMap)
     {
-        var returnObject = new Dictionary<int, string>();
+        var map = new Dictionary<int, string>();
+
         foreach (PSPropertyInfo property in colorMap.Properties)
         {
-            returnObject[int.Parse(property.Name)] = property.Value.ToString()!;
+            map[int.Parse(property.Name)] = property.Value.ToString()!;
         }
-        return returnObject;
+
+        return map.OrderBy(kv => kv.Key).ToArray();
+
     }
 
     private Dictionary<string, object> SetGraphConfig(PSObject graphConfiguration)
@@ -253,68 +280,6 @@ public class CounterConfiguration
             }
         }
         return returnObject;
-    }
-
-    private void TestAvailability()
-    {
-        try
-        {
-            _logger.Info(_source, $"Testing {CounterPath}");
-            _ = GetCurrentValue();
-            IsAvailable = true;
-            LastError = string.Empty;
-        }
-        catch (Exception ex)
-        {
-            IsAvailable = false;
-            LastError = ex.Message;
-            _logger.Warning(_source, $"Counter '{Title}' is not available: {LastError}");
-        }
-    }
-
-    public (double counterValue, int? duration) GetCurrentValue()
-    {
-        var scriptBlock = ScriptBlock.Create(@"
-            param($CounterPath, $MaxSamples)
-            $counter = Get-Counter -Counter $CounterPath -MaxSamples $MaxSamples
-            $counter.CounterSamples.CookedValue
-        ");
-
-        try
-        {
-            var dateStart = DateTime.Now;
-
-            using var ps = PowerShell.Create(RunspaceMode.NewRunspace);
-            ps.AddCommand("Invoke-Command");
-
-            if (IsRemote)
-            {
-                    foreach (var kvp in ParamRemote)
-                    {
-                        ps.AddParameter(kvp.Key, kvp.Value);
-                    }
-            }
-
-
-            ps.AddParameter("ScriptBlock", scriptBlock);
-            ps.AddParameter("ArgumentList", new object[] { CounterPath, 1 });
-
-            var result = ps.Invoke();
-            var dateEnd = DateTime.Now;
-            var duration = (int)(dateEnd - dateStart).TotalMilliseconds;
-
-            if (result.Count == 0) throw new Exception("No value returned from Get-Counter");
-
-            var rawValue = Convert.ToDouble(result[0].BaseObject);
-            var counterValue = Math.Round(rawValue / Math.Pow(ConversionFactor, ConversionExponent));
-
-            return (counterValue, duration);
-        }
-        catch (Exception ex)
-        {
-            LastError = ex.Message;
-            throw new Exception($"Error reading counter '{Title}': {ex.Message}", ex);
-        }
     }
 
     private string GetCounterPath(string counterID, string counterSetType, string counterInstance, Dictionary<int, string> counterMap)

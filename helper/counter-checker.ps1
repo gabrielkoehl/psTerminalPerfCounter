@@ -1,7 +1,7 @@
 
 
 
-    $computername = $Env:COMPUTERNAME
+    $ComputerName = $Env:COMPUTERNAME
     $name = 'sql'
 
     $remoteScript = {

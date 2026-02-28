@@ -1,0 +1,98 @@
+{
+    "name": "Memory Leak Investigation",
+    "description": "Counters for detecting memory leaks: pool usage, committed bytes, handle/thread counts",
+    "counters": [
+        {
+            "title": "Available Memory",
+            "unit": "MB",
+            "conversionFactor": 1024,
+            "conversionExponent": 2,
+            "conversionType": "D",
+            "decimalPlaces": 0,
+            "format": "both",
+            "counterID": "4-24",
+            "counterSetType": "SingleInstance",
+            "counterInstance": "",
+            "colorMap": {
+                "512": "Red",
+                "1024": "Yellow",
+                "999999": "Green"
+            }
+        },
+        {
+            "title": "Committed Bytes In Use",
+            "unit": "%",
+            "format": "both",
+            "counterID": "4-1406",
+            "counterSetType": "SingleInstance",
+            "counterInstance": "",
+            "colorMap": {
+                "60": "Green",
+                "80": "Yellow",
+                "90": "Red"
+            }
+        },
+        {
+            "title": "Pool Nonpaged Bytes",
+            "unit": "MB",
+            "conversionFactor": 1024,
+            "conversionExponent": 2,
+            "conversionType": "D",
+            "decimalPlaces": 1,
+            "format": "table",
+            "counterID": "4-56",
+            "counterSetType": "SingleInstance",
+            "counterInstance": "",
+            "colorMap": {
+                "128": "Green",
+                "256": "Yellow",
+                "512": "Red"
+            }
+        },
+        {
+            "title": "Pool Paged Bytes",
+            "unit": "MB",
+            "conversionFactor": 1024,
+            "conversionExponent": 2,
+            "conversionType": "D",
+            "decimalPlaces": 1,
+            "format": "table",
+            "counterID": "4-58",
+            "counterSetType": "SingleInstance",
+            "counterInstance": "",
+            "colorMap": {
+                "256": "Green",
+                "512": "Yellow",
+                "1024": "Red"
+            }
+        },
+        {
+            "title": "Pages/sec",
+            "unit": "",
+            "format": "table",
+            "counterID": "4-822",
+            "counterSetType": "SingleInstance",
+            "counterInstance": "",
+            "colorMap": {
+                "50": "Green",
+                "200": "Yellow",
+                "1000": "Red"
+            }
+        },
+        {
+            "title": "Cache Bytes",
+            "unit": "MB",
+            "conversionFactor": 1024,
+            "conversionExponent": 2,
+            "conversionType": "D",
+            "decimalPlaces": 0,
+            "format": "table",
+            "counterID": "4-818",
+            "counterSetType": "SingleInstance",
+            "counterInstance": "",
+            "colorMap": {
+                "0": "White"
+            }
+        }
+    ]
+}

@@ -1,0 +1,107 @@
+{
+    "name": "Hyper-V Host Health",
+    "description": "Host-level counters for Hyper-V servers. Verify IDs with Get-tpcPerformanceCounterInfo. Requires Hyper-V role installed.",
+    "counters": [
+        {
+            "title": "CPU Total",
+            "unit": "%",
+            "format": "both",
+            "counterID": "238-6",
+            "counterSetType": "MultiInstance",
+            "counterInstance": "_Total",
+            "colorMap": {
+                "30": "Green",
+                "70": "Yellow",
+                "90": "Red"
+            }
+        },
+        {
+            "title": "Available Memory",
+            "unit": "MB",
+            "conversionFactor": 1048576,
+            "conversionExponent": 1,
+            "conversionType": "D",
+            "decimalPlaces": 0,
+            "format": "table",
+            "counterID": "4-24",
+            "counterSetType": "SingleInstance",
+            "counterInstance": "",
+            "colorMap": {
+                "2048": "Red",
+                "4096": "Yellow",
+                "999999": "Green"
+            }
+        },
+        {
+            "title": "Committed Bytes In Use",
+            "unit": "%",
+            "format": "both",
+            "counterID": "4-1406",
+            "counterSetType": "SingleInstance",
+            "counterInstance": "",
+            "colorMap": {
+                "60": "Green",
+                "80": "Yellow",
+                "95": "Red"
+            }
+        },
+        {
+            "title": "Disk Read KB/sec",
+            "unit": "KB/s",
+            "conversionFactor": 1024,
+            "conversionExponent": 1,
+            "conversionType": "D",
+            "format": "table",
+            "counterID": "234-220",
+            "counterSetType": "MultiInstance",
+            "counterInstance": "_Total",
+            "colorMap": {
+                "50000": "Green",
+                "200000": "Yellow",
+                "500000": "Red"
+            }
+        },
+        {
+            "title": "Disk Write KB/sec",
+            "unit": "KB/s",
+            "conversionFactor": 1024,
+            "conversionExponent": 1,
+            "conversionType": "D",
+            "format": "table",
+            "counterID": "234-222",
+            "counterSetType": "MultiInstance",
+            "counterInstance": "_Total",
+            "colorMap": {
+                "50000": "Green",
+                "200000": "Yellow",
+                "500000": "Red"
+            }
+        },
+        {
+            "title": "Disk Queue Length",
+            "unit": "",
+            "format": "table",
+            "counterID": "234-198",
+            "counterSetType": "MultiInstance",
+            "counterInstance": "_Total",
+            "colorMap": {
+                "3": "Green",
+                "8": "Yellow",
+                "15": "Red"
+            }
+        },
+        {
+            "title": "Processor Queue Length",
+            "unit": "Threads",
+            "format": "table",
+            "counterID": "2-44",
+            "counterSetType": "SingleInstance",
+            "counterInstance": "",
+            "colorMap": {
+                "4": "Green",
+                "8": "Yellow",
+                "16": "Red"
+            }
+        }
+    ]
+}

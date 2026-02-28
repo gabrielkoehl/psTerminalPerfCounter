@@ -1,0 +1,32 @@
+﻿{
+    "name": "CPU Performance",
+    "description": "CPU utilization and queue monitoring",
+    "counters": [
+        {
+            "title": "Processor Time",
+            "unit": "%",
+            "format": "both",
+            "counterID": "238-6",
+            "counterSetType": "MultiInstance",
+            "counterInstance": "_Total|0|1",
+            "colorMap": {
+                "30": "Green",
+                "70": "Yellow",
+                "80": "Red"
+            }
+        },
+        {
+            "title": "Processor Queue Length",
+            "unit": "Threads",
+            "format": "both",
+            "counterID": "2-44",
+            "counterSetType": "SingleInstance",
+            "counterInstance": "",
+            "colorMap": {
+                "1": "Green",
+                "2": "Yellow",
+                "5": "Red"
+            }
+        }
+    ]
+}
