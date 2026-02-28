@@ -5,7 +5,13 @@
 
 A PowerShell module for creating and using predefined performance counter configurations with real-time terminal-based visualization. This module addresses the challenge of efficiently monitoring system performance by providing ready-to-use presets tailored to specific requirements.
 
-**Requirement:** PowerShell 7.4 or newer is required.
+**Requirement:** PowerShell 7.4
+
+## 0.3.1 Release Info
+
+This is just a small patch version bump – no new features, nothing groundbreaking. But the amount of work was enormous, which I think the [CHANGELOG.MD](CHANGELOG.MD) speaks for itself. The last few months were all about features and functionality, and the technical debt had piled up. On top of that, the rebuild of the core classes in C# marked the point where I started using the module productively – with the result: lots of bugs and abysmal usability. Accordingly, a lot has been simplified, especially the creation of custom counter configurations. But the bulk of it was simply technical debt and bugs. I wanted to get all of this out of the way before the next big step...
+
+...which is finally the export of entire time series for historization or visualization with PSWriteHTML <3. That will be the next minor release.
 
 ## Key Features
 
