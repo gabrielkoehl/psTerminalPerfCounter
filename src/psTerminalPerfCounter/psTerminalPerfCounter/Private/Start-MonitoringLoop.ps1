@@ -22,6 +22,12 @@ function Start-MonitoringLoop {
             # Collect data from all counters
             [psTPCCLASSES.CounterConfiguration]::GetValuesBatched($Config.Counters)
 
+# test
+[psTPCCLASSES.CounterConfiguration]::ExportJson($Config.Counters)
+[psTPCCLASSES.CounterConfiguration]::ExportCsv($Config.Counters)
+#--------------------------------------------------------------------
+
+
 
             Show-SessionHeader -ConfigName $Config.Name -StartTime $StartTime -SampleCount $SampleCount
 

@@ -4,6 +4,9 @@ using System.Threading.Tasks;
 using System.Linq;
 using System;
 using System.Threading;
+using System.IO;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace psTPCCLASSES;
 
@@ -222,6 +225,93 @@ public class CounterConfiguration
                 }
             }
         });
+    }
+
+    public static bool ExportJson(List<CounterConfiguration> allCounters, string? exportPath = null)
+    {
+        string filePath = Path.Combine(
+            exportPath ?? Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+            "psTPC_rolling.json"
+        );
+
+        try
+        {
+            // Build structure: { Intervall, Computer: { ComputerName: { CounterPath: { Title, Unit, Values } } } }
+            var computerDict = new Dictionary<string, Dictionary<string, object>>();
+
+            foreach (var group in allCounters.Where(c => c.IsAvailable).GroupBy(c => c.ComputerName))
+            {
+                var counterDict = new Dictionary<string, object>();
+
+                foreach (var counter in group)
+                {
+                    var values = new Dictionary<string, object>();
+                    foreach (var dp in counter.HistoricalData)
+                    {
+                        values[dp.Timestamp.ToString("yyyy-MM-ddTHH:mm:ss")] = dp.Value;
+                    }
+
+                    counterDict[counter.CounterPath] = new Dictionary<string, object>
+                    {
+                        { "Title", counter.Title },
+                        { "Unit", counter.Unit },
+                        { "Values", values }
+                    };
+                }
+
+                computerDict[group.Key] = counterDict;
+            }
+
+            var exportObject = new Dictionary<string, object>
+            {
+                { "Computer", computerDict }
+            };
+
+            var jsonOptions = new JsonSerializerOptions { WriteIndented = true };
+            string json = JsonSerializer.Serialize(exportObject, jsonOptions);
+            File.WriteAllText(filePath, json);
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.Info("ExportJson", $"Error writing JSON ( {filePath} ) ( {ex.Message} )");
+            return false;
+        }
+    }
+
+    public static bool ExportCsv(List<CounterConfiguration> allCounters, string? exportPath = null)
+    {
+        string filePath = Path.Combine(
+            exportPath ?? Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+            "psTPC_history.csv"
+        );
+
+        try
+        {
+            bool fileExists = File.Exists(filePath);
+
+            using var writer = new StreamWriter(filePath, append: true);
+
+            if (!fileExists)
+            {
+                writer.WriteLine("Timestamp,Computer,CounterPath,Title,Unit,Value");
+            }
+
+            foreach (var counter in allCounters.Where(c => c.IsAvailable && c.HistoricalData.Count > 0))
+            {
+                var lastPoint = counter.HistoricalData[^1];
+                writer.WriteLine($"{lastPoint.Timestamp:yyyy-MM-ddTHH:mm:ss},{counter.ComputerName},{counter.CounterPath},{counter.Title},{counter.Unit},{lastPoint.Value}");
+            }
+
+            return true;
+
+        }
+        catch (Exception ex)
+        {
+            _logger.Info("ExportCsv", $"Error writing CSV ( {filePath} ) ( {ex.Message} )");
+            return false;
+        }
     }
 
     private void SetRemoteConnectionParameter()
