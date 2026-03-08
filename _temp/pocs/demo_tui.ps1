@@ -212,7 +212,7 @@ function Update-Table {
 
 
 $script:sparkBlocks = @(
-    [char]0x00A0,   # 0: Leerzeichen
+    ' ',            # 0: Leerzeichen
     [char]0x2581,   # 1: 1/8 Block
     [char]0x2582,   # 2: 2/8 Block
     [char]0x2583,   # 3: 3/8 Block
@@ -288,9 +288,13 @@ function Update-Sparklines {
         $desc = "$($c.ComputerName) > $($c.Title) ($($c.Unit))".PadRight($labelWidth)
         $valStr = if ($c.Statistics.ContainsKey('Current')) { $c.Statistics['Current'].ToString("F$($c.DecimalPlaces)").PadLeft(8) } else { " - " }
 
-        $lines.Add((" " * ($labelWidth + 3)) + $sparkRows[0])
-        $lines.Add(" # $desc " + $sparkRows[1] + "  " + $valStr)
-        $lines.Add((" " * ($labelWidth + 3)) + $sparkRows[2])
+        $prefixEmpty = " " * 39
+        $prefixMid   = " # $desc "
+
+        $lines.Add($prefixEmpty + $sparkRows[0])
+        $lines.Add($prefixMid   + $sparkRows[1] + "  " + $valStr)
+        $lines.Add($prefixEmpty + $sparkRows[2])
+
         if ($i -lt $counters.Count - 1) { $lines.Add("") }
     }
     $sparkLabel.Text = $lines -join "`n"
