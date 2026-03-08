@@ -1,13 +1,3 @@
-<#
-
-Das funktioniert grundsaetzlich, aber gefaellt mir nicht. Steif, das permanente reloading unterbricht den visuellen Fluss
-Ich komme auch auch nicht auf den Ajax HTML Kram klar. Ich werde das mit erst mit Vibe Coding loesen und mich dann
-einarbeiten in den Code
-
-JSON export war auch unnoetig
-
-#>
-
 # POC Code
 
 

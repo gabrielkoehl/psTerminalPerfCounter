@@ -278,25 +278,52 @@ function Get-Sparkline3Row {
 }
 
 function Update-Sparklines {
-    if (-not $script:showSparklines) { $sparkLabel.Text = " [Sparklines deaktiviert]"; return }
-    $lines = [System.Collections.Generic.List[string]]::new()
+    if (-not $script:showSparklines) {
+        $sparkLabel.Text = " [Sparklines deaktiviert]"
+        return
+    }
+
+    # 1. Ermitteln der aktuell im Terminal verfügbaren Breite für das Label
+    $availableWidth = $sparkLabel.Bounds.Width
+
+    # Fallback für den allerersten manuellen Aufruf, bevor Application::Run() das Layout berechnet hat
+    if ($availableWidth -le 0) {
+        $availableWidth = 115
+    }
+
     $labelWidth = 35
+    # 2. Berechnung des statischen Platzbedarfs:
+    # 39 Zeichen für Präfix (" # " + Label + " ")
+    # 10 Zeichen für Suffix ("  " + Wert)
+    $reservedWidth = 49
+
+    # 3. Der verbleibende Platz ist die maximale Breite für die Sparkline
+    $dynamicMaxWidth = $availableWidth - $reservedWidth
+
+    # Sicherheitsschranke: Verhindert Fehler, wenn das Fenster extrem klein gezogen wird
+    if ($dynamicMaxWidth -lt 10) {
+        $dynamicMaxWidth = 10
+    }
+
+    $lines = [System.Collections.Generic.List[string]]::new()
+    $prefixEmpty = " " * 39
 
     for ($i = 0; $i -lt $counters.Count; $i++) {
         $c = $counters[$i]
-        $sparkRows = Get-Sparkline3Row -Data $c.HistoricalData -MaxWidth 60
+
+        # Dynamische Breite ($dynamicMaxWidth) wird an die Berechnungsfunktion übergeben
+        $sparkRows = Get-Sparkline3Row -Data $c.HistoricalData -MaxWidth $dynamicMaxWidth
+
         $desc = "$($c.ComputerName) > $($c.Title) ($($c.Unit))".PadRight($labelWidth)
         $valStr = if ($c.Statistics.ContainsKey('Current')) { $c.Statistics['Current'].ToString("F$($c.DecimalPlaces)").PadLeft(8) } else { " - " }
 
-        $prefixEmpty = " " * 39
-        $prefixMid   = " # $desc "
-
         $lines.Add($prefixEmpty + $sparkRows[0])
-        $lines.Add($prefixMid   + $sparkRows[1] + "  " + $valStr)
+        $lines.Add(" # $desc " + $sparkRows[1] + "  " + $valStr)
         $lines.Add($prefixEmpty + $sparkRows[2])
 
         if ($i -lt $counters.Count - 1) { $lines.Add("") }
     }
+
     $sparkLabel.Text = $lines -join "`n"
 }
 
