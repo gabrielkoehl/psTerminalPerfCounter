@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+* **CSV Export** (`-ExportCsv`, `-CsvPath`)
+  * New parameters for `Start-tpcMonitor` and `Start-tpcEnvironmentMonitor` to export counter values to CSV after each batch cycle (append mode, long format)
+  * Default export path: Desktop; file naming: `psTPC_<ConfigName>_<ddMMyy>.csv`
+  * CSV columns: `Timestamp, Computer, CounterPath, Title, Unit, Value`
+  * C# implementation: `CounterConfiguration.ExportCsv()` (static, single-server) and `EnvironmentConfiguration.ExportCsv()` (multi-server aggregation)
+
 ### Changed
 
 ### Deprecated
