@@ -70,6 +70,16 @@ public class EnvironmentConfiguration
         }
     }
 
+    public bool ExportCsv(string filePath)
+    {
+        var allCounters = Servers
+            .Where(s => s.IsAvailable)
+            .SelectMany(s => s.Counters)
+            .ToList();
+
+        return CounterConfiguration.ExportCsv(allCounters, filePath);
+    }
+
     public Dictionary<string, object> GetEnvironmentStatistics()
     {
         var availableServers    = Servers.Where(s => s.IsAvailable).ToList();

@@ -1,12 +1,18 @@
 function Start-MonitoringLoop {
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'Default')]
     param(
         [Parameter(Mandatory=$true)]
         [string]    $monitorType,
         [Parameter(Mandatory=$true)]
         [psobject]  $Config,
         [Parameter(Mandatory=$true)]
-        [int]       $UpdateInterval
+        [int]       $UpdateInterval,
+
+        [Parameter(ParameterSetName = 'CsvExport', Mandatory)]
+        [switch]    $ExportCsv,
+
+        [Parameter(ParameterSetName = 'CsvExport')]
+        [string]    $CsvPath = [Environment]::GetFolderPath('Desktop')
     )
 
     $SampleCount    = 0
@@ -22,6 +28,11 @@ function Start-MonitoringLoop {
             # Collect data from all counters
             [psTPCCLASSES.CounterConfiguration]::GetValuesBatched($Config.Counters)
 
+            # CSV Export
+            if ( $ExportCsv ) {
+                $csvFilePath = Join-Path $CsvPath "psTPC_$($Config.Name)_$(Get-Date -Format 'ddMMyy').csv"
+                [psTPCCLASSES.CounterConfiguration]::ExportCsv($Config.Counters, $csvFilePath)
+            }
 
             Show-SessionHeader -ConfigName $Config.Name -StartTime $StartTime -SampleCount $SampleCount
 
@@ -77,6 +88,12 @@ function Start-MonitoringLoop {
             $SampleCount++
 
             $Config.GetAllValuesBatched()
+
+            # CSV Export
+            if ( $ExportCsv ) {
+                $csvFilePath = Join-Path $CsvPath "psTPC_$($Config.Name)_$(Get-Date -Format 'ddMMyy').csv"
+                $Config.ExportCsv($csvFilePath)
+            }
 
             # Clear screen
             Clear-Host

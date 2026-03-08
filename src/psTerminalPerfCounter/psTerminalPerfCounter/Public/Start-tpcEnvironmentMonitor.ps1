@@ -16,10 +16,22 @@ function Start-tpcEnvironmentMonitor {
 
         Starts environment monitoring using the interval defined in the JSON config.
 
+    .PARAMETER ExportCsv
+        Enables CSV export of counter values after each batch cycle (append mode, long format).
+
+    .PARAMETER CsvPath
+        Directory path for the CSV export file.
+        Default: Desktop.
+
     .EXAMPLE
         Start-tpcEnvironmentMonitor -EnvConfigPath "C:\Configs\SQL_PROD.json" -UpdateInterval 5
 
         Starts environment monitoring with a 5-second update interval.
+
+    .EXAMPLE
+        Start-tpcEnvironmentMonitor -EnvConfigPath "C:\Configs\SQL_PROD.json" -ExportCsv -CsvPath "C:\Exports"
+
+        Starts environment monitoring with CSV export.
     #>
 
     [CmdletBinding()]
@@ -28,7 +40,11 @@ function Start-tpcEnvironmentMonitor {
         [string] $EnvConfigPath,
 
         [Parameter()]
-        [int] $UpdateInterval = 0  # 0 = use from config
+        [int] $UpdateInterval = 0,  # 0 = use from config
+
+        [switch]    $ExportCsv,
+
+        [string]    $CsvPath = [Environment]::GetFolderPath('Desktop')
     )
 
     $environment = $null
@@ -77,6 +93,8 @@ function Start-tpcEnvironmentMonitor {
             MonitorType     = 'environment'
             Config          = $environment
             UpdateInterval  = $effectiveInterval
+            ExportCsv       = $ExportCsv
+            CsvPath         = $CsvPath
         }
 
         Start-MonitoringLoop @MonitoringParams
