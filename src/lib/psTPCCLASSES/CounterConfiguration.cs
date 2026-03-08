@@ -227,12 +227,8 @@ public class CounterConfiguration
         });
     }
 
-    public static bool ExportCsv(List<CounterConfiguration> allCounters, string? exportPath = null)
+    public static bool ExportCsv(List<CounterConfiguration> allCounters, string filePath)
     {
-        string filePath = Path.Combine(
-            exportPath ?? Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
-            "psTPC_history.csv"
-        );
 
         try
         {

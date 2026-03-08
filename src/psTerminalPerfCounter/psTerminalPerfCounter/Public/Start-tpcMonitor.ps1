@@ -22,6 +22,13 @@
     .PARAMETER UpdateInterval
         Seconds between counter updates. Default: 1.
 
+    .PARAMETER ExportCsv
+        Enables CSV export of counter values after each batch cycle (append mode, long format).
+
+    .PARAMETER CsvPath
+        Directory path for the CSV export file.
+        Default: Desktop.
+
     .EXAMPLE
         Start-tpcMonitor -ConfigName "CPU"
 
@@ -36,6 +43,11 @@
         Start-tpcMonitor -ConfigName "Memory" -ComputerName "Server01" -Credential $cred -UpdateInterval 2
 
         Starts remote memory monitoring with 2-second intervals.
+
+    .EXAMPLE
+        Start-tpcMonitor -ConfigName "CPU" -ExportCsv -CsvPath "C:\Exports"
+
+        Starts CPU monitoring with CSV export to C:\Exports\psTPC_history.csv.
     #>
 
     [CmdletBinding()]
@@ -56,7 +68,11 @@
         [Parameter(ParameterSetName = 'RemoteByPath')]
         [pscredential]  $Credential = $null,
 
-        [int]           $UpdateInterval = 1
+        [int]           $UpdateInterval = 1,
+
+        [switch]        $ExportCsv,
+
+        [string]        $CsvPath = [Environment]::GetFolderPath('Desktop')
     )
 
     $configParams       = @{}
@@ -136,6 +152,8 @@
             MonitorType     = $monitorType
             Config          = Get-CounterConfiguration @configParams
             UpdateInterval  = $UpdateInterval
+            ExportCsv       = $ExportCsv
+            CsvPath         = $CsvPath
         }
 
         Start-MonitoringLoop @MonitoringParams

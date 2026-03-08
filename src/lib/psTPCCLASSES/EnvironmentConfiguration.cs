@@ -70,24 +70,14 @@ public class EnvironmentConfiguration
         }
     }
 
-    public bool ExportJson(string? exportPath = null)
+    public bool ExportCsv(string filePath)
     {
         var allCounters = Servers
             .Where(s => s.IsAvailable)
             .SelectMany(s => s.Counters)
             .ToList();
 
-        return CounterConfiguration.ExportJson(allCounters, exportPath);
-    }
-
-    public bool ExportCsv(string? exportPath = null)
-    {
-        var allCounters = Servers
-            .Where(s => s.IsAvailable)
-            .SelectMany(s => s.Counters)
-            .ToList();
-
-        return CounterConfiguration.ExportCsv(allCounters, exportPath);
+        return CounterConfiguration.ExportCsv(allCounters, filePath);
     }
 
     public Dictionary<string, object> GetEnvironmentStatistics()
