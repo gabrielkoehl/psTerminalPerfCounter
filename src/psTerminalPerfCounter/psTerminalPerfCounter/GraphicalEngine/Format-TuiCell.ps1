@@ -1,8 +1,4 @@
-<#
-
-    padding 1 space, text left, int right
-
-#>
+# padding 1 space, text left, int right
 
 function Format-TuiCell {
     [OutputType([string])]

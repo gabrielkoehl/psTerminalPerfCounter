@@ -14,20 +14,6 @@
 #           ├── btnToggle    <-- Button: Sparklines ein/aus
 #           └── btnQuit      <-- Button: Beenden
 
-# Terminal.Gui-Engine initialisieren (uebernimmt das Terminal, Cursor aus, etc.)
-[Terminal.Gui.Application]::Init()
-
-# Hauptfenster: Fuellt den gesamten Bildschirm aus (Fill = restlicher Platz)
-$window = [Terminal.Gui.Window]@{ Title = "psTerminalPerfCounter Monitor"; Width = [Terminal.Gui.Dim]::Fill(); Height = [Terminal.Gui.Dim]::Fill() }
-
-# Header-Label: Zeigt Session-Infos an (oben im Fenster, 2 Zeilen hoch)
-$headerLabel = [Terminal.Gui.Label]@{ X = 1; Y = 0; Width = [Terminal.Gui.Dim]::Fill(1); Height = 2 }
-$window.Add($headerLabel)
-
-# --- TABELLEN-BEREICH ---
-# FrameView = ein Container mit sichtbarem Rahmen und Titel
-# Pos]::Percent(40) = nimmt 40% der Fensterhoehe ein
-$tableFrame = [Terminal.Gui.FrameView]@{ Title = "Counter Uebersicht"; X = 0; Y = 2; Width = [Terminal.Gui.Dim]::Fill(); Height = [Terminal.Gui.Dim]::Percent(40) }
 
 # Spaltennamen mit zentrierten Headern definieren
 # Diese werden sowohl als DataTable-Spaltennamen als auch als sichtbare Header benutzt

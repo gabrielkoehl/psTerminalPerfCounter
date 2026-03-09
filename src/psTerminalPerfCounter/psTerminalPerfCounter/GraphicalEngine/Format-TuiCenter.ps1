@@ -1,6 +1,4 @@
-<#
-    center TableHeader
-#>
+# center TableHeader
 
 function Format-TuiCenter {
     [OutputType([string])]
