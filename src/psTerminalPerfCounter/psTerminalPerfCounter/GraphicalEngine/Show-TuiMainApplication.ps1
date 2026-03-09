@@ -145,7 +145,9 @@ function Show-TuiMainApplication {
         Y       = [Terminal.Gui.Pos]::Bottom($chartFrame)
     }
 
-    $window.Add($btnPause); $window.Add($btnToggle); $window.Add($btnQuit)
+    $window.Add($btnPause);
+    $window.Add($btnToggle);
+    $window.Add($btnQuit)
 
 #endregion
 
