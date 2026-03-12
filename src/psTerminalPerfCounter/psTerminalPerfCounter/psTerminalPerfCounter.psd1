@@ -46,7 +46,7 @@ PowerShellVersion = '7.4'
 # RequiredModules = @('')
 
 # Assemblies that must be loaded prior to importing this module
-RequiredAssemblies = @('Lib\psTPCCLASSES.dll','Lib\NStack.dll','Terminal.Gui.dll')
+RequiredAssemblies = @('Lib\psTPCCLASSES.dll','Lib\TUI\NStack.dll','Lib\TUI\Terminal.Gui.dll')
 
 # Script files (.ps1) that are run in the caller's environment prior to importing this module.
 # ScriptsToProcess = @()

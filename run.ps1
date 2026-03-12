@@ -1,7 +1,10 @@
 import-module -fullyqualifiedname ".\src\psTerminalPerfCounter\psTerminalPerfCounter\psTerminalPerfCounter.psd1" -force
 
 
-  start-tpcmonitor -ConfigName CPU # -exportcsv -csvpath 'C:\Temp'
+  #start-tpcmonitor -ConfigName CPU # -exportcsv -csvpath 'C:\Temp'
+
+  Start-tpcMonitor -ConfigName "SystemOverview" -Tui
+
 
  # Start-tpcMonitor  -ComputerName 'lab-node1' -ConfigPath 'C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\psTerminalPerfCounter\Config\tpc_cpu.json'
 

@@ -8,6 +8,9 @@ function Start-MonitoringLoop {
         [Parameter(Mandatory=$true)]
         [int]       $UpdateInterval,
 
+        [Parameter()]
+        [switch]    $Tui,
+
         [Parameter(ParameterSetName = 'CsvExport', Mandatory)]
         [switch]    $ExportCsv,
 
@@ -20,6 +23,13 @@ function Start-MonitoringLoop {
 
 
     if ( $monitorType -in @('local','remoteSingle') ) {
+
+        # TUI mode: launch interactive Terminal.Gui application
+        if ( $Tui ) {
+            Show-TuiMainApplication -Counters $Config.Counters -ConfigName $Config.Name `
+                                    -Interval $UpdateInterval -ExportCsv:$ExportCsv -CsvPath $CsvPath
+            return
+        }
 
         while ( $true ) {
 
@@ -82,6 +92,21 @@ function Start-MonitoringLoop {
         }
 
     } elseif ( $monitorType -eq 'environment' ) {
+
+        # TUI mode for environment: collect all counters from all servers
+        if ( $Tui ) {
+            $allCounters = [System.Collections.Generic.List[psTPCCLASSES.CounterConfiguration]]::new()
+            foreach ( $server in $Config.Servers ) {
+                if ( $server.IsAvailable ) {
+                    foreach ( $counter in $server.Counters ) {
+                        if ( $counter.IsAvailable ) { $allCounters.Add($counter) }
+                    }
+                }
+            }
+            Show-TuiMainApplication -Counters $allCounters -ConfigName $Config.Name `
+                                    -Interval $UpdateInterval -ExportCsv:$ExportCsv -CsvPath $CsvPath
+            return
+        }
 
         while ( $true ) {
 

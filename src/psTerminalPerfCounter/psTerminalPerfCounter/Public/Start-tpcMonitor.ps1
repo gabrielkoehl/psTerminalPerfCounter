@@ -70,6 +70,8 @@
 
         [int]           $UpdateInterval = 1,
 
+        [switch]        $Tui,
+
         [switch]        $ExportCsv,
 
         [string]        $CsvPath = [Environment]::GetFolderPath('Desktop')
@@ -152,6 +154,7 @@
             MonitorType     = $monitorType
             Config          = Get-CounterConfiguration @configParams
             UpdateInterval  = $UpdateInterval
+            Tui             = $Tui
             ExportCsv       = $ExportCsv
             CsvPath         = $CsvPath
         }

@@ -42,6 +42,8 @@ function Start-tpcEnvironmentMonitor {
         [Parameter()]
         [int] $UpdateInterval = 0,  # 0 = use from config
 
+        [switch]    $Tui,
+
         [switch]    $ExportCsv,
 
         [string]    $CsvPath = [Environment]::GetFolderPath('Desktop')
@@ -93,6 +95,7 @@ function Start-tpcEnvironmentMonitor {
             MonitorType     = 'environment'
             Config          = $environment
             UpdateInterval  = $effectiveInterval
+            Tui             = $Tui
             ExportCsv       = $ExportCsv
             CsvPath         = $CsvPath
         }
