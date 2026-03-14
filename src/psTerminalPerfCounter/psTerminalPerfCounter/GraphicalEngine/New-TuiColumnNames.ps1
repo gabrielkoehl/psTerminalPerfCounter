@@ -14,5 +14,6 @@ function New-TuiColumnNames {
         Max      = Format-TuiCenter "Max"       12
         Avg      = Format-TuiCenter "Avg"       12
         Samples  = Format-TuiCenter "Samples"   10
+        Duration = Format-TuiCenter "Duration"  13
     }
 }

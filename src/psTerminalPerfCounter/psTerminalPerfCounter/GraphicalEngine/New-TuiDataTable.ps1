@@ -1,4 +1,4 @@
-# creates a System.Data.DataTable with all 9 string columns
+# creates a System.Data.DataTable
 
 function New-TuiDataTable {
     [OutputType([System.Data.DataTable])]
@@ -18,6 +18,7 @@ function New-TuiDataTable {
     [void]$dataTable.Columns.Add($ColumnNames.Max,      [string])
     [void]$dataTable.Columns.Add($ColumnNames.Avg,      [string])
     [void]$dataTable.Columns.Add($ColumnNames.Samples,  [string])
+    [void]$dataTable.Columns.Add($ColumnNames.Duration, [string])
 
     return , $dataTable  # comma prevents PowerShell from enumerating the empty DataTable
 }

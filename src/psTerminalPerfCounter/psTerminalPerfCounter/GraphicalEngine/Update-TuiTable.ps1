@@ -23,6 +23,7 @@ function Update-TuiTable {
         $row[$ColumnNames.Max]      = Format-TuiCell $(if ($stats.ContainsKey('Maximum')) { $stats['Maximum'].ToString("F1") } else { "-" }) 10
         $row[$ColumnNames.Avg]      = Format-TuiCell $(if ($stats.ContainsKey('Average')) { $stats['Average'].ToString("F1") } else { "-" }) 10
         $row[$ColumnNames.Samples]  = Format-TuiCell $(if ($stats.ContainsKey('Count'))   { $stats['Count'].ToString() } else { "0" }) 8
+        $row[$ColumnNames.Duration] = Format-TuiCell "$($c.ExecutionDuration.ToString()) ms" 11
 
         # last 5 values formatted side by side
         if ($stats.ContainsKey('Last5')) {
