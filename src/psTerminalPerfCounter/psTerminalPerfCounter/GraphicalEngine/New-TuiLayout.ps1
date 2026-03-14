@@ -54,7 +54,7 @@ function New-TuiLayout {
         $ColumnNames.Max      = [Terminal.Gui.TableView+ColumnStyle]@{ MinWidth = 12; MaxWidth = 12 }
         $ColumnNames.Avg      = [Terminal.Gui.TableView+ColumnStyle]@{ MinWidth = 12; MaxWidth = 12 }
         $ColumnNames.Samples  = [Terminal.Gui.TableView+ColumnStyle]@{ MinWidth = 10; MaxWidth = 10 }
-        $ColumnNames.Duration = [Terminal.Gui.TableView+ColumnStyle]@{ MinWidth = 13; MaxWidth = 13 }
+        $ColumnNames.Duration = [Terminal.Gui.TableView+ColumnStyle]@{ MinWidth = 9;  MaxWidth = 9  }
     }
 
     # apply column styles by ordinal index
