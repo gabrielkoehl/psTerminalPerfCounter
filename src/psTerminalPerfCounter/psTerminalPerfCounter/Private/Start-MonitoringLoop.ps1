@@ -26,8 +26,11 @@ function Start-MonitoringLoop {
 
         # TUI mode: launch interactive Terminal.Gui application
         if ( $Tui ) {
-            Show-TuiMainApplication -Counters $Config.Counters -ConfigName $Config.Name `
-                                    -Interval $UpdateInterval -ExportCsv:$ExportCsv -CsvPath $CsvPath
+            Show-TuiMainApplication -Counters $Config.Counters `
+                                    -ConfigName $Config.Name `
+                                    -Interval $UpdateInterval `
+                                    -ExportCsv:$ExportCsv `
+                                    -CsvPath $CsvPath
             return
         }
 
