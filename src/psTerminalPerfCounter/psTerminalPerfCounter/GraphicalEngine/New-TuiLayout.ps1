@@ -25,20 +25,12 @@ function New-TuiLayout {
 
     #region Table Area
 
-    $tableFrame = [Terminal.Gui.FrameView]@{
-        Title  = "Counter Summary"
-        X      = 0
-        Y      = 2
-        Width  = [Terminal.Gui.Dim]::Fill()
-        Height = [Terminal.Gui.Dim]::Percent(40)
-    }
-
     # TableView widget to display DataTable
     $tableView = [Terminal.Gui.TableView]@{
         X             = 0
-        Y             = 0
+        Y             = 2
         Width         = [Terminal.Gui.Dim]::Fill()
-        Height        = [Terminal.Gui.Dim]::Fill()
+        Height        = [Terminal.Gui.Dim]::Percent(40)
         FullRowSelect = $true
         Table         = $DataTable
     }
@@ -63,8 +55,8 @@ function New-TuiLayout {
         $tableView.Style.ColumnStyles[$colIdx] = $columnStyles[$colName]
     }
 
-    $tableFrame.Add($tableView)
-    $window.Add($tableFrame)
+    #$tableFrame.Add($tableView)
+    $window.Add($tableView)
 
     #endregion
 
@@ -73,7 +65,7 @@ function New-TuiLayout {
     $chartFrame = [Terminal.Gui.FrameView]@{
         Title  = "Sparklines (Live-View)"
         X      = 0
-        Y      = [Terminal.Gui.Pos]::Bottom($tableFrame)
+        Y      = [Terminal.Gui.Pos]::Bottom($tableView)
         Width  = [Terminal.Gui.Dim]::Fill()
         Height = [Terminal.Gui.Dim]::Fill(3)
     }
