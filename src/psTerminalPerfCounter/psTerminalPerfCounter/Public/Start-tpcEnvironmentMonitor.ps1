@@ -23,6 +23,14 @@ function Start-tpcEnvironmentMonitor {
         Directory path for the CSV export file.
         Default: Desktop.
 
+    .PARAMETER ExportHtml
+        Enables HTML report export after each batch cycle using PSWriteHTML.
+        The report contains a counter overview table, a combined chart and individual charts per counter.
+
+    .PARAMETER HtmlPath
+        Directory path for the HTML report file.
+        Default: Desktop.
+
     .EXAMPLE
         Start-tpcEnvironmentMonitor -EnvConfigPath "C:\Configs\SQL_PROD.json" -UpdateInterval 5
 
@@ -46,7 +54,11 @@ function Start-tpcEnvironmentMonitor {
 
         [switch]    $ExportCsv,
 
-        [string]    $CsvPath = [Environment]::GetFolderPath('Desktop')
+        [string]    $CsvPath = [Environment]::GetFolderPath('Desktop'),
+
+        [switch]    $ExportHtml,
+
+        [string]    $HtmlPath = [Environment]::GetFolderPath('Desktop')
     )
 
     $environment = $null
@@ -98,6 +110,8 @@ function Start-tpcEnvironmentMonitor {
             Tui             = $Tui
             ExportCsv       = $ExportCsv
             CsvPath         = $CsvPath
+            ExportHtml      = $ExportHtml
+            HtmlPath        = $HtmlPath
         }
 
         Start-MonitoringLoop @MonitoringParams

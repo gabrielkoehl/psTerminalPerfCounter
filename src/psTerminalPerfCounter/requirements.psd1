@@ -23,4 +23,7 @@
     'PSScriptAnalyzer' = @{
         Version = '1.24.0'
     }
+    'PSWriteHTML' = @{
+        Version = '1.28.0'
+    }
 }

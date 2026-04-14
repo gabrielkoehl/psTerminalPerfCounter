@@ -29,6 +29,14 @@
         Directory path for the CSV export file.
         Default: Desktop.
 
+    .PARAMETER ExportHtml
+        Enables HTML report export after each batch cycle using PSWriteHTML.
+        The report contains a counter overview table, a combined chart and individual charts per counter.
+
+    .PARAMETER HtmlPath
+        Directory path for the HTML report file.
+        Default: Desktop.
+
     .EXAMPLE
         Start-tpcMonitor -ConfigName "CPU"
 
@@ -48,6 +56,16 @@
         Start-tpcMonitor -ConfigName "CPU" -ExportCsv -CsvPath "C:\Exports"
 
         Starts CPU monitoring with CSV export to C:\Exports\psTPC_history.csv.
+
+    .EXAMPLE
+        Start-tpcMonitor -ConfigName "CPU" -ExportHtml
+
+        Starts CPU monitoring with HTML report export to the Desktop after each cycle.
+
+    .EXAMPLE
+        Start-tpcMonitor -ConfigName "CPU" -ExportHtml -HtmlPath "C:\Reports"
+
+        Starts CPU monitoring with HTML report export to C:\Reports\psTPC_CPU_report.html.
     #>
 
     [CmdletBinding()]
@@ -74,7 +92,11 @@
 
         [switch]        $ExportCsv,
 
-        [string]        $CsvPath = [Environment]::GetFolderPath('Desktop')
+        [string]        $CsvPath = [Environment]::GetFolderPath('Desktop'),
+
+        [switch]        $ExportHtml,
+
+        [string]        $HtmlPath = [Environment]::GetFolderPath('Desktop')
     )
 
     $configParams       = @{}
@@ -157,6 +179,8 @@
             Tui             = $Tui
             ExportCsv       = $ExportCsv
             CsvPath         = $CsvPath
+            ExportHtml      = $ExportHtml
+            HtmlPath        = $HtmlPath
         }
 
         Start-MonitoringLoop @MonitoringParams

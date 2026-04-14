@@ -15,7 +15,13 @@ function Start-MonitoringLoop {
         [switch]    $ExportCsv,
 
         [Parameter(ParameterSetName = 'CsvExport')]
-        [string]    $CsvPath = [Environment]::GetFolderPath('Desktop')
+        [string]    $CsvPath = [Environment]::GetFolderPath('Desktop'),
+
+        [Parameter()]
+        [switch]    $ExportHtml,
+
+        [Parameter()]
+        [string]    $HtmlPath = [Environment]::GetFolderPath('Desktop')
     )
 
     $SampleCount    = 0
@@ -45,6 +51,17 @@ function Start-MonitoringLoop {
             if ( $ExportCsv ) {
                 $csvFilePath = Join-Path $CsvPath "psTPC_$($Config.Name)_$(Get-Date -Format 'ddMMyy').csv"
                 [psTPCCLASSES.CounterConfiguration]::ExportCsv($Config.Counters, $csvFilePath)
+            }
+
+            # HTML Export
+            if ( $ExportHtml ) {
+                $htmlFilePath = Join-Path $HtmlPath "psTPC_$($Config.Name)_report.html"
+                Export-HtmlReport -Counters $Config.Counters `
+                                  -ConfigName $Config.Name `
+                                  -HtmlFilePath $htmlFilePath `
+                                  -StartTime $StartTime `
+                                  -SampleCount $SampleCount `
+                                  -UpdateInterval $UpdateInterval
             }
 
             Show-SessionHeader -ConfigName $Config.Name -StartTime $StartTime -SampleCount $SampleCount
@@ -154,6 +171,17 @@ function Start-MonitoringLoop {
                 }
             } else {
                 Write-Host "No data available from any server." -ForegroundColor Yellow
+            }
+
+            # HTML Export
+            if ( $ExportHtml -and $allCounters.Count -gt 0 ) {
+                $htmlFilePath = Join-Path $HtmlPath "psTPC_$($Config.Name)_report.html"
+                Export-HtmlReport -Counters $allCounters `
+                                  -ConfigName $Config.Name `
+                                  -HtmlFilePath $htmlFilePath `
+                                  -StartTime $StartTime `
+                                  -SampleCount $SampleCount `
+                                  -UpdateInterval $UpdateInterval
             }
 
             # Show environment statistics
