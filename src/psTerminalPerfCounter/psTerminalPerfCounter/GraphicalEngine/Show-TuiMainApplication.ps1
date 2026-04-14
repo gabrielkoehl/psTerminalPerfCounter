@@ -7,7 +7,11 @@ function Show-TuiMainApplication {
         [string] $ConfigName,
         [int]    $Interval  = 2,
         [switch] $ExportCsv,
-        [string] $CsvPath   = [Environment]::GetFolderPath('Desktop')
+        [string] $CsvPath       = [Environment]::GetFolderPath('Desktop'),
+        [switch] $ExportHtml,
+        [string] $HtmlPath      = [Environment]::GetFolderPath('Desktop'),
+        [ValidateSet('Counter', 'Host')]
+        [string] $HtmlGroupBy   = 'Counter'
     )
 
     # 1. initialize Terminal.Gui
@@ -34,13 +38,17 @@ function Show-TuiMainApplication {
         ConfigName     = $ConfigName
         ExportCsv      = [bool]$ExportCsv
         CsvPath        = $CsvPath
+        ExportHtml     = [bool]$ExportHtml
+        HtmlPath       = $HtmlPath
+        HtmlGroupBy    = $HtmlGroupBy
     }
 
     # 7. register button handlers and timer callback (includes data collection)
     Register-TuiEventHandlers -Layout $layout -TuiState $tuiState -Counters $Counters `
                               -ColumnNames $columnNames -DataTable $dataTable `
                               -SparkBlocks $sparkBlocks -Interval $Interval `
-                              -ExportCsv:$ExportCsv -CsvPath $CsvPath
+                              -ExportCsv:$ExportCsv -CsvPath $CsvPath `
+                              -ExportHtml:$ExportHtml -HtmlPath $HtmlPath -HtmlGroupBy $HtmlGroupBy
 
     # 8. collect initial data batch
     [psTPCCLASSES.CounterConfiguration]::GetValuesBatched($Counters)

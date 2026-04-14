@@ -31,6 +31,11 @@ function Start-tpcEnvironmentMonitor {
         Directory path for the HTML report file.
         Default: Desktop.
 
+    .PARAMETER HtmlGroupBy
+        Controls how individual tabs are grouped in the HTML report.
+        'Counter' (default): one tab per counter type, series per host — best for comparing hosts.
+        'Host': one tab per host, series per counter — best for viewing a single host's metrics.
+
     .EXAMPLE
         Start-tpcEnvironmentMonitor -EnvConfigPath "C:\Configs\SQL_PROD.json" -UpdateInterval 5
 
@@ -58,7 +63,10 @@ function Start-tpcEnvironmentMonitor {
 
         [switch]    $ExportHtml,
 
-        [string]    $HtmlPath = [Environment]::GetFolderPath('Desktop')
+        [string]    $HtmlPath = [Environment]::GetFolderPath('Desktop'),
+
+        [ValidateSet('Counter', 'Host')]
+        [string]    $HtmlGroupBy = 'Counter'
     )
 
     $environment = $null
@@ -112,6 +120,7 @@ function Start-tpcEnvironmentMonitor {
             CsvPath         = $CsvPath
             ExportHtml      = $ExportHtml
             HtmlPath        = $HtmlPath
+            HtmlGroupBy     = $HtmlGroupBy
         }
 
         Start-MonitoringLoop @MonitoringParams

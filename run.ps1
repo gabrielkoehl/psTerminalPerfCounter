@@ -5,12 +5,12 @@ import-module -fullyqualifiedname ".\src\psTerminalPerfCounter\psTerminalPerfCou
 
   #Start-tpcMonitor -ConfigName "SystemOverview" -Tui
 
-   Start-tpcMonitor -ConfigName "CPU" -ExportHtml
+ #  Start-tpcMonitor -ConfigName "CPU" -ExportHtml -tui
 
  # Start-tpcMonitor  -ComputerName 'lab-node1' -ConfigPath 'C:\syncthing\gabi_development\repositories\psTerminalPerfCounter\src\psTerminalPerfCounter\psTerminalPerfCounter\Config\tpc_cpu.json'
 
   #start-tpcMonitor -ConfigPath 'src\psTerminalPerfCounter\psTerminalPerfCounter\Config\tpc_SystemOverview.json'
 
- #Start-tpcEnvironmentMonitor -EnvConfigPath "example_configs\ENV_SERVER_EXAMPLE.json" # -exportcsv -csvpath 'C:\Temp'
+ Start-tpcEnvironmentMonitor -EnvConfigPath "example_configs\ENV_SERVER_EXAMPLE2.json" -tui
 
 # Test-tpcAvailableCounterConfig

@@ -11,7 +11,11 @@ function Register-TuiEventHandlers {
         [char[]]                $SparkBlocks,
         [int]                   $Interval,
         [switch]                $ExportCsv,
-        [string]                $CsvPath
+        [string]                $CsvPath,
+        [switch]                $ExportHtml,
+        [string]                $HtmlPath   = [Environment]::GetFolderPath('Desktop'),
+        [ValidateSet('Counter', 'Host')]
+        [string]                $HtmlGroupBy = 'Counter'
     )
 
     # pause/resume button
@@ -51,6 +55,18 @@ function Register-TuiEventHandlers {
         if ($TuiState.ExportCsv) {
             $csvFilePath = Join-Path $TuiState.CsvPath "psTPC_$($TuiState.ConfigName)_$(Get-Date -Format 'ddMMyy').csv"
             [psTPCCLASSES.CounterConfiguration]::ExportCsv($Counters, $csvFilePath)
+        }
+
+        # optional HTML export
+        if ($TuiState.ExportHtml) {
+            $htmlFilePath = Join-Path $TuiState.HtmlPath "psTPC_$($TuiState.ConfigName)_report.html"
+            Export-HtmlReport -Counters $Counters `
+                              -ConfigName $TuiState.ConfigName `
+                              -HtmlFilePath $htmlFilePath `
+                              -StartTime $TuiState.StartTime `
+                              -SampleCount $TuiState.SampleCount `
+                              -UpdateInterval $Interval `
+                              -GroupBy $TuiState.HtmlGroupBy
         }
 
         # refresh all UI elements

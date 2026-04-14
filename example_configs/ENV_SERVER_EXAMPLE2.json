@@ -1,0 +1,44 @@
+[
+    {
+        "name": "SQL_ENVIRONMENT_001",
+        "description": "SQL Server Environment Production",
+        "interval": 2,
+        "secretvaultname": "SecretStore",
+        "credentialname": "integrated",
+        "servers": [
+            {
+                "computername": "DEV-NODE2",
+                "comment": "Sql Server Node B Production",
+                "counterConfig": [
+                    "CPU",
+                    "DISK"
+                ]
+            },
+            {
+                "computername": "DEV-NODE1",
+                "comment": "Sql Server Node A Production",
+                "counterConfig": [
+                    "CPU",
+                    "DISK"
+                ]
+            },
+            {
+                "computername": "DEV-DC01",
+                "comment": "Sql Server Node A Production",
+                "counterConfig": [
+                    "CPU",
+                    "Memory"
+                ]
+            },
+            {
+                "computername": "DEV-NODE3",
+                "comment": "Sql Server Single Node Dev",
+                "counterConfig": [
+                    "CPU",
+                    "DISK",
+                    "Memory"
+                ]
+            }
+        ]
+    }
+]

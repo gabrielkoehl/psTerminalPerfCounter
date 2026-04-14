@@ -21,7 +21,11 @@ function Start-MonitoringLoop {
         [switch]    $ExportHtml,
 
         [Parameter()]
-        [string]    $HtmlPath = [Environment]::GetFolderPath('Desktop')
+        [string]    $HtmlPath = [Environment]::GetFolderPath('Desktop'),
+
+        [Parameter()]
+        [ValidateSet('Counter', 'Host')]
+        [string]    $HtmlGroupBy = 'Counter'
     )
 
     $SampleCount    = 0
@@ -36,7 +40,10 @@ function Start-MonitoringLoop {
                                     -ConfigName $Config.Name `
                                     -Interval $UpdateInterval `
                                     -ExportCsv:$ExportCsv `
-                                    -CsvPath $CsvPath
+                                    -CsvPath $CsvPath `
+                                    -ExportHtml:$ExportHtml `
+                                    -HtmlPath $HtmlPath `
+                                    -HtmlGroupBy $HtmlGroupBy
             return
         }
 
@@ -61,7 +68,8 @@ function Start-MonitoringLoop {
                                   -HtmlFilePath $htmlFilePath `
                                   -StartTime $StartTime `
                                   -SampleCount $SampleCount `
-                                  -UpdateInterval $UpdateInterval
+                                  -UpdateInterval $UpdateInterval `
+                                  -GroupBy $HtmlGroupBy
             }
 
             Show-SessionHeader -ConfigName $Config.Name -StartTime $StartTime -SampleCount $SampleCount
@@ -123,8 +131,14 @@ function Start-MonitoringLoop {
                     }
                 }
             }
-            Show-TuiMainApplication -Counters $allCounters -ConfigName $Config.Name `
-                                    -Interval $UpdateInterval -ExportCsv:$ExportCsv -CsvPath $CsvPath
+            Show-TuiMainApplication -Counters $allCounters `
+                                    -ConfigName $Config.Name `
+                                    -Interval $UpdateInterval `
+                                    -ExportCsv:$ExportCsv `
+                                    -CsvPath $CsvPath `
+                                    -ExportHtml:$ExportHtml `
+                                    -HtmlPath $HtmlPath `
+                                    -HtmlGroupBy $HtmlGroupBy
             return
         }
 
@@ -181,7 +195,8 @@ function Start-MonitoringLoop {
                                   -HtmlFilePath $htmlFilePath `
                                   -StartTime $StartTime `
                                   -SampleCount $SampleCount `
-                                  -UpdateInterval $UpdateInterval
+                                  -UpdateInterval $UpdateInterval `
+                                  -GroupBy $HtmlGroupBy
             }
 
             # Show environment statistics
