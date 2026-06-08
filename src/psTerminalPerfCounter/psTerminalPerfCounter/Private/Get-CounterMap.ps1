@@ -36,6 +36,14 @@ function Get-CounterMap {
         }
         else {
             Write-Host "Retrieving CounterMap from remote computer: $ComputerName..." -ForegroundColor Yellow
+
+            # Single authoritative reachability gate for the whole module: all remote data is
+            # collected via WinRM (Invoke-Command, TCP 5985). Test-tpcWinRm fails fast (explicit
+            # timeout) on dead hosts instead of waiting for the WinRM connection timeout.
+            if ( -not (Test-tpcWinRm -ComputerName $ComputerName) ) {
+                throw "Server '$ComputerName' is not reachable via WinRM (TCP 5985)."
+            }
+
             $invokeParams['ComputerName'] = $ComputerName
 
             if ($Credential) {
@@ -66,6 +74,8 @@ function Get-CounterMap {
 
     }
     catch {
-        Write-Error "Failed to retrieve CounterMap: $($_.Exception.Message)"
+        # Throw so callers have a single, unambiguous reachability signal to branch on
+        # (instead of a swallowed Write-Error + null return that downstream code had to re-probe).
+        throw "Failed to retrieve CounterMap from '$ComputerName': $($_.Exception.Message)"
     }
 }

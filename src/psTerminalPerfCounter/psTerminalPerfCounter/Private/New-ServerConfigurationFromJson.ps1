@@ -30,7 +30,6 @@
 
 
                 $performanceCounters    = [System.Collections.Generic.List[psTPCCLASSES.CounterConfiguration]]::new()
-                $skipServer             = $false
 
 
                 if ( $ServerConfig.CounterConfig ) {
@@ -49,28 +48,18 @@
                             # Nothing to do here - schema validation would have already aborted before reaching this point
                         }
 
+                        # An unreachable server has already caused Get-CounterMap (above) to throw,
+                        # which is handled by the catch below. No separate reachability state needed.
                         $config = Get-CounterConfiguration @paramCounter
-
-                        if ( $config.SkipServer ) {
-                            $skipServer = $true
-                            break
-                        }
 
                         $performanceCounters.AddRange($config.Counters)
                     }
                 }
 
-                if ( $skipServer ) {
-                    Write-Warning "Skipping server '$($ServerConfig.computername)' - marked as unreachable during counter configuration."
-                    Start-Sleep 1
-                    continue
-                }
-
                 $serverConfiguration = [psTPCCLASSES.ServerConfiguration]::new(
                     $ServerConfig.computername,
                     $ServerConfig.comment,
-                    $performanceCounters,
-                    $true # skip availability check - server already validated via Get-CounterMap
+                    $performanceCounters
                 )
 
                 $servers.Add($serverConfiguration)

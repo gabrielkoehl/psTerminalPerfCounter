@@ -1,6 +1,4 @@
-using System.Management.Automation;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Linq;
 using System;
 
@@ -11,8 +9,6 @@ namespace psTPCCLASSES;
 
 public class ServerConfiguration
 {
-     private static readonly PowerShellLogger _logger = PowerShellLogger.Instance;
-     private readonly string _source;
      public string ComputerName { get; set; }
      public string Comment { get; set; }
      public List<CounterConfiguration> Counters { get; set; }
@@ -24,54 +20,18 @@ public class ServerConfiguration
      public ServerConfiguration(
           string computerName,
           string comment,
-          List<CounterConfiguration> counters,
-          bool skipAvailabilityCheck = false)
+          List<CounterConfiguration> counters)
      {
-          _source        = "ServerConfiguration";
           ComputerName   = computerName;
           Comment        = comment;
           Counters       = counters ?? new List<CounterConfiguration>();
           Statistics     = new Dictionary<string, object>();
-          IsAvailable    = false;
           LastError      = string.Empty;
 
-          if (skipAvailabilityCheck)
-          {
-               IsAvailable = true;
-          }
-          else
-          {
-               TestServerAvailability();
-          }
-     }
-
-     private void TestServerAvailability()
-     {
-          try
-          {
-               using var ps = PowerShell.Create(RunspaceMode.NewRunspace);
-
-               ps.AddCommand("Test-Connection")
-               .AddParameter("ComputerName", ComputerName)
-               .AddParameter("Count", 1)
-               .AddParameter("Quiet");
-
-               var result = ps.Invoke();
-
-               IsAvailable = result.Count > 0 && (bool)result[0].BaseObject;
-
-               if (!IsAvailable)
-               {
-                    LastError = "Server not reachable";
-                    _logger.Warning(_source, $"Server '{ComputerName}' is not reachable");
-               }
-          }
-          catch (Exception ex)
-          {
-               IsAvailable    = false;
-               LastError      = ex.Message;
-               _logger.Error(_source, $"Cannot reach server '{ComputerName}': {ex.Message}");
-          }
+          // Reachability is owned by Get-CounterMap (WinRM): a ServerConfiguration is only constructed
+          // after the host has already answered a remote call, so by definition it is online here.
+          // No separate ICMP/TCP probe - that was a redundant second source of truth.
+          IsAvailable    = true;
      }
 
      public void UpdateStatistics()

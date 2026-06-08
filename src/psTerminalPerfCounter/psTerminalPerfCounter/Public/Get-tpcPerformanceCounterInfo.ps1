@@ -59,8 +59,9 @@ function Get-tpcPerformanceCounterInfo {
 
     try {
 
-        if ( $PSCmdlet.ParameterSetName -eq 'Remote' -and -not $(Test-Connection -ComputerName $ComputerName -Count 1 -Quiet) ) {
-            THROW "Remote computer $ComputerName not reachable. Aborting"
+        # Reachability via the shared WinRM check (counter info is retrieved via Invoke-Command/WinRM).
+        if ( $PSCmdlet.ParameterSetName -eq 'Remote' -and -not (Test-tpcWinRm -ComputerName $ComputerName) ) {
+            THROW "Remote computer $ComputerName not reachable via WinRM (TCP 5985). Aborting"
         }
 
         # is ID
