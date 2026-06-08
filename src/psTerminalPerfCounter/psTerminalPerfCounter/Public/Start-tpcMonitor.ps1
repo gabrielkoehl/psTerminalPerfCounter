@@ -22,6 +22,10 @@
     .PARAMETER UpdateInterval
         Seconds between counter updates. Default: 1.
 
+    .PARAMETER Tui
+        (Beta) Launches an interactive Terminal GUI (Terminal.Gui) instead of the scrolling console output.
+        Shows a live table and 3-row sparklines per counter with Pause / Sparklines-toggle / Quit buttons.
+
     .PARAMETER ExportCsv
         Enables CSV export of counter values after each batch cycle (append mode, long format).
 
@@ -56,6 +60,11 @@
         Start-tpcMonitor -ConfigName "Memory" -ComputerName "Server01" -Credential $cred -UpdateInterval 2
 
         Starts remote memory monitoring with 2-second intervals.
+
+    .EXAMPLE
+        Start-tpcMonitor -ConfigName "CPU" -Tui
+
+        (Beta) Starts CPU monitoring in the interactive Terminal GUI.
 
     .EXAMPLE
         Start-tpcMonitor -ConfigName "CPU" -ExportCsv -CsvPath "C:\Exports"
@@ -162,20 +171,13 @@
                 Write-Host "using $env:USERDOMAIN\$env:USERNAME ." -ForegroundColor Yellow
             }
 
-            if ( Test-Connection -ComputerName $ComputerName -Count 1 -Quiet ) {
+            # Reachability is owned solely by Get-CounterMap (WinRM, TCP 5985): it fails fast and
+            # throws if the host is unreachable, which the surrounding try/catch reports.
+            $configParams['counterMap'] = $(Get-CounterMap @configParams)
 
-                $configParams['counterMap'] = $(Get-CounterMap @configParams)
-
-                switch ( $PSCmdlet.ParameterSetName ) {
-                    'RemoteByName' { $configParams['ConfigName'] = $ConfigName }
-                    'RemoteByPath' { $configParams['ConfigPath'] = $ConfigPath }
-                }
-
-            } else {
-
-                Write-Warning "Remote computer $ComputerName not reachable. Aborting"
-                Return
-
+            switch ( $PSCmdlet.ParameterSetName ) {
+                'RemoteByName' { $configParams['ConfigName'] = $ConfigName }
+                'RemoteByPath' { $configParams['ConfigPath'] = $ConfigPath }
             }
         }
 

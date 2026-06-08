@@ -11,10 +11,19 @@ function Start-tpcEnvironmentMonitor {
     .PARAMETER UpdateInterval
         Seconds between updates. Default: uses interval from JSON config (fallback: 2s).
 
+    .PARAMETER Tui
+        (Beta) Launches an interactive Terminal GUI (Terminal.Gui) instead of the scrolling console output.
+        For environment monitoring the TUI shows a table-only view (counters are not graphed across servers).
+
     .EXAMPLE
         Start-tpcEnvironmentMonitor -EnvConfigPath "C:\Configs\SQL_PROD.json"
 
         Starts environment monitoring using the interval defined in the JSON config.
+
+    .EXAMPLE
+        Start-tpcEnvironmentMonitor -EnvConfigPath "C:\Configs\SQL_PROD.json" -Tui
+
+        (Beta) Starts environment monitoring in the interactive Terminal GUI (table-only view).
 
     .PARAMETER ExportCsv
         Enables CSV export of counter values after each batch cycle (append mode, long format).

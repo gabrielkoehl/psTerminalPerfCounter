@@ -12,7 +12,8 @@ schema: 2.0.0
 ## SYNTAX
 
 ```
-Start-tpcEnvironmentMonitor [-EnvConfigPath] <String> [[-UpdateInterval] <Int32>]
+Start-tpcEnvironmentMonitor [-EnvConfigPath] <String> [[-UpdateInterval] <Int32>] [-Tui] [-ExportCsv]
+ [[-CsvPath] <String>] [-ExportHtml] [[-HtmlPath] <String>] [[-HtmlGroupBy] <String>]
  [-ProgressAction <ActionPreference>] [<CommonParameters>]
 ```
 
@@ -64,6 +65,102 @@ Aliases:
 Required: False
 Position: 2
 Default value: 0
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Tui
+(Beta) Launches an interactive Terminal GUI (Terminal.Gui) instead of the scrolling console output.
+For environment monitoring the TUI shows a table-only view (counters are not graphed across servers).
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ExportCsv
+Enables CSV export of counter values after each batch cycle (append mode, long format).
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -CsvPath
+Directory path for the CSV export file.
+Default: Desktop.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 3
+Default value: [Environment]::GetFolderPath('Desktop')
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ExportHtml
+Enables HTML report export after each batch cycle using PSWriteHTML.
+The report contains a counter overview table, a combined chart and individual charts per counter.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -HtmlPath
+Directory path for the HTML report file.
+Default: Desktop.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 4
+Default value: [Environment]::GetFolderPath('Desktop')
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -HtmlGroupBy
+Controls how individual tabs are grouped in the HTML report.
+'Counter' (default): one tab per counter type, series per host - best for comparing hosts.
+'Host': one tab per host, series per counter - best for viewing a single host's metrics.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 5
+Default value: Counter
 Accept pipeline input: False
 Accept wildcard characters: False
 ```

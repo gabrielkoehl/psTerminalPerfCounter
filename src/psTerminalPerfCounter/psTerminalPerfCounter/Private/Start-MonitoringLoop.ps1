@@ -138,7 +138,8 @@ function Start-MonitoringLoop {
                                     -CsvPath $CsvPath `
                                     -ExportHtml:$ExportHtml `
                                     -HtmlPath $HtmlPath `
-                                    -HtmlGroupBy $HtmlGroupBy
+                                    -HtmlGroupBy $HtmlGroupBy `
+                                    -ShowGraphs $false
             return
         }
 

@@ -11,7 +11,9 @@ function Show-TuiMainApplication {
         [switch] $ExportHtml,
         [string] $HtmlPath      = [Environment]::GetFolderPath('Desktop'),
         [ValidateSet('Counter', 'Host')]
-        [string] $HtmlGroupBy   = 'Counter'
+        [string] $HtmlGroupBy   = 'Counter',
+        # $false for multi-server: table-only view, no sparkline area
+        [bool]   $ShowGraphs    = $true
     )
 
     # 1. initialize Terminal.Gui
@@ -27,7 +29,8 @@ function Show-TuiMainApplication {
     $dataTable = New-TuiDataTable -ColumnNames $columnNames
 
     # 5. build the full UI layout
-    $layout = New-TuiLayout -DataTable $dataTable -ColumnNames $columnNames
+    $layout = New-TuiLayout -DataTable $dataTable -ColumnNames $columnNames `
+                            -ShowGraphs $ShowGraphs -CounterCount $Counters.Count
 
     # 6. initialize mutable state object (hashtable = reference type)
     $tuiState = @{
@@ -61,8 +64,10 @@ function Show-TuiMainApplication {
     Update-TuiTable -DataTable $dataTable -TableView $layout.TableView `
                     -Counters $Counters -ColumnNames $columnNames
 
-    Update-TuiSparklines -SparkLabel $layout.SparkLabel -Counters $Counters `
-                         -SparkBlocks $sparkBlocks -ShowSparklines $true
+    if ( $layout.SparkLabel ) {
+        Update-TuiSparklines -SparkLabel $layout.SparkLabel -Counters $Counters `
+                             -SparkBlocks $sparkBlocks -ShowSparklines $true
+    }
 
     # 10. add window to application and run (blocks until quit)
     [Terminal.Gui.Application]::Top.Add($layout.Window)

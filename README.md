@@ -7,11 +7,28 @@ A PowerShell module for creating and using predefined performance counter config
 
 **Requirement:** PowerShell 7.4
 
-## Development Info 0.4.0 planned Main Features
+## Beta Features (0.4.0)
 
-- [ ] Export Data
+Two new visualisation options ship with 0.4.0. Both work but are flagged **beta** — see Known Issues below.
+
+- **Terminal GUI / TUI** (`-Tui`): interactive live view (table + sparklines) built on Terminal.Gui. The required assemblies ship with the module.
+- **HTML Report Export** (`-ExportHtml`) via [PSWriteHTML](https://github.com/EvotecIT/PSWriteHTML): interactive HTML report with overview table and ApexCharts. Requires `PSWriteHTML` to be installed:
+
+  ```powershell
+  Install-Module PSWriteHTML
+  ```
+
+### Known Issues (TUI beta)
+
+- The sparkline view is **not scrollable**. With many counters the sparklines run off the bottom of the screen (the table itself scrolls via the keyboard).
+- In the multi-server (environment) TUI, sparklines are not shown — only the table.
+
+## Development Info — 0.5.0 planned Main Features
+
+- [x] Export Data (CSV)
+- [x] Implement PSWriteHTML for visualisation (beta)
 - [ ] Export xlsx
-- [ ] Implement PSWriteHTML fir visualisation
+- [ ] Scrollable TUI sparkline view
 
 
 ## Key Features
@@ -38,7 +55,7 @@ This module utilizes numerical Performance Counter IDs instead of localized name
 
 Initially, the graphical capabilities (powered by [PSConsoleGraph](https://github.com/PrateekKumarSingh/PSConsoleGraph)) were the driving force behind this module. While still beautiful and effective for individual servers, visualizing complex environments pushed the engine to its limits.
 
-As a result, I have shifted the focus towards robust Console Table outputs for daily administration of multiple systems. Looking ahead, I plan to leverage PSWriteHTML for generating visual reports.
+As a result, I have shifted the focus towards robust Console Table outputs for daily administration of multiple systems. As of 0.4.0 there are two additional (beta) options: an interactive Terminal GUI (`-Tui`) and PSWriteHTML-based HTML reports (`-ExportHtml`) — see the Beta Features section above.
 
 ### Configuration-Driven Monitoring
 
@@ -75,6 +92,16 @@ See [tpc_CPU.json](src\psTerminalPerfCounter\psTerminalPerfCounter\Config\tpc_CP
 ```powershell
 # Load config for localhost
 Start-tpcMonitor -ConfigName "CPU"
+```
+
+```powershell
+# Interactive Terminal GUI (beta)
+Start-tpcMonitor -ConfigName "CPU" -Tui
+```
+
+```powershell
+# Write an interactive HTML report to the Desktop after each cycle (beta, requires PSWriteHTML)
+Start-tpcMonitor -ConfigName "CPU" -ExportHtml
 ```
 
 ```powershell

@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [-]
+## [0.4.0] - 2026-06-08
 
 ### Added
 
@@ -15,7 +15,22 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   * CSV columns: `Timestamp, Computer, CounterPath, Title, Unit, Value`
   * C# implementation: `CounterConfiguration.ExportCsv()` (static, single-server) and `EnvironmentConfiguration.ExportCsv()` (multi-server aggregation)
 
+* **Terminal GUI / TUI** (`-Tui`) — **BETA**
+  * Interactive live view powered by Terminal.Gui for `Start-tpcMonitor` and `Start-tpcEnvironmentMonitor`
+  * Single-server: live table plus 3-row unicode sparklines per counter, with Pause / Sparklines-toggle / Quit buttons
+  * Multi-server (environment): table-only view (counters are not graphed across servers)
+  * Required assemblies (`Lib\TUI\NStack.dll`, `Lib\TUI\Terminal.Gui.dll`) ship with the module and load via the manifest
+
+* **HTML Report Export** via PSWriteHTML (`-ExportHtml`, `-HtmlPath`, `-HtmlGroupBy`) — **BETA**
+  * New parameters for `Start-tpcMonitor` and `Start-tpcEnvironmentMonitor` to write an interactive HTML report after each batch cycle
+  * Report contains a counter overview table, a combined chart and grouped tabs with individual charts (ApexCharts) plus auto-refresh
+  * `-HtmlGroupBy`: `Counter` (default — one tab per counter type, one series per host) or `Host` (one tab per host, one series per counter)
+  * Default export path: Desktop; file naming: `psTPC_<ConfigName>_report.html`
+  * Soft dependency: requires `PSWriteHTML` to be installed (runtime check with install hint, not enforced via manifest)
+
 ### Changed
+
+* **TUI layout** scales the sparkline area to the number of counters (single-server); the multi-server TUI shows only the table.
 
 ### Deprecated
 
@@ -23,11 +38,23 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+* **Server reachability no longer uses ICMP ping, and is now determined in a single place.** Hosts that block ICMP behind a firewall but allow WinRM were wrongly flagged as offline / skipped (this caused `Start-tpcEnvironmentMonitor` to skip reachable servers). Reachability is now owned solely by `Get-CounterMap` — the first WinRM call: it fast-fails with a TCP probe of the WinRM port (TCP 5985) and throws when a host is unreachable.
+  * New shared helper `Test-tpcWinRm`: TCP connect to 5985 with an explicit 2s timeout — the single module-wide definition of "reachable". No ICMP, and not `Test-NetConnection -Port` (which has no timeout and blocks ~21s on dead hosts).
+  * Removed the redundant reachability probes in `Get-CounterConfiguration` and `Start-tpcMonitor`; both rely on `Get-CounterMap` now. `Get-tpcPerformanceCounterInfo` uses the shared helper.
+  * C#: removed `ServerConfiguration.TestServerAvailability()` and the `skipAvailabilityCheck` constructor parameter — a `ServerConfiguration` is only constructed after the host answered a remote call, so it is online by construction (`IsAvailable = true`).
+  * Note: for WinRM over HTTPS the port would be 5986.
+
 ### Security
 
 ### Code Quality
 
+* Centralized server reachability into a single `Test-tpcWinRm` helper, with `Get-CounterMap` as the sole authority. Removed the now-dead `SkipServer` plumbing from `Get-CounterConfiguration` and `New-ServerConfigurationFromJson`, and the redundant availability code from the `ServerConfiguration` C# class.
+
 ### Known Issues
+
+* **TUI is BETA.**
+* **Sparkline view is not scrollable** (Terminal.Gui `Label`). With many counters the sparkline content runs off the bottom of the visible area. The table itself scrolls via keyboard.
+* Sparkline height is capped at a sane maximum, so with a very large number of counters not all sparklines are visible at once.
 
 ## [0.3.1]
 

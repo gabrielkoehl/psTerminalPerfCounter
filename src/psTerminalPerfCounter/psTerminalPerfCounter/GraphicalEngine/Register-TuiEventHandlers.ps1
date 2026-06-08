@@ -28,12 +28,14 @@ function Register-TuiEventHandlers {
                          -Interval $Interval
     })
 
-    # toggle sparkline visibility
-    $Layout.BtnToggle.add_Clicked({
-        $TuiState.ShowSparklines = -not $TuiState.ShowSparklines
-        Update-TuiSparklines -SparkLabel $Layout.SparkLabel -Counters $Counters `
-                             -SparkBlocks $SparkBlocks -ShowSparklines $TuiState.ShowSparklines
-    })
+    # toggle sparkline visibility (only present when sparklines are shown)
+    if ( $Layout.BtnToggle ) {
+        $Layout.BtnToggle.add_Clicked({
+            $TuiState.ShowSparklines = -not $TuiState.ShowSparklines
+            Update-TuiSparklines -SparkLabel $Layout.SparkLabel -Counters $Counters `
+                                 -SparkBlocks $SparkBlocks -ShowSparklines $TuiState.ShowSparklines
+        })
+    }
 
     # quit button
     $Layout.BtnQuit.add_Clicked({
@@ -77,8 +79,10 @@ function Register-TuiEventHandlers {
         Update-TuiTable -DataTable $DataTable -TableView $Layout.TableView `
                         -Counters $Counters -ColumnNames $ColumnNames
 
-        Update-TuiSparklines -SparkLabel $Layout.SparkLabel -Counters $Counters `
-                             -SparkBlocks $SparkBlocks -ShowSparklines $TuiState.ShowSparklines
+        if ( $Layout.SparkLabel ) {
+            Update-TuiSparklines -SparkLabel $Layout.SparkLabel -Counters $Counters `
+                                 -SparkBlocks $SparkBlocks -ShowSparklines $TuiState.ShowSparklines
+        }
 
         return $true  # keep timer running
     }

@@ -4,7 +4,11 @@ function New-TuiLayout {
     [OutputType([hashtable])]
     param(
         [System.Data.DataTable] $DataTable,
-        [hashtable]             $ColumnNames
+        [hashtable]             $ColumnNames,
+        # when $false (e.g. multi-server environment) the sparkline area is omitted and the table fills the window
+        [bool]                  $ShowGraphs   = $true,
+        # number of counters; used to scale the sparkline area to its content
+        [int]                   $CounterCount = 0
     )
 
     # main window
@@ -23,14 +27,26 @@ function New-TuiLayout {
     }
     $window.Add($headerLabel)
 
+    # sparkline area height scales with the number of counters (3 rows + 1 separator each),
+    # clamped to a sane range so few counters do not waste space and many do not eat the screen
+    $sparkHeight = [Math]::Min([Math]::Max(($CounterCount * 4 + 1), 6), 20)
+
     #region Table Area
 
-    # TableView widget to display DataTable
+    # TableView widget to display DataTable.
+    # With sparklines: leave room for the sparkline frame + button row below.
+    # Without sparklines (multi-server): table fills down to just above the buttons.
+    $tableHeight = if ( $ShowGraphs ) {
+        [Terminal.Gui.Dim]::Fill($sparkHeight + 3)
+    } else {
+        [Terminal.Gui.Dim]::Fill(3)
+    }
+
     $tableView = [Terminal.Gui.TableView]@{
         X             = 0
         Y             = 2
         Width         = [Terminal.Gui.Dim]::Fill()
-        Height        = [Terminal.Gui.Dim]::Percent(40)
+        Height        = $tableHeight
         FullRowSelect = $true
         Table         = $DataTable
     }
@@ -60,26 +76,36 @@ function New-TuiLayout {
 
     #endregion
 
-    #region Sparkline Area
+    #region Sparkline Area (single-server only)
 
-    $chartFrame = [Terminal.Gui.FrameView]@{
-        Title  = "Sparklines (Live-View)"
-        X      = 0
-        Y      = [Terminal.Gui.Pos]::Bottom($tableView)
-        Width  = [Terminal.Gui.Dim]::Fill()
-        Height = [Terminal.Gui.Dim]::Fill(3)
+    $sparkLabel = $null
+    $btnToggle  = $null
+    # buttons are anchored below the sparkline frame when present, otherwise below the table
+    $buttonAnchor = $tableView
+
+    if ( $ShowGraphs ) {
+
+        $chartFrame = [Terminal.Gui.FrameView]@{
+            Title  = "Sparklines (Live-View)"
+            X      = 0
+            Y      = [Terminal.Gui.Pos]::Bottom($tableView)
+            Width  = [Terminal.Gui.Dim]::Fill()
+            Height = $sparkHeight
+        }
+
+        # label holding sparkline unicode characters as text
+        $sparkLabel = [Terminal.Gui.Label]@{
+            X      = 1
+            Y      = 0
+            Width  = [Terminal.Gui.Dim]::Fill(1)
+            Height = [Terminal.Gui.Dim]::Fill()
+        }
+
+        $chartFrame.Add($sparkLabel)
+        $window.Add($chartFrame)
+
+        $buttonAnchor = $chartFrame
     }
-
-    # label holding sparkline unicode characters as text
-    $sparkLabel = [Terminal.Gui.Label]@{
-        X      = 1
-        Y      = 0
-        Width  = [Terminal.Gui.Dim]::Fill(1)
-        Height = [Terminal.Gui.Dim]::Fill()
-    }
-
-    $chartFrame.Add($sparkLabel)
-    $window.Add($chartFrame)
 
     #endregion
 
@@ -88,23 +114,28 @@ function New-TuiLayout {
     $btnPause = [Terminal.Gui.Button]@{
         Text = "|| Pause"
         X    = 1
-        Y    = [Terminal.Gui.Pos]::Bottom($chartFrame)
+        Y    = [Terminal.Gui.Pos]::Bottom($buttonAnchor)
     }
+    $window.Add($btnPause)
 
-    $btnToggle = [Terminal.Gui.Button]@{
-        Text = "Sparklines on/off"
-        X    = [Terminal.Gui.Pos]::Right($btnPause) + 2
-        Y    = [Terminal.Gui.Pos]::Bottom($chartFrame)
+    $lastButton = $btnPause
+
+    # sparkline toggle only makes sense when sparklines are shown
+    if ( $ShowGraphs ) {
+        $btnToggle = [Terminal.Gui.Button]@{
+            Text = "Sparklines on/off"
+            X    = [Terminal.Gui.Pos]::Right($btnPause) + 2
+            Y    = [Terminal.Gui.Pos]::Bottom($buttonAnchor)
+        }
+        $window.Add($btnToggle)
+        $lastButton = $btnToggle
     }
 
     $btnQuit = [Terminal.Gui.Button]@{
         Text = "Quit"
-        X    = [Terminal.Gui.Pos]::Right($btnToggle) + 2
-        Y    = [Terminal.Gui.Pos]::Bottom($chartFrame)
+        X    = [Terminal.Gui.Pos]::Right($lastButton) + 2
+        Y    = [Terminal.Gui.Pos]::Bottom($buttonAnchor)
     }
-
-    $window.Add($btnPause)
-    $window.Add($btnToggle)
     $window.Add($btnQuit)
 
     #endregion

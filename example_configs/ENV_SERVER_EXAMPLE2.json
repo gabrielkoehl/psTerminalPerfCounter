@@ -23,7 +23,7 @@
                 ]
             },
             {
-                "computername": "DEV-DC01",
+                "computername": "DEV-DC",
                 "comment": "Sql Server Node A Production",
                 "counterConfig": [
                     "CPU",
