@@ -1,5 +1,5 @@
-[!IMPORTANT]
-v0.4 was the last release for a while. For personal reasons, I won't be making any significant contributions here until approximately 2027. Thanks for your understanding. Feel free to keep opening issues - I'll be reading along and tracking them so nothing gets lost when I pick this back up.
+> [!IMPORTANT]
+> v0.4 was the last release for a while. For personal reasons, I won't be making any significant contributions here until approximately 2027. Thanks for your understanding. Feel free to keep opening issues - I'll be reading along and tracking them so nothing gets lost when I pick this back up.
 
 <br>
 <div align="center">
