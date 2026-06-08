@@ -7,11 +7,29 @@ A PowerShell module for creating and using predefined performance counter config
 
 **Requirement:** PowerShell 7.4
 
-## 0.3.1 Release Info
+## Beta Features (0.4.0)
 
-This is just a small patch version bump – no new features, nothing groundbreaking. But the amount of work was enormous, which I think the [CHANGELOG.MD](CHANGELOG.MD) speaks for itself. The last few months were all about features and functionality, and the technical debt had piled up. On top of that, the rebuild of the core classes in C# marked the point where I started using the module productively – with the result: lots of bugs and abysmal usability. Accordingly, a lot has been simplified, especially the creation of custom counter configurations. But the bulk of it was simply technical debt and bugs. I wanted to get all of this out of the way before the next big step...
+Two new visualisation options ship with 0.4.0. Both work but are flagged **beta** — see Known Issues below.
 
-...which is finally the export of entire time series for historization or visualization with PSWriteHTML <3. That will be the next minor release.
+- **Terminal GUI / TUI** (`-Tui`): interactive live view (table + sparklines) built on Terminal.Gui. The required assemblies ship with the module.
+- **HTML Report Export** (`-ExportHtml`) via [PSWriteHTML](https://github.com/EvotecIT/PSWriteHTML): interactive HTML report with overview table and ApexCharts. Requires `PSWriteHTML` to be installed:
+
+  ```powershell
+  Install-Module PSWriteHTML
+  ```
+
+### Known Issues (TUI beta)
+
+- The sparkline view is **not scrollable**. With many counters the sparklines run off the bottom of the screen (the table itself scrolls via the keyboard).
+- In the multi-server (environment) TUI, sparklines are not shown — only the table.
+
+## Development Info — 0.5.0 planned Main Features
+
+- [x] Export Data (CSV)
+- [x] Implement PSWriteHTML for visualisation (beta)
+- [ ] Export xlsx
+- [ ] Scrollable TUI sparkline view
+
 
 ## Key Features
 
@@ -37,7 +55,7 @@ This module utilizes numerical Performance Counter IDs instead of localized name
 
 Initially, the graphical capabilities (powered by [PSConsoleGraph](https://github.com/PrateekKumarSingh/PSConsoleGraph)) were the driving force behind this module. While still beautiful and effective for individual servers, visualizing complex environments pushed the engine to its limits.
 
-As a result, I have shifted the focus towards robust Console Table outputs for daily administration of multiple systems. Looking ahead, I plan to leverage PSWriteHTML for generating visual reports.
+As a result, I have shifted the focus towards robust Console Table outputs for daily administration of multiple systems. As of 0.4.0 there are two additional (beta) options: an interactive Terminal GUI (`-Tui`) and PSWriteHTML-based HTML reports (`-ExportHtml`) — see the Beta Features section above.
 
 ### Configuration-Driven Monitoring
 
@@ -74,6 +92,16 @@ See [tpc_CPU.json](src\psTerminalPerfCounter\psTerminalPerfCounter\Config\tpc_CP
 ```powershell
 # Load config for localhost
 Start-tpcMonitor -ConfigName "CPU"
+```
+
+```powershell
+# Interactive Terminal GUI (beta)
+Start-tpcMonitor -ConfigName "CPU" -Tui
+```
+
+```powershell
+# Write an interactive HTML report to the Desktop after each cycle (beta, requires PSWriteHTML)
+Start-tpcMonitor -ConfigName "CPU" -ExportHtml
 ```
 
 ```powershell

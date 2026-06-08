@@ -54,5 +54,5 @@
     "workbench.sideBar.location": "left",
     "files.trimTrailingWhitespace": true,
     "files.trimFinalNewlines": true,
-    "workbench.colorTheme": "Default Dark+"
+    "workbench.colorTheme": "Dark+"
 }

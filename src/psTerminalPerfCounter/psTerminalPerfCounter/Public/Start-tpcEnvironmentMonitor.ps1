@@ -11,15 +11,49 @@ function Start-tpcEnvironmentMonitor {
     .PARAMETER UpdateInterval
         Seconds between updates. Default: uses interval from JSON config (fallback: 2s).
 
+    .PARAMETER Tui
+        (Beta) Launches an interactive Terminal GUI (Terminal.Gui) instead of the scrolling console output.
+        For environment monitoring the TUI shows a table-only view (counters are not graphed across servers).
+
     .EXAMPLE
         Start-tpcEnvironmentMonitor -EnvConfigPath "C:\Configs\SQL_PROD.json"
 
         Starts environment monitoring using the interval defined in the JSON config.
 
     .EXAMPLE
+        Start-tpcEnvironmentMonitor -EnvConfigPath "C:\Configs\SQL_PROD.json" -Tui
+
+        (Beta) Starts environment monitoring in the interactive Terminal GUI (table-only view).
+
+    .PARAMETER ExportCsv
+        Enables CSV export of counter values after each batch cycle (append mode, long format).
+
+    .PARAMETER CsvPath
+        Directory path for the CSV export file.
+        Default: Desktop.
+
+    .PARAMETER ExportHtml
+        Enables HTML report export after each batch cycle using PSWriteHTML.
+        The report contains a counter overview table, a combined chart and individual charts per counter.
+
+    .PARAMETER HtmlPath
+        Directory path for the HTML report file.
+        Default: Desktop.
+
+    .PARAMETER HtmlGroupBy
+        Controls how individual tabs are grouped in the HTML report.
+        'Counter' (default): one tab per counter type, series per host — best for comparing hosts.
+        'Host': one tab per host, series per counter — best for viewing a single host's metrics.
+
+    .EXAMPLE
         Start-tpcEnvironmentMonitor -EnvConfigPath "C:\Configs\SQL_PROD.json" -UpdateInterval 5
 
         Starts environment monitoring with a 5-second update interval.
+
+    .EXAMPLE
+        Start-tpcEnvironmentMonitor -EnvConfigPath "C:\Configs\SQL_PROD.json" -ExportCsv -CsvPath "C:\Exports"
+
+        Starts environment monitoring with CSV export.
     #>
 
     [CmdletBinding()]
@@ -28,7 +62,20 @@ function Start-tpcEnvironmentMonitor {
         [string] $EnvConfigPath,
 
         [Parameter()]
-        [int] $UpdateInterval = 0  # 0 = use from config
+        [int] $UpdateInterval = 0,  # 0 = use from config
+
+        [switch]    $Tui,
+
+        [switch]    $ExportCsv,
+
+        [string]    $CsvPath = [Environment]::GetFolderPath('Desktop'),
+
+        [switch]    $ExportHtml,
+
+        [string]    $HtmlPath = [Environment]::GetFolderPath('Desktop'),
+
+        [ValidateSet('Counter', 'Host')]
+        [string]    $HtmlGroupBy = 'Counter'
     )
 
     $environment = $null
@@ -77,6 +124,12 @@ function Start-tpcEnvironmentMonitor {
             MonitorType     = 'environment'
             Config          = $environment
             UpdateInterval  = $effectiveInterval
+            Tui             = $Tui
+            ExportCsv       = $ExportCsv
+            CsvPath         = $CsvPath
+            ExportHtml      = $ExportHtml
+            HtmlPath        = $HtmlPath
+            HtmlGroupBy     = $HtmlGroupBy
         }
 
         Start-MonitoringLoop @MonitoringParams

@@ -1,12 +1,31 @@
 function Start-MonitoringLoop {
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'Default')]
     param(
         [Parameter(Mandatory=$true)]
         [string]    $monitorType,
         [Parameter(Mandatory=$true)]
         [psobject]  $Config,
         [Parameter(Mandatory=$true)]
-        [int]       $UpdateInterval
+        [int]       $UpdateInterval,
+
+        [Parameter()]
+        [switch]    $Tui,
+
+        [Parameter(ParameterSetName = 'CsvExport', Mandatory)]
+        [switch]    $ExportCsv,
+
+        [Parameter(ParameterSetName = 'CsvExport')]
+        [string]    $CsvPath = [Environment]::GetFolderPath('Desktop'),
+
+        [Parameter()]
+        [switch]    $ExportHtml,
+
+        [Parameter()]
+        [string]    $HtmlPath = [Environment]::GetFolderPath('Desktop'),
+
+        [Parameter()]
+        [ValidateSet('Counter', 'Host')]
+        [string]    $HtmlGroupBy = 'Counter'
     )
 
     $SampleCount    = 0
@@ -15,6 +34,19 @@ function Start-MonitoringLoop {
 
     if ( $monitorType -in @('local','remoteSingle') ) {
 
+        # TUI mode: launch interactive Terminal.Gui application
+        if ( $Tui ) {
+            Show-TuiMainApplication -Counters $Config.Counters `
+                                    -ConfigName $Config.Name `
+                                    -Interval $UpdateInterval `
+                                    -ExportCsv:$ExportCsv `
+                                    -CsvPath $CsvPath `
+                                    -ExportHtml:$ExportHtml `
+                                    -HtmlPath $HtmlPath `
+                                    -HtmlGroupBy $HtmlGroupBy
+            return
+        }
+
         while ( $true ) {
 
             $SampleCount++
@@ -22,6 +54,23 @@ function Start-MonitoringLoop {
             # Collect data from all counters
             [psTPCCLASSES.CounterConfiguration]::GetValuesBatched($Config.Counters)
 
+            # CSV Export
+            if ( $ExportCsv ) {
+                $csvFilePath = Join-Path $CsvPath "psTPC_$($Config.Name)_$(Get-Date -Format 'ddMMyy').csv"
+                [psTPCCLASSES.CounterConfiguration]::ExportCsv($Config.Counters, $csvFilePath)
+            }
+
+            # HTML Export
+            if ( $ExportHtml ) {
+                $htmlFilePath = Join-Path $HtmlPath "psTPC_$($Config.Name)_report.html"
+                Export-HtmlReport -Counters $Config.Counters `
+                                  -ConfigName $Config.Name `
+                                  -HtmlFilePath $htmlFilePath `
+                                  -StartTime $StartTime `
+                                  -SampleCount $SampleCount `
+                                  -UpdateInterval $UpdateInterval `
+                                  -GroupBy $HtmlGroupBy
+            }
 
             Show-SessionHeader -ConfigName $Config.Name -StartTime $StartTime -SampleCount $SampleCount
 
@@ -72,11 +121,39 @@ function Start-MonitoringLoop {
 
     } elseif ( $monitorType -eq 'environment' ) {
 
+        # TUI mode for environment: collect all counters from all servers
+        if ( $Tui ) {
+            $allCounters = [System.Collections.Generic.List[psTPCCLASSES.CounterConfiguration]]::new()
+            foreach ( $server in $Config.Servers ) {
+                if ( $server.IsAvailable ) {
+                    foreach ( $counter in $server.Counters ) {
+                        if ( $counter.IsAvailable ) { $allCounters.Add($counter) }
+                    }
+                }
+            }
+            Show-TuiMainApplication -Counters $allCounters `
+                                    -ConfigName $Config.Name `
+                                    -Interval $UpdateInterval `
+                                    -ExportCsv:$ExportCsv `
+                                    -CsvPath $CsvPath `
+                                    -ExportHtml:$ExportHtml `
+                                    -HtmlPath $HtmlPath `
+                                    -HtmlGroupBy $HtmlGroupBy `
+                                    -ShowGraphs $false
+            return
+        }
+
         while ( $true ) {
 
             $SampleCount++
 
             $Config.GetAllValuesBatched()
+
+            # CSV Export
+            if ( $ExportCsv ) {
+                $csvFilePath = Join-Path $CsvPath "psTPC_$($Config.Name)_$(Get-Date -Format 'ddMMyy').csv"
+                $Config.ExportCsv($csvFilePath)
+            }
 
             # Clear screen
             Clear-Host
@@ -109,6 +186,18 @@ function Start-MonitoringLoop {
                 }
             } else {
                 Write-Host "No data available from any server." -ForegroundColor Yellow
+            }
+
+            # HTML Export
+            if ( $ExportHtml -and $allCounters.Count -gt 0 ) {
+                $htmlFilePath = Join-Path $HtmlPath "psTPC_$($Config.Name)_report.html"
+                Export-HtmlReport -Counters $allCounters `
+                                  -ConfigName $Config.Name `
+                                  -HtmlFilePath $htmlFilePath `
+                                  -StartTime $StartTime `
+                                  -SampleCount $SampleCount `
+                                  -UpdateInterval $UpdateInterval `
+                                  -GroupBy $HtmlGroupBy
             }
 
             # Show environment statistics

@@ -29,36 +29,9 @@ function Get-CounterConfiguration {
 
     try {
 
-        if ( $isRemote ) {
-
-            try {
-
-                $testResult = Test-Connection -ComputerName $ComputerName -Count 1 -Quiet -TimeoutSeconds 2 -ErrorAction Stop
-
-                if ( -not $testResult ) {
-                    Write-Warning "Server '$ComputerName' is not reachable. Skipping counter configuration."
-                    return @{
-                        Name        = if ( $ConfigName ) { "$ConfigName @ Remote $ComputerName" } else { "Unknown" }
-                        Description = "Server unreachable"
-                        Counters    = @()
-                        ConfigPath  = ""
-                        SkipServer  = $true
-                    }
-                }
-
-            } catch {
-
-                Write-Warning "Cannot reach server '$ComputerName': $_. Skipping counter configuration."
-                return @{
-                    Name        = if ( $ConfigName ) { "$ConfigName @ Remote $ComputerName" } else { "Unknown" }
-                    Description = "Server unreachable"
-                    Counters    = @()
-                    ConfigPath  = ""
-                    SkipServer  = $true
-                }
-            }
-        }
-
+        # No reachability probe here: by the time a counter configuration is loaded for a remote
+        # server, Get-CounterMap (WinRM) has already succeeded - the server is proven online.
+        # Reachability is owned solely by Get-CounterMap, which throws when a host is unreachable.
 
         if ( $PSCmdlet.ParameterSetName -eq 'ConfigPath' ) {
             if ( [string]::IsNullOrWhiteSpace($ConfigPath) ) {
@@ -94,7 +67,6 @@ function Get-CounterConfiguration {
                 Description = $mergedJsonContent.description
                 Counters    = $counters
                 ConfigPath  = Split-Path $ConfigPath -Parent
-                SkipServer  = $false
             }
         }
 
@@ -159,7 +131,6 @@ function Get-CounterConfiguration {
             Description = $mergedJsonContent.description
             Counters    = $counters
             ConfigPath  = $selectedConfig.ConfigPath
-            SkipServer  = $false
         }
 
     } catch {

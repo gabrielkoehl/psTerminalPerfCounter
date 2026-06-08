@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(pwsh -Command:*)"
-    ],
-    "deny": [],
-    "ask": []
-  }
-}

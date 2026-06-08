@@ -22,6 +22,30 @@
     .PARAMETER UpdateInterval
         Seconds between counter updates. Default: 1.
 
+    .PARAMETER Tui
+        (Beta) Launches an interactive Terminal GUI (Terminal.Gui) instead of the scrolling console output.
+        Shows a live table and 3-row sparklines per counter with Pause / Sparklines-toggle / Quit buttons.
+
+    .PARAMETER ExportCsv
+        Enables CSV export of counter values after each batch cycle (append mode, long format).
+
+    .PARAMETER CsvPath
+        Directory path for the CSV export file.
+        Default: Desktop.
+
+    .PARAMETER ExportHtml
+        Enables HTML report export after each batch cycle using PSWriteHTML.
+        The report contains a counter overview table, a combined chart and individual charts per counter.
+
+    .PARAMETER HtmlPath
+        Directory path for the HTML report file.
+        Default: Desktop.
+
+    .PARAMETER HtmlGroupBy
+        Controls how individual tabs are grouped in the HTML report.
+        'Counter' (default): one tab per counter type, series per host — best for comparing hosts.
+        'Host': one tab per host, series per counter — best for viewing a single host's metrics.
+
     .EXAMPLE
         Start-tpcMonitor -ConfigName "CPU"
 
@@ -36,6 +60,26 @@
         Start-tpcMonitor -ConfigName "Memory" -ComputerName "Server01" -Credential $cred -UpdateInterval 2
 
         Starts remote memory monitoring with 2-second intervals.
+
+    .EXAMPLE
+        Start-tpcMonitor -ConfigName "CPU" -Tui
+
+        (Beta) Starts CPU monitoring in the interactive Terminal GUI.
+
+    .EXAMPLE
+        Start-tpcMonitor -ConfigName "CPU" -ExportCsv -CsvPath "C:\Exports"
+
+        Starts CPU monitoring with CSV export to C:\Exports\psTPC_history.csv.
+
+    .EXAMPLE
+        Start-tpcMonitor -ConfigName "CPU" -ExportHtml
+
+        Starts CPU monitoring with HTML report export to the Desktop after each cycle.
+
+    .EXAMPLE
+        Start-tpcMonitor -ConfigName "CPU" -ExportHtml -HtmlPath "C:\Reports"
+
+        Starts CPU monitoring with HTML report export to C:\Reports\psTPC_CPU_report.html.
     #>
 
     [CmdletBinding()]
@@ -56,7 +100,20 @@
         [Parameter(ParameterSetName = 'RemoteByPath')]
         [pscredential]  $Credential = $null,
 
-        [int]           $UpdateInterval = 1
+        [int]           $UpdateInterval = 1,
+
+        [switch]        $Tui,
+
+        [switch]        $ExportCsv,
+
+        [string]        $CsvPath = [Environment]::GetFolderPath('Desktop'),
+
+        [switch]        $ExportHtml,
+
+        [string]        $HtmlPath = [Environment]::GetFolderPath('Desktop'),
+
+        [ValidateSet('Counter', 'Host')]
+        [string]        $HtmlGroupBy = 'Counter'
     )
 
     $configParams       = @{}
@@ -114,20 +171,13 @@
                 Write-Host "using $env:USERDOMAIN\$env:USERNAME ." -ForegroundColor Yellow
             }
 
-            if ( Test-Connection -ComputerName $ComputerName -Count 1 -Quiet ) {
+            # Reachability is owned solely by Get-CounterMap (WinRM, TCP 5985): it fails fast and
+            # throws if the host is unreachable, which the surrounding try/catch reports.
+            $configParams['counterMap'] = $(Get-CounterMap @configParams)
 
-                $configParams['counterMap'] = $(Get-CounterMap @configParams)
-
-                switch ( $PSCmdlet.ParameterSetName ) {
-                    'RemoteByName' { $configParams['ConfigName'] = $ConfigName }
-                    'RemoteByPath' { $configParams['ConfigPath'] = $ConfigPath }
-                }
-
-            } else {
-
-                Write-Warning "Remote computer $ComputerName not reachable. Aborting"
-                Return
-
+            switch ( $PSCmdlet.ParameterSetName ) {
+                'RemoteByName' { $configParams['ConfigName'] = $ConfigName }
+                'RemoteByPath' { $configParams['ConfigPath'] = $ConfigPath }
             }
         }
 
@@ -136,6 +186,12 @@
             MonitorType     = $monitorType
             Config          = Get-CounterConfiguration @configParams
             UpdateInterval  = $UpdateInterval
+            Tui             = $Tui
+            ExportCsv       = $ExportCsv
+            CsvPath         = $CsvPath
+            ExportHtml      = $ExportHtml
+            HtmlPath        = $HtmlPath
+            HtmlGroupBy     = $HtmlGroupBy
         }
 
         Start-MonitoringLoop @MonitoringParams

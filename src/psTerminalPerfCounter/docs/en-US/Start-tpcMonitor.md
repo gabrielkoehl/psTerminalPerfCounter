@@ -14,24 +14,28 @@ schema: 2.0.0
 ### RemoteByName
 ```
 Start-tpcMonitor -ConfigName <String> -ComputerName <String> [-Credential <PSCredential>]
- [-UpdateInterval <Int32>] [-ProgressAction <ActionPreference>] [<CommonParameters>]
+ [-UpdateInterval <Int32>] [-Tui] [-ExportCsv] [-CsvPath <String>] [-ExportHtml] [-HtmlPath <String>]
+ [-HtmlGroupBy <String>] [-ProgressAction <ActionPreference>] [<CommonParameters>]
 ```
 
 ### ConfigName
 ```
-Start-tpcMonitor -ConfigName <String> [-UpdateInterval <Int32>] [-ProgressAction <ActionPreference>]
+Start-tpcMonitor -ConfigName <String> [-UpdateInterval <Int32>] [-Tui] [-ExportCsv] [-CsvPath <String>]
+ [-ExportHtml] [-HtmlPath <String>] [-HtmlGroupBy <String>] [-ProgressAction <ActionPreference>]
  [<CommonParameters>]
 ```
 
 ### RemoteByPath
 ```
 Start-tpcMonitor -ConfigPath <String> -ComputerName <String> [-Credential <PSCredential>]
- [-UpdateInterval <Int32>] [-ProgressAction <ActionPreference>] [<CommonParameters>]
+ [-UpdateInterval <Int32>] [-Tui] [-ExportCsv] [-CsvPath <String>] [-ExportHtml] [-HtmlPath <String>]
+ [-HtmlGroupBy <String>] [-ProgressAction <ActionPreference>] [<CommonParameters>]
 ```
 
 ### ConfigPath
 ```
-Start-tpcMonitor -ConfigPath <String> [-UpdateInterval <Int32>] [-ProgressAction <ActionPreference>]
+Start-tpcMonitor -ConfigPath <String> [-UpdateInterval <Int32>] [-Tui] [-ExportCsv] [-CsvPath <String>]
+ [-ExportHtml] [-HtmlPath <String>] [-HtmlGroupBy <String>] [-ProgressAction <ActionPreference>]
  [<CommonParameters>]
 ```
 
@@ -138,6 +142,102 @@ Aliases:
 Required: False
 Position: Named
 Default value: 1
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Tui
+(Beta) Launches an interactive Terminal GUI (Terminal.Gui) instead of the scrolling console output.
+Shows a live table and 3-row sparklines per counter with Pause / Sparklines-toggle / Quit buttons.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ExportCsv
+Enables CSV export of counter values after each batch cycle (append mode, long format).
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -CsvPath
+Directory path for the CSV export file.
+Default: Desktop.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: [Environment]::GetFolderPath('Desktop')
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ExportHtml
+Enables HTML report export after each batch cycle using PSWriteHTML.
+The report contains a counter overview table, a combined chart and individual charts per counter.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -HtmlPath
+Directory path for the HTML report file.
+Default: Desktop.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: [Environment]::GetFolderPath('Desktop')
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -HtmlGroupBy
+Controls how individual tabs are grouped in the HTML report.
+'Counter' (default): one tab per counter type, series per host - best for comparing hosts.
+'Host': one tab per host, series per counter - best for viewing a single host's metrics.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: Counter
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
